@@ -16,8 +16,7 @@ git init
 
 git remote add origin git@github.com:mflechl/DatacardProducer.git
 
-git checkout -b master
+git checkout -b master/SM/MSSM
 
-git pull origin master
-
+git pull origin master/SM/MSSM
 #test run with sh run.sh test
