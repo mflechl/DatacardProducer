@@ -1,0 +1,10 @@
+#include "interface/SelectionAnalyzer.h"
+
+using namespace std;
+
+SelectionAnalyzer::SelectionAnalyzer()
+{  
+}
+SelectionAnalyzer::~SelectionAnalyzer()
+{
+}
