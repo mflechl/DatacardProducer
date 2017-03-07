@@ -6,7 +6,7 @@ mkdir HTTutilities/Jet2TauFakes/data/
 cp -r /afs/cern.ch/user/j/jbrandst/public/Htautau/FakeRate/2016/20170228/* HTTutilities/Jet2TauFakes/data/
 scram b -j 8
 git init
-git remote add origin git@github.com:MarkusSpanring/DatacardProducer.git
+git remote add origin git@github.com:mflechl/DatacardProducer.git
 git checkout -b master
 git pull origin master
 
