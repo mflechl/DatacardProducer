@@ -42,17 +42,6 @@ float GlobalClass::getMT2(){
   return NtupleView->pfmt_2;
 }
 
-float GlobalClass::getMTTOT(){
-  return TMath::Sqrt( TMath::Power(this->getMT(),2) + TMath::Power(this->getMT2(),2) + 2*NtupleView->pt_1*NtupleView->pt_2*( 1-TMath::Cos( TVector2::Phi_mpi_pi( NtupleView->phi_1-NtupleView->phi_2 ) ) ) );
-}
-
-float GlobalClass::CalcJdeta(){
-    if(NtupleView->jeta_1 != -999 && NtupleView->jeta_2 != -999 ){
-        return fabs( NtupleView->jeta_1 - NtupleView->jeta_2 );
-    }
-    else return -999;
-
-}
 float GlobalClass::CalcHPt(){
 
   TLorentzVector tau;
@@ -145,69 +134,6 @@ int GlobalClass::Vetos(){
 
 int GlobalClass::CategorySelection(TString cat, TString mtcut){
 
-//////////////////  Vertex dependendcy ////////////////////////////////////
-  if(cat == "splitlowv"
-     || cat == "splithighv"
-     || cat == "lowv"
-     || cat == "highv"){
-
-    if( this->getNjets() > 1
-        && this->getMT() < Parameter.analysisCut.mTLow
-        && NtupleView->m_vis > 50
-        && NtupleView->m_vis < 80
-      ){
-
-      if(cat == "splitlowv" && NtupleView->npv < 16) return 1;
-      if(cat == "splithighv" && NtupleView->npv >= 16) return 1;
-      if(cat == "lowv" && NtupleView->npv < 13) return 1;
-      if(cat == "highv" && NtupleView->npv > 18) return 1;
-    }  
-    return 0;
-  }
-/////////////////////////  Inclusive ////////////////////////////////////////
-  if(cat == s_inclusive) return 1;
-  if(cat == "PUId_tight")      return  this->PUJetIdSelection("tight");
-  if(cat == "PUId_tight_fail") return !this->PUJetIdSelection("tight");
-  if(cat == "PUId_med")      return  this->PUJetIdSelection("medium");
-  if(cat == "PUId_med_fail") return !this->PUJetIdSelection("medium");
-  if(cat == "PUId_loose")      return  this->PUJetIdSelection("loose");
-  if(cat == "PUId_loose_fail") return !this->PUJetIdSelection("loose");
-
-/////////////////////////  2jet mvis5080 mt40 ///////////////////////////////
-  if(cat == "2jet_mvis5080_mt40") return this->jet2_mvis();
-  if(cat == "2jet_mvis5080_mt40_PUId_tight")      return  this->PUJetIdSelection("tight") & this->jet2_mvis();
-  if(cat == "2jet_mvis5080_mt40_PUId_tight_fail") return !this->PUJetIdSelection("tight") & this->jet2_mvis();
-  if(cat == "2jet_mvis5080_mt40_PUId_med")      return  this->PUJetIdSelection("medium") & this->jet2_mvis();
-  if(cat == "2jet_mvis5080_mt40_PUId_med_fail") return !this->PUJetIdSelection("medium") & this->jet2_mvis();
-  if(cat == "2jet_mvis5080_mt40_PUId_loose")      return  this->PUJetIdSelection("loose") & this->jet2_mvis();
-  if(cat == "2jet_mvis5080_mt40_PUId_loose_fail") return !this->PUJetIdSelection("loose") & this->jet2_mvis();
-
-/////////////////////////  VBF low category ///////////////////////////////
-  if(cat == s_vbf_low) return this->VBF_low(mtcut);
-  if(cat == "PUId_lo_VBF_low") return ( this->PUJetIdSelection("loose") & this->VBF_low(mtcut) );
-  if(cat == "PUId_me_VBF_low") return ( this->PUJetIdSelection("medium") & this->VBF_low(mtcut) );
-  if(cat == "PUId_ti_VBF_low") return ( this->PUJetIdSelection("tight") & this->VBF_low(mtcut) );
-
-/////////////////////////  VBF high category ///////////////////////////////
-  if(cat == s_vbf_high) return this->VBF_high(mtcut);
-  if(cat == "PUId_VBF_high") return ( this->PUJetIdSelection("tight") & this->VBF_high(mtcut) );
-
-/////////////////////////  1Jet low category ///////////////////////////////
-  if(cat == s_1jet_low) return this->Jet1_low(mtcut);
-  if(cat == "PUId_1Jet_low") return ( this->PUJetIdSelection("tight") & this->Jet1_low(mtcut) );
-
-/////////////////////////  1Jet high category ///////////////////////////////
-  if(cat == s_1jet_high) return this->Jet1_high(mtcut);
-  if(cat == "PUId_1Jet_high") return ( this->PUJetIdSelection("tight") & this->Jet1_high(mtcut) );
-
-/////////////////////////  2Jet low category ///////////////////////////////
-  if(cat == s_0jet_low) return this->Jet0_low(mtcut);
-  if(cat == "PUId_0Jet_low") return ( this->PUJetIdSelection("tight") & this->Jet0_low(mtcut) );
-
-/////////////////////////  Jet high category ///////////////////////////////
-  if(cat == s_0jet_low) return this->Jet0_high(mtcut);  
-  if(cat == "PUId_0Jet_high") return ( this->PUJetIdSelection("tight") & this->Jet0_high(mtcut) );
-
   ///////////////////////  0jet category     ///////////////////////////////
   if(cat == s_0jet) return this->Jet0(mtcut);
   if(cat == s_wjets_0jet_cr) return this->Jet0("mtHigh");
@@ -221,19 +147,6 @@ int GlobalClass::CategorySelection(TString cat, TString mtcut){
   if(cat == s_wjets_vbf_cr) return this->VBF("mtHigh");
   if(cat == s_antiiso_vbf_cr) return this->VBF(mtcut);
   
-  return 0;
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-int GlobalClass::jet2_mvis(){
-  
-  if( this->getNjets() > 1
-      && NtupleView->jpt_1 > 30
-      && NtupleView->jpt_2 > 30
-      && this->getMT() < Parameter.analysisCut.mTLow
-      && NtupleView->m_vis > 50
-      && NtupleView->m_vis < 80)  return 1;
   return 0;
 }
 
@@ -424,39 +337,7 @@ int GlobalClass::VBF(TString mtcut){
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-int GlobalClass::PUJetIdSelection(TString wp){
-  if( wp == "tight" && NtupleView->jmva_1 > this->PUIdCutParamsTight(NtupleView->jeta_1) )    return 1;
-  if( wp == "medium" && NtupleView->jmva_1 > this->PUIdCutParamsMedium(NtupleView->jeta_1) )  return 1;
-  if( wp == "loose" && NtupleView->jmva_1 > this->PUIdCutParamsLoose(NtupleView->jeta_1) )    return 1;
-  return 0;
-}
 
-float GlobalClass::PUIdCutParamsTight(float eta){
-  if( fabs(eta) < 2.5) return 0.62;
-  else if( fabs(eta) < 2.75 ) return -0.21;
-  else if( fabs(eta) < 3.0 )  return -0.07;
-  else if( fabs(eta) < 5.0 ) return  -0.03;
-
-  return -1.;
-}
-
-float GlobalClass::PUIdCutParamsMedium(float eta){
-  if( fabs(eta) < 2.5) return -0.06;
-  else if( fabs(eta) < 2.75 ) return -0.42;
-  else if( fabs(eta) < 3.0 )  return -0.3;
-  else if( fabs(eta) < 5.0 ) return  -0.23;
-
-  return -1.;
-}
-
-float GlobalClass::PUIdCutParamsLoose(float eta){
-  if( fabs(eta) < 2.5) return -0.92;
-  else if( fabs(eta) < 2.75 ) return -0.56;
-  else if( fabs(eta) < 3.0 )  return -0.44;
-  else if( fabs(eta) < 5.0 ) return  -0.39;
-
-  return -1.;
-}
 
 TH1D* GlobalClass::GetHistbyName(TString name, TString strVar){
 

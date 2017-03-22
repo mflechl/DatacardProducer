@@ -203,28 +203,8 @@ void CreateHistos::run(TString isTest){
           else if(strVar == s_eta1)                           var = NtupleView->eta_1;
           else if(strVar == s_eta2)                           var = NtupleView->eta_2;
           else if(strVar == s_met)                            var = NtupleView->met;
-          else if(strVar == s_mttot)                          var = this->getMTTOT();
+          else if(strVar == s_mttot)                          var = NtupleView->mt_tot;
           else if(strVar == s_Hpt)                            var = this->CalcHPt(); 
-
-
-          else if(strVar == "jpt_1_2"
-                  && fabs(NtupleView->jeta_1) < 2.5)         var = NtupleView->jpt_1;
-          else if(strVar == "jpt_1_2p5"
-                  && fabs(NtupleView->jeta_1) >= 2.5
-                  && fabs(NtupleView->jeta_1) < 3.)          var = NtupleView->jpt_1;
-          else if(strVar == "jpt_1_3"
-                  && fabs(NtupleView->jeta_1) >= 3.)         var = NtupleView->jpt_1;
-
-
-
-          else if(strVar == "jpt_2_2"
-                  && fabs(NtupleView->jeta_1) < 2.5)         var = NtupleView->jpt_2;
-          else if(strVar == "jpt_2_2p5"
-                  && fabs(NtupleView->jeta_1) >= 2.5
-                  && fabs(NtupleView->jeta_1) < 3.)          var = NtupleView->jpt_2;
-          else if(strVar == "jpt_2_3"
-                  && fabs(NtupleView->jeta_1) >= 3.)         var = NtupleView->jpt_2;
-
 
 
           else if(strVar == "jeta_1"
@@ -241,7 +221,7 @@ void CreateHistos::run(TString isTest){
 
           else if(strVar == "jdeta"
              && NtupleView->jpt_1 > 30
-             && NtupleView->jpt_2 > 30)     var = this->getJdeta();
+             && NtupleView->jpt_2 > 30)     var = NtupleView->jdeta;
 
           else continue;
 

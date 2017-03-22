@@ -46,7 +46,7 @@ void FFCalculator::applyFF(float var, float weight, TString cat, TString strVar,
           }
           if(fname=="TT"){
             this->GetHistbyName( fname+"_"+s_jetFakes+"_"+s_up+sub,strVar)->Fill(usedVar, (1.+Parameter.FFsystematics.XSvariation.TTXSvariation)*weight*FFObj[cat]->value(FFinputs) );
-            this->GetHistbyName( fname+"_"+s_jetFakes+"_"+s_down+sub,strVar)->Fill(usedVar, (1.+Parameter.FFsystematics.XSvariation.TTXSvariation)*weight*FFObj[cat]->value(FFinputs) );
+            this->GetHistbyName( fname+"_"+s_jetFakes+"_"+s_down+sub,strVar)->Fill(usedVar, (1.-Parameter.FFsystematics.XSvariation.TTXSvariation)*weight*FFObj[cat]->value(FFinputs) );
           }
           
           for( auto syst : FFsyst[channel] ){
@@ -66,12 +66,12 @@ void FFCalculator::applyFF(float var, float weight, TString cat, TString strVar,
           this->getFF1Inputs(FFinputs);
           this->GetHistbyName( fname+"_"+s_jetFakes+sub,strVar)->Fill(usedVar, 0.5*weight*FFObj[cat]->value(FFinputs) );
           if(fname=="Z"){
-            this->GetHistbyName( fname+"_"+s_jetFakes+"_"+s_up+sub,strVar)->Fill(usedVar, 1.08*0.5*weight*FFObj[cat]->value(FFinputs) );
-            this->GetHistbyName( fname+"_"+s_jetFakes+"_"+s_down+sub,strVar)->Fill(usedVar, 0.92*0.5*weight*FFObj[cat]->value(FFinputs) );
+            this->GetHistbyName( fname+"_"+s_jetFakes+"_"+s_up+sub,strVar)->Fill(usedVar, (1.+Parameter.FFsystematics.XSvariation.DYXSvariation)*0.5*weight*FFObj[cat]->value(FFinputs) );
+            this->GetHistbyName( fname+"_"+s_jetFakes+"_"+s_down+sub,strVar)->Fill(usedVar, (1.-Parameter.FFsystematics.XSvariation.DYXSvariation)*0.5*weight*FFObj[cat]->value(FFinputs) );
           }
           if(fname=="TT"){
-            this->GetHistbyName( fname+"_"+s_jetFakes+"_"+s_up+sub,strVar)->Fill(usedVar, 1.12*0.5*weight*FFObj[cat]->value(FFinputs) );
-            this->GetHistbyName( fname+"_"+s_jetFakes+"_"+s_down+sub,strVar)->Fill(usedVar, 0.88*0.5*weight*FFObj[cat]->value(FFinputs) );
+            this->GetHistbyName( fname+"_"+s_jetFakes+"_"+s_up+sub,strVar)->Fill(usedVar, (1.+Parameter.FFsystematics.XSvariation.TTXSvariation)*0.5*weight*FFObj[cat]->value(FFinputs) );
+            this->GetHistbyName( fname+"_"+s_jetFakes+"_"+s_down+sub,strVar)->Fill(usedVar, (1.-Parameter.FFsystematics.XSvariation.TTXSvariation)*0.5*weight*FFObj[cat]->value(FFinputs) );
           }
           
           for( auto syst : FFsyst[channel] ){
@@ -88,12 +88,12 @@ void FFCalculator::applyFF(float var, float weight, TString cat, TString strVar,
           this->getFF2Inputs(FFinputs);
           this->GetHistbyName( fname+"_"+s_jetFakes+sub,strVar)->Fill(usedVar, 0.5*weight*FFObj[cat]->value(FFinputs) );
           if(fname=="Z"){
-            this->GetHistbyName( fname+"_"+s_jetFakes+"_"+s_up+sub,strVar)->Fill(usedVar, 1.08*0.5*weight*FFObj[cat]->value(FFinputs) );
-            this->GetHistbyName( fname+"_"+s_jetFakes+"_"+s_down+sub,strVar)->Fill(usedVar, 0.92*0.5*weight*FFObj[cat]->value(FFinputs) );
+            this->GetHistbyName( fname+"_"+s_jetFakes+"_"+s_up+sub,strVar)->Fill(usedVar, (1.+Parameter.FFsystematics.XSvariation.DYXSvariation)*0.5*weight*FFObj[cat]->value(FFinputs) );
+            this->GetHistbyName( fname+"_"+s_jetFakes+"_"+s_down+sub,strVar)->Fill(usedVar, (1.-Parameter.FFsystematics.XSvariation.DYXSvariation)*0.5*weight*FFObj[cat]->value(FFinputs) );
           }
           if(fname=="TT"){
-            this->GetHistbyName( fname+"_"+s_jetFakes+"_"+s_up+sub,strVar)->Fill(usedVar, 1.12*0.5*weight*FFObj[cat]->value(FFinputs) );
-            this->GetHistbyName( fname+"_"+s_jetFakes+"_"+s_down+sub,strVar)->Fill(usedVar, 0.88*0.5*weight*FFObj[cat]->value(FFinputs) );
+            this->GetHistbyName( fname+"_"+s_jetFakes+"_"+s_up+sub,strVar)->Fill(usedVar, (1.+Parameter.FFsystematics.XSvariation.TTXSvariation)*0.5*weight*FFObj[cat]->value(FFinputs) );
+            this->GetHistbyName( fname+"_"+s_jetFakes+"_"+s_down+sub,strVar)->Fill(usedVar, (1.-Parameter.FFsystematics.XSvariation.TTXSvariation)*0.5*weight*FFObj[cat]->value(FFinputs) );
           }
           
           for( auto syst : FFsyst[channel] ){

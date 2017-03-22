@@ -22,8 +22,6 @@ class GlobalClass{
   float getJdeta();
   float getMT();
   float getMT2();
-  float getMTTOT();
-  float CalcJdeta();
   float CalcHPt();
 
   int Baseline(TString sign, TString cat);
@@ -39,7 +37,6 @@ class GlobalClass{
   double applyZmumuUncertainty( TString cat );
   TString return2DString( TString cat );
 
-  int jet2_mvis();
   int VBF_low(TString mtcut = "");
   int VBF_high(TString mtcut = "");
   int Jet1_low(TString mtcut = "");
@@ -49,10 +46,6 @@ class GlobalClass{
   int Jet0(TString mtcut = "");
   int Boosted(TString mtcut = "");
   int VBF(TString mtcut = "");
-  int PUJetIdSelection(TString wp);
-  float PUIdCutParamsTight(float eta);
-  float PUIdCutParamsMedium(float eta);
-  float PUIdCutParamsLoose(float eta);
 
   double QCD_OSSS(TString cat);
   int OS_W(TString cat);
