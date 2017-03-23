@@ -9,51 +9,49 @@ using namespace std;
 
 CreateHistos::CreateHistos(){
 
-  histos.clear();
   files.clear();
-  histo_names.clear();
   
   files.push_back({Parameter.dataset.Z,s_Z});
-  files.push_back({Parameter.dataset.EWKZ,s_EWKZ});
-  files.push_back({Parameter.dataset.W,s_W});
-  files.push_back({Parameter.dataset.TT,s_TT});
-  files.push_back({Parameter.dataset.VV,s_VV});
-  if(channel=="mt" && !doMC )files.push_back({Parameter.dataset.data_mt,s_data});
-  else if(channel=="mt" && doMC)files.push_back({Parameter.dataset.MCsum_mt,s_data});
-  if(channel=="et")files.push_back({Parameter.dataset.data_et,s_data});
-  if(channel=="tt")files.push_back({Parameter.dataset.data_tt,s_data});
-  files.push_back({Parameter.dataset.ggH,s_ggH});
-  files.push_back({Parameter.dataset.qqH,s_qqH});
-  if(ptShift){
-    files.push_back({Parameter.dataset.ZtauUp,s_ZtauUp});
-    files.push_back({Parameter.dataset.ZtauDown,s_ZtauDown});
-    files.push_back({Parameter.dataset.EWKZtauUp,s_EWKZtauUp});
-    files.push_back({Parameter.dataset.EWKZtauDown,s_EWKZtauDown});
-    files.push_back({Parameter.dataset.TTtauUp,s_TTtauUp});
-    files.push_back({Parameter.dataset.TTtauDown,s_TTtauDown});
-    files.push_back({Parameter.dataset.VVtauUp,s_VVtauUp});
-    files.push_back({Parameter.dataset.VVtauDown,s_VVtauDown});
-    files.push_back({Parameter.dataset.ggHtauUp,s_ggHtauUp});
-    files.push_back({Parameter.dataset.ggHtauDown,s_ggHtauDown});
-    files.push_back({Parameter.dataset.qqHtauUp,s_qqHtauUp});
-    files.push_back({Parameter.dataset.qqHtauDown,s_qqHtauDown});
-  }
-  if(jecShift){
-    files.push_back({Parameter.dataset.Z,s_ZjecUp});
-    files.push_back({Parameter.dataset.Z,s_ZjecDown});
-    files.push_back({Parameter.dataset.EWKZ,s_EWKZjecUp});
-    files.push_back({Parameter.dataset.EWKZ,s_EWKZjecDown});
-    files.push_back({Parameter.dataset.W,s_WjecUp});
-    files.push_back({Parameter.dataset.W,s_WjecDown});
-    files.push_back({Parameter.dataset.TT,s_TTjecUp});
-    files.push_back({Parameter.dataset.TT,s_TTjecDown});
-    files.push_back({Parameter.dataset.VV,s_VVjecUp});
-    files.push_back({Parameter.dataset.VV,s_VVjecDown});
-    files.push_back({Parameter.dataset.ggH,s_ggHjecUp});
-    files.push_back({Parameter.dataset.ggH,s_ggHjecDown});
-    files.push_back({Parameter.dataset.qqH,s_qqHjecUp});
-    files.push_back({Parameter.dataset.qqH,s_qqHjecDown});
-  }
+  // files.push_back({Parameter.dataset.EWKZ,s_EWKZ});
+  // files.push_back({Parameter.dataset.W,s_W});
+  // files.push_back({Parameter.dataset.TT,s_TT});
+  // files.push_back({Parameter.dataset.VV,s_VV});
+  // if(channel=="mt" && !doMC )files.push_back({Parameter.dataset.data_mt,s_data});
+  // else if(channel=="mt" && doMC)files.push_back({Parameter.dataset.MCsum_mt,s_data});
+  // if(channel=="et")files.push_back({Parameter.dataset.data_et,s_data});
+  // if(channel=="tt")files.push_back({Parameter.dataset.data_tt,s_data});
+  // files.push_back({Parameter.dataset.ggH,s_ggH});
+  // files.push_back({Parameter.dataset.qqH,s_qqH});
+  // if(ptShift){
+  //   files.push_back({Parameter.dataset.ZtauUp,s_ZtauUp});
+  //   files.push_back({Parameter.dataset.ZtauDown,s_ZtauDown});
+  //   files.push_back({Parameter.dataset.EWKZtauUp,s_EWKZtauUp});
+  //   files.push_back({Parameter.dataset.EWKZtauDown,s_EWKZtauDown});
+  //   files.push_back({Parameter.dataset.TTtauUp,s_TTtauUp});
+  //   files.push_back({Parameter.dataset.TTtauDown,s_TTtauDown});
+  //   files.push_back({Parameter.dataset.VVtauUp,s_VVtauUp});
+  //   files.push_back({Parameter.dataset.VVtauDown,s_VVtauDown});
+  //   files.push_back({Parameter.dataset.ggHtauUp,s_ggHtauUp});
+  //   files.push_back({Parameter.dataset.ggHtauDown,s_ggHtauDown});
+  //   files.push_back({Parameter.dataset.qqHtauUp,s_qqHtauUp});
+  //   files.push_back({Parameter.dataset.qqHtauDown,s_qqHtauDown});
+  // }
+  // if(jecShift){
+  //   files.push_back({Parameter.dataset.Z,s_ZjecUp});
+  //   files.push_back({Parameter.dataset.Z,s_ZjecDown});
+  //   files.push_back({Parameter.dataset.EWKZ,s_EWKZjecUp});
+  //   files.push_back({Parameter.dataset.EWKZ,s_EWKZjecDown});
+  //   files.push_back({Parameter.dataset.W,s_WjecUp});
+  //   files.push_back({Parameter.dataset.W,s_WjecDown});
+  //   files.push_back({Parameter.dataset.TT,s_TTjecUp});
+  //   files.push_back({Parameter.dataset.TT,s_TTjecDown});
+  //   files.push_back({Parameter.dataset.VV,s_VVjecUp});
+  //   files.push_back({Parameter.dataset.VV,s_VVjecDown});
+  //   files.push_back({Parameter.dataset.ggH,s_ggHjecUp});
+  //   files.push_back({Parameter.dataset.ggH,s_ggHjecDown});
+  //   files.push_back({Parameter.dataset.qqH,s_qqHjecUp});
+  //   files.push_back({Parameter.dataset.qqH,s_qqHjecDown});
+  // }
 
   for(int i=0; i<variables.size(); i++)      vars.push_back(variables.at(i));
   for(int i=0; i<categories.size(); i++)     cats.push_back(categories.at(i));
@@ -62,8 +60,6 @@ CreateHistos::CreateHistos(){
 }
 
 CreateHistos::~CreateHistos(){
-
-  histos.clear();
 
   cout << "Deleting instance of CreateHistos" << endl;
 
@@ -144,7 +140,7 @@ void CreateHistos::run(TString isTest){
     }
   }
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  
+
   for(int i =0;i < files.size();i++){
 
     if(files[i][1].Contains(s_jecUp)) this->isJEC=1;
@@ -203,28 +199,8 @@ void CreateHistos::run(TString isTest){
           else if(strVar == s_eta1)                           var = NtupleView->eta_1;
           else if(strVar == s_eta2)                           var = NtupleView->eta_2;
           else if(strVar == s_met)                            var = NtupleView->met;
-          else if(strVar == s_mttot)                          var = this->getMTTOT();
+          //else if(strVar == s_mttot)                          var = NtupleView->mt_tot;
           else if(strVar == s_Hpt)                            var = this->CalcHPt(); 
-
-
-          else if(strVar == "jpt_1_2"
-                  && fabs(NtupleView->jeta_1) < 2.5)         var = NtupleView->jpt_1;
-          else if(strVar == "jpt_1_2p5"
-                  && fabs(NtupleView->jeta_1) >= 2.5
-                  && fabs(NtupleView->jeta_1) < 3.)          var = NtupleView->jpt_1;
-          else if(strVar == "jpt_1_3"
-                  && fabs(NtupleView->jeta_1) >= 3.)         var = NtupleView->jpt_1;
-
-
-
-          else if(strVar == "jpt_2_2"
-                  && fabs(NtupleView->jeta_1) < 2.5)         var = NtupleView->jpt_2;
-          else if(strVar == "jpt_2_2p5"
-                  && fabs(NtupleView->jeta_1) >= 2.5
-                  && fabs(NtupleView->jeta_1) < 3.)          var = NtupleView->jpt_2;
-          else if(strVar == "jpt_2_3"
-                  && fabs(NtupleView->jeta_1) >= 3.)         var = NtupleView->jpt_2;
-
 
 
           else if(strVar == "jeta_1"
@@ -241,7 +217,7 @@ void CreateHistos::run(TString isTest){
 
           else if(strVar == "jdeta"
              && NtupleView->jpt_1 > 30
-             && NtupleView->jpt_2 > 30)     var = this->getJdeta();
+             && NtupleView->jpt_2 > 30)     var = NtupleView->jdeta;
 
           else continue;
 
@@ -1009,7 +985,7 @@ void CreateHistos::writeHistos( TString channel, vector<TString> cats, vector<TS
   if(do2DFit) D2+="-2D";
   if(doMC) D2+="-MCsum";
 
-  
+
   for(auto var : vars){
     outfile_name << "histos/"  << "htt_" << channel << ".inputs-sm-13TeV-"<<var<<D2<<".root";
     outfile = new TFile(outfile_name.str().c_str(), "RECREATE") ;
@@ -1019,45 +995,45 @@ void CreateHistos::writeHistos( TString channel, vector<TString> cats, vector<TS
       outfile->cd(channel +"_"+ cat); 
       sub = "+" + var +"_" + cat + "+";
 
-      for( int i=0;i<histo_names.size();i++ ){
+      for (auto const& name : histograms){
 
-        if(histo_names.at(i).Contains(sub) ){
+        if(name.first.Contains(sub) ){
           if(!keepDebugHistos
-             && ( histo_names.at(i).Contains("SS_Low")
-                  || histo_names.at(i).Contains("relaxed")
-                  || histo_names.at(i).Contains("SS_"+s_W)
-                  //|| histo_names.at(i).Contains("OS_"+s_W)
-                  || histo_names.at(i).Contains(s_W+"_OSW")
-                  || histo_names.at(i).Contains(s_WjecUp+"_OSW")
-                  || histo_names.at(i).Contains(s_WjecDown+"_OSW")
+             && ( name.first.Contains("SS_Low")
+                  || name.first.Contains("relaxed")
+                  || name.first.Contains("SS_"+s_W)
+                  //|| name.first.Contains("OS_"+s_W)
+                  || name.first.Contains(s_W+"_OSW")
+                  || name.first.Contains(s_WjecUp+"_OSW")
+                  || name.first.Contains(s_WjecDown+"_OSW")
                   )
              ) continue;
           if(!keepFFDebugHistos
-             && ( histo_names.at(i).Contains(s_data+"_"+s_jetFakes)
-                  || histo_names.at(i).Contains(s_W+"_"+s_jetFakes)
-                  || histo_names.at(i).Contains(s_WjecUp+"_"+s_jetFakes)
-                  || histo_names.at(i).Contains(s_WjecDown+"_"+s_jetFakes)
-                  || histo_names.at(i).Contains(s_Z+"_"+s_jetFakes)
-                  || histo_names.at(i).Contains(s_ZjecUp+"_"+s_jetFakes)
-                  || histo_names.at(i).Contains(s_ZjecDown+"_"+s_jetFakes)
-                  || histo_names.at(i).Contains(s_TT+"_"+s_jetFakes)
-                  || histo_names.at(i).Contains(s_TTjecUp+"_"+s_jetFakes)
-                  || histo_names.at(i).Contains(s_TTjecDown+"_"+s_jetFakes)
-                  || histo_names.at(i).Contains(s_VV+"_"+s_jetFakes)
-                  || histo_names.at(i).Contains(s_VVjecUp+"_"+s_jetFakes)
-                  || histo_names.at(i).Contains(s_VVjecDown+"_"+s_jetFakes)
-                  || histo_names.at(i).Contains(s_EWKZ+"_"+s_jetFakes)
-                  || histo_names.at(i).Contains(s_EWKZjecUp+"_"+s_jetFakes)
-                  || histo_names.at(i).Contains(s_EWKZjecDown+"_"+s_jetFakes)                  
+             && ( name.first.Contains(s_data+"_"+s_jetFakes)
+                  || name.first.Contains(s_W+"_"+s_jetFakes)
+                  || name.first.Contains(s_WjecUp+"_"+s_jetFakes)
+                  || name.first.Contains(s_WjecDown+"_"+s_jetFakes)
+                  || name.first.Contains(s_Z+"_"+s_jetFakes)
+                  || name.first.Contains(s_ZjecUp+"_"+s_jetFakes)
+                  || name.first.Contains(s_ZjecDown+"_"+s_jetFakes)
+                  || name.first.Contains(s_TT+"_"+s_jetFakes)
+                  || name.first.Contains(s_TTjecUp+"_"+s_jetFakes)
+                  || name.first.Contains(s_TTjecDown+"_"+s_jetFakes)
+                  || name.first.Contains(s_VV+"_"+s_jetFakes)
+                  || name.first.Contains(s_VVjecUp+"_"+s_jetFakes)
+                  || name.first.Contains(s_VVjecDown+"_"+s_jetFakes)
+                  || name.first.Contains(s_EWKZ+"_"+s_jetFakes)
+                  || name.first.Contains(s_EWKZjecUp+"_"+s_jetFakes)
+                  || name.first.Contains(s_EWKZjecDown+"_"+s_jetFakes)                  
                   )
              ) continue;
           if(!keepZGenJetsSplitting
-             && ( histo_names.at(i).Contains("Z_0Jets")
-                  || histo_names.at(i).Contains("Z_1Jets")
-                  || histo_names.at(i).Contains("Z_ge2Jets")
+             && ( name.first.Contains("Z_0Jets")
+                  || name.first.Contains("Z_1Jets")
+                  || name.first.Contains("Z_ge2Jets")
                   )
              ) continue;
-          tmp = histo_names.at(i);
+          tmp = name.first;
           if( (cat.Contains(s_wjets)
                ||cat.Contains(s_antiiso) )
               && tmp.Contains(s_West) ) continue;
@@ -1089,23 +1065,25 @@ void CreateHistos::writeHistos( TString channel, vector<TString> cats, vector<TS
           tmp.ReplaceAll(s_jecDown,s_CMSjecScale+s_13TeVDown);
           tmp.ReplaceAll(s_jetToTauFakeUp,s_CMSjetToTauFake+s_13TeVUp);
           tmp.ReplaceAll(s_jetToTauFakeDown,s_CMSjetToTauFake+s_13TeVDown);
-          histos.at(i)->SetName(tmp);
+          histograms.at( name.first )->SetName(tmp);
+
           if(do2DFit ){
             if( is2DCategories(cat) ){
               tmp.ReplaceAll("2D","");
-              this->resetZeroBins(histos.at(i));
-              histos.at(i)->Write(tmp, TObject::kWriteDelete);
+              this->resetZeroBins(histograms.at( name.first ));
+              histograms.at( name.first )->Write(tmp, TObject::kWriteDelete);
             }
             else if( cat == s_inclusive){
-              this->resetZeroBins(histos.at(i));
-              histos.at(i)->Write(tmp, TObject::kWriteDelete);
+              this->resetZeroBins(histograms.at( name.first ));
+              histograms.at( name.first )->Write(tmp, TObject::kWriteDelete);
             }
             else continue;
           }
           else {
-            this->resetZeroBins(histos.at(i));
-            histos.at(i)->Write(tmp, TObject::kWriteDelete);
+            this->resetZeroBins(histograms.at( name.first ));
+            histograms.at( name.first )->Write(tmp, TObject::kWriteDelete);
           }
+
         }
       }
     }
