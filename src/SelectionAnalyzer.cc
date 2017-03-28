@@ -99,6 +99,7 @@ void SelectionAnalyzer::initVVSelections(TString cat, TString strVar, TString ex
 void SelectionAnalyzer::initSignalSelections(TString cat, TString strVar, TString extend){
 
   TString sub = extend + "+" + strVar +"_" + cat + "+";
+
   this->GetHistbyName(s_qqH+"125"+sub,strVar);
   this->GetHistbyName(s_ggH+"125"+sub,strVar);
   this->GetHistbyName(s_qqH+"125"+s_jecUp+sub,strVar);
@@ -672,41 +673,50 @@ void SelectionAnalyzer::VVSelections(float var, float weight, TString cat, TStri
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void SelectionAnalyzer::signalSelections(float var, float weight, TString cat, TString strVar, TString fname, TString extend){
 
-    TString sub = extend + "+" + strVar +"_" + cat + "+";
-    float usedVar=var;
-    if(extend=="2D") usedVar = this->get2DVar(sub)+0.1;
+  TString sub = extend + "+" + strVar +"_" + cat + "+";
+  float usedVar=var;
+  if(extend=="2D") usedVar = this->get2DVar(sub)+0.1;
     
-    if(fname == s_ggH
-       || fname == s_qqH){
+  for(auto mass : Parameter.dataset.masspoints){
+    if(fname == s_H+mass
+       || fname == s_BBH+mass){
 
-      if( this->Baseline("OS",cat) )                   this->GetHistbyName(fname+"125"+sub,strVar)->Fill(usedVar, weight);
-      if(fname == s_ggH){
-        if( this->Baseline("OS",cat) )                 this->GetHistbyName(fname+"125"+s_CMSscalegg+s_13TeVUp+sub,strVar)->Fill(usedVar, weight*this->getRenormScale(cat) );
-        if( this->Baseline("OS",cat) )                 this->GetHistbyName(fname+"125"+s_CMSscalegg+s_13TeVDown+sub,strVar)->Fill(usedVar, weight*(2-this->getRenormScale(cat) ) );
+      if( this->Baseline("OS",cat) )                   this->GetHistbyName(fname+sub,strVar)->Fill(usedVar, weight);
+      if(fname == s_H+mass){
+        if( this->Baseline("OS",cat) )                 this->GetHistbyName(fname+s_CMSscalegg+s_13TeVUp+sub,strVar)->Fill(usedVar, weight*this->getRenormScale(cat) );
+        if( this->Baseline("OS",cat) )                 this->GetHistbyName(fname+s_CMSscalegg+s_13TeVDown+sub,strVar)->Fill(usedVar, weight*(2-this->getRenormScale(cat) ) );
       }
+      return;
     }
-    else if(fname == s_ggHjecUp
-       || fname == s_qqHjecUp){
+    else if(fname == s_HjecUp+mass
+       || fname == s_BBHjecUp+mass){
 
-      if( this->Baseline("OS",cat) )                   this->GetHistbyName(fname.ReplaceAll(s_jecUp,"125"+s_jecUp)+sub,strVar)->Fill(usedVar, weight);
+      if( this->Baseline("OS",cat) )                   this->GetHistbyName(fname.ReplaceAll(s_jecUp,s_jecUp)+sub,strVar)->Fill(usedVar, weight);
+      return;
     }
-    else if(fname == s_ggHjecDown
-       || fname == s_qqHjecDown){
+    else if(fname == s_HjecDown+mass
+       || fname == s_BBHjecDown+mass){
 
-      if( this->Baseline("OS",cat) )                   this->GetHistbyName(fname.ReplaceAll(s_jecDown,"125"+s_jecDown)+sub,strVar)->Fill(usedVar, weight);
+      if( this->Baseline("OS",cat) )                   this->GetHistbyName(fname.ReplaceAll(s_jecDown,s_jecDown)+sub,strVar)->Fill(usedVar, weight);
+      return;
     }
-    else if(fname == s_ggHtauUp){
-      if( this->Baseline("OS",cat) )                   this->GetHistbyName(s_ggH+"125"+s_CMStauScale+channel+"_"+s_13TeVUp+sub,strVar)->Fill(usedVar, weight);
+    else if(fname == s_HtauUp+mass){
+      if( this->Baseline("OS",cat) )                   this->GetHistbyName(s_H+mass+s_CMStauScale+channel+"_"+s_13TeVUp+sub,strVar)->Fill(usedVar, weight);
+      return;
     }
-    else if(fname == s_ggHtauDown){
-      if( this->Baseline("OS",cat) )                   this->GetHistbyName(s_ggH+"125"+s_CMStauScale+channel+"_"+s_13TeVDown+sub,strVar)->Fill(usedVar, weight);
+    else if(fname == s_HtauDown+mass){
+      if( this->Baseline("OS",cat) )                   this->GetHistbyName(s_H+mass+s_CMStauScale+channel+"_"+s_13TeVDown+sub,strVar)->Fill(usedVar, weight);
+      return;
     }
-    else if(fname == s_qqHtauUp){
-      if( this->Baseline("OS",cat) )                   this->GetHistbyName(s_qqH+"125"+s_CMStauScale+channel+"_"+s_13TeVUp+sub,strVar)->Fill(usedVar, weight);
+    else if(fname == s_BBHtauUp+mass){
+      if( this->Baseline("OS",cat) )                   this->GetHistbyName(s_BBH+mass+s_CMStauScale+channel+"_"+s_13TeVUp+sub,strVar)->Fill(usedVar, weight);
+      return;
     }
-    else if(fname == s_qqHtauDown){
-      if( this->Baseline("OS",cat) )                   this->GetHistbyName(s_qqH+"125"+s_CMStauScale+channel+"_"+s_13TeVDown+sub,strVar)->Fill(usedVar, weight);
+    else if(fname == s_BBHtauDown+mass){
+      if( this->Baseline("OS",cat) )                   this->GetHistbyName(s_BBH+mass+s_CMStauScale+channel+"_"+s_13TeVDown+sub,strVar)->Fill(usedVar, weight);
+      return;
     }
+  }
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

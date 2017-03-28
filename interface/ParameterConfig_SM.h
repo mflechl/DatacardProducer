@@ -3,6 +3,7 @@
 const struct Parameter{
 
   struct dataset{
+
     TString data_mt="/data/higgs/data_2016/ntuples_"+version+"/"+channel+"/ntuples_"+doSvfit+"_merged/BASIS_ntuple_SingleMuon_"+channel+"_"+version+reduced+".root";
     TString MCsum_mt="/data/higgs/data_2016/ntuples_"+version+"/"+channel+"/ntuples_"+doSvfit+"_merged/BASIS_ntuple_MCsum_merged_MCSummer16_"+channel+"_"+version+reduced+".root";
     TString data_et="/data/higgs/data_2016/ntuples_"+version+"/"+channel+"/ntuples_"+doSvfit+"_merged/BASIS_ntuple_SingleElectron_"+channel+"_"+version+reduced+".root";
@@ -26,6 +27,14 @@ const struct Parameter{
     TString ggH="/data/higgs/data_2016/ntuples_"+version+"/"+channel+"/ntuples_"+doSvfit+"_merged/BASIS_ntuple_GluGluHToTauTau_M125_powheg_MCSummer16_"+channel+"_"+version+reduced+".root";
     TString ggHtauUp="/data/higgs/data_2016/ntuples_"+version+"/"+channel+"/ntuples_"+doSvfit+"_merged/BASIS_ntuple_GluGluHToTauTau_M125_powheg_MCSummer16_"+channel+"_"+version+"_TauPtUp"+reduced+".root";
     TString ggHtauDown="/data/higgs/data_2016/ntuples_"+version+"/"+channel+"/ntuples_"+doSvfit+"_merged/BASIS_ntuple_GluGluHToTauTau_M125_powheg_MCSummer16_"+channel+"_"+version+"_TauPtDown"+reduced+".root";
+
+    vector<TString> masspoints = {"90","120","160","250","400","700","1000","1500","2000","2900"};
+    TString BBH="/data/higgs/data_2016/ntuples_"+version+"/"+channel+"/ntuples_"+doSvfit+"_merged/BASIS_ntuple_SUSYGluGluToBBHToTauTau_M_XXX_pythia8_MCSummer16_"+channel+"_"+version+reduced+".root";
+    TString BBHtauUp="/data/higgs/data_2016/ntuples_"+version+"/"+channel+"/ntuples_"+doSvfit+"_merged/BASIS_ntuple_SUSYGluGluToBBHToTauTau_M_XXX_pythia8_MCSummer16_"+channel+"_"+version+"_TauPtUp"+reduced+".root";
+    TString BBHtauDown="/data/higgs/data_2016/ntuples_"+version+"/"+channel+"/ntuples_"+doSvfit+"_merged/BASIS_ntuple_SUSYGluGluToBBHToTauTau_M_XXX_pythia8_MCSummer16_"+channel+"_"+version+"_TauPtDown"+reduced+".root";
+    TString H="/data/higgs/data_2016/ntuples_"+version+"/"+channel+"/ntuples_"+doSvfit+"_merged/BASIS_ntuple_SUSYGluGluToHToTauTau_M_XXX_pythia8_MCSummer16_"+channel+"_"+version+reduced+".root";
+    TString HtauUp="/data/higgs/data_2016/ntuples_"+version+"/"+channel+"/ntuples_"+doSvfit+"_merged/BASIS_ntuple_SUSYGluGluToHToTauTau_M_XXX_pythia8_MCSummer16_"+channel+"_"+version+"_TauPtUp"+reduced+".root";
+    TString HtauDown="/data/higgs/data_2016/ntuples_"+version+"/"+channel+"/ntuples_"+doSvfit+"_merged/BASIS_ntuple_SUSYGluGluToHToTauTau_M_XXX_pythia8_MCSummer16_"+channel+"_"+version+"_TauPtDown"+reduced+".root";
 
   } dataset;
   struct variable{
@@ -87,9 +96,9 @@ const struct Parameter{
       vector<double> varBins = {50,55,60,65,80};
     } jdeta;
     struct mt_1{
-      int nbins = 25;
+      int nbins = 35;
       double nmin = 0;
-      double nmax = 250;
+      double nmax = 350;
       int doVarBins = 0;
       vector<double> varBins = {50,55,60,65,80};
     } mt_1;
@@ -198,8 +207,8 @@ const struct Parameter{
   } variable2D_tt;  
 
   struct analysisCut{
-    double mTHigh = 80;
-    double mTLow  = 50;
+    double mTHigh = 70;
+    double mTLow  = 40;
     double muIso_base = 0.15;
     double muIso_relaxed = 0.3;
     double muIso_antiIsoLow = 0.15;
@@ -210,9 +219,9 @@ const struct Parameter{
     double elIso_antiIsoHigh = 0.3;
   } analysisCut;
 
-  struct category{
-    vector<TString> D1categories = {s_inclusive,s_0jet_low,s_0jet_high,s_1jet_low,s_1jet_high,s_vbf_low,s_vbf_high};
-    vector<TString> D2categories = {s_0jet,s_boosted,s_vbf,s_wjets_0jet_cr,s_wjets_boosted_cr,s_wjets_vbf_cr,s_antiiso_0jet_cr,s_antiiso_boosted_cr,s_antiiso_vbf_cr};
+   struct category{
+    vector<TString> categoriesForFF = {s_nobtag, s_btag, s_nobtagLow,s_btagLow,s_nobtagLoose,s_btagLoose,s_nobtagHigh,s_btagHigh};
+    //vector<TString> D2categories = {s_0jet,s_boosted,s_vbf,s_wjets_0jet_cr,s_wjets_boosted_cr,s_wjets_vbf_cr,s_antiiso_0jet_cr,s_antiiso_boosted_cr,s_antiiso_vbf_cr};
     //FIXME: add PU jet categories
   } category;
 

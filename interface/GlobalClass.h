@@ -14,8 +14,6 @@ class GlobalClass{
   GlobalClass();
   ~GlobalClass();
 
-  int is1DCategories(TString category);
-  int is2DCategories(TString category);
   double get2DVar(TString sub);
   int returnBin(vector<double> bins, double value);
 
@@ -30,7 +28,11 @@ class GlobalClass{
   int passMTCut();
   int passIso(TString type);
   int Vetos();
-  int CategorySelection(TString cat, TString mtcut = "");
+  int CategorySelection(TString cat, TString iso = "");
+  int Btag(TString btag);
+  int LowMt(TString iso);
+  int LooseMt(TString iso);
+  int HighMt(TString iso);
 
   double getWSFUncertainty( TString cat );
   double getQCDSFUncertainty( TString cat );
@@ -38,10 +40,6 @@ class GlobalClass{
   double getZmumuWeight( TString cat );
   double applyZmumuUncertainty( TString cat );
   TString return2DString( TString cat );
-
-  int Jet0(TString mtcut = "");
-  int Boosted(TString mtcut = "");
-  int VBF(TString mtcut = "");
 
   double QCD_OSSS(TString cat);
   int OS_W(TString cat);
@@ -72,3 +70,5 @@ class GlobalClass{
 
 
 #endif
+
+

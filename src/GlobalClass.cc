@@ -1,6 +1,7 @@
 #include "interface/GlobalClass.h"
 #include "TLorentzVector.h"
 #include <iostream>
+#include <utility>
 #include <sstream>
 #include <TObject.h>
 #include <algorithm>
@@ -60,28 +61,17 @@ float GlobalClass::CalcHPt(){
 int GlobalClass::Baseline(TString sign, TString cat){
   
   if( NtupleView->q_1 * NtupleView->q_2 < 0
-      && ( cat != s_inclusive
-           || this->passMTCut() )
       &&( ( cat.Contains(s_antiiso)
             && this->passIso("antiiso")
-            )
-          || ( this->passIso("base") )
           )
+          || this->passIso("base") 
+      )
       && this->Vetos()
-      && this->CategorySelection(cat)
+      && this->CategorySelection(cat,sign)
       ){
-
-    if(channel == "tt"
-       && sign == "OS"
-       && NtupleView->byTightIsolationMVArun2v1DBoldDMwLT_1
-       && NtupleView->byTightIsolationMVArun2v1DBoldDMwLT_2
-       ) return 1;
-    else if( channel != "tt"
-             && sign == "OS"
-             && NtupleView->byTightIsolationMVArun2v1DBoldDMwLT_2
-             ) return 1;
+    if( sign == "OS") return 1;
     if( sign == "FF"
-        && !NtupleView->byTightIsolationMVArun2v1DBoldDMwLT_2
+        && !NtupleView->byMediumIsolationMVArun2v1DBoldDMwLT_2
         && NtupleView->byVLooseIsolationMVArun2v1DBoldDMwLT_2
         ) return 1;
     if( sign == "FF1"
@@ -134,115 +124,68 @@ int GlobalClass::Vetos(){
   return 0;
 }
 
-int GlobalClass::CategorySelection(TString cat, TString mtcut){
+int GlobalClass::CategorySelection(TString cat, TString iso){
 
   if(cat == s_inclusive) return 1;
   ///////////////////////  0jet category     ///////////////////////////////
-  if(cat == s_0jet) return this->Jet0(mtcut);
-  if(cat == s_wjets_0jet_cr) return this->Jet0("mtHigh");
-  if(cat == s_antiiso_0jet_cr) return this->Jet0(mtcut);
-  ///////////////////////  boosted category     ///////////////////////////////
-  if(cat == s_boosted) return this->Boosted(mtcut);
-  if(cat == s_wjets_boosted_cr) return this->Boosted("mtHigh");
-  if(cat == s_antiiso_boosted_cr) return this->Boosted(mtcut);
-  ///////////////////////  vbf category     ///////////////////////////////
-  if(cat == s_vbf) return this->VBF(mtcut);
-  if(cat == s_wjets_vbf_cr) return this->VBF("mtHigh");
-  if(cat == s_antiiso_vbf_cr) return this->VBF(mtcut);
+  if(cat == s_nobtag      )    return this->Btag("nobtag");
+  if(cat == s_btag        )    return this->Btag("btag");
+  if(cat == s_nobtagLow   )    return this->Btag("nobtag") && this->LowMt(iso);
+  if(cat == s_btagLow     )    return this->Btag("btag") && this->LowMt(iso);
+  if(cat == s_nobtagLoose )    return this->Btag("nobtag") && this->LooseMt(iso);
+  if(cat == s_btagLoose   )    return this->Btag("btag") && this->LooseMt(iso);
+  if(cat == s_nobtagHigh  )    return this->Btag("nobtag") && this->HighMt(iso);
+  if(cat == s_btagHigh    )    return this->Btag("btag") && this->HighMt(iso);
   
   return 0;
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-int GlobalClass::Jet0(TString mtcut){
+int GlobalClass::Btag(TString btag){
 
-  if( channel != "tt" ){
-    if( ( (mtcut == ""
-           && this->getMT() < Parameter.analysisCut.mTLow
-           )
-          || mtcut == "wo"
-          || (mtcut == "mtHigh"
-              && this->getMT() > Parameter.analysisCut.mTHigh
-              && this->getMT() < 200 )
-          )
-        && this->getNjets() == 0
-        && NtupleView->pt_2 > 30
-        )return 1;
-  }
-  else{
-    if( this->getNjets() == 0
-        && NtupleView->pt_1 > 50
-        )return 1;
-  }
-  return 0;
-}
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-int GlobalClass::Boosted(TString mtcut){
+  if(btag == "btag" 
+    && NtupleView->nbtag > 0) return 1;
 
-  if( channel != "tt" ){
-    if( ( (mtcut == ""
-           && this->getMT() < Parameter.analysisCut.mTLow
-           )
-          || mtcut == "wo"
-          || (mtcut == "mtHigh"
-              && this->getMT() > Parameter.analysisCut.mTHigh
-              && this->getMT() < 200 )
-          )
-        && (this->getNjets() == 1
-            || (this->getNjets()==2 && this->getMjj()<300)
-            || this->getNjets()>2
-            )
-        && NtupleView->pt_2 > 30
-        )return 1;
-  }
-  else{
-    if(NtupleView->pt_1 > 50 
-       && ( this->getNjets() == 1
-            || (this->getNjets()>=2
-                && !( abs(this->getJdeta()) > 2.5
-                      && ( (doSvfit=="SVFIT"
-                            && NtupleView->pt_sv > 100 )
-                           || ( doSvfit=="woSVFIT"
-                                && this->CalcHPt() > 100 ) ) ) )
-            )
-       )return 1;
-  }
-  return 0;
-}
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-int GlobalClass::VBF(TString mtcut){
+  if(btag == "nobtag" 
+     && NtupleView->nbtag ==0) return 1;
 
-  if( channel != "tt"){
-    if( ( (mtcut == ""
-           && this->getMT() < Parameter.analysisCut.mTLow
-           )
-          || mtcut == "wo"
-          || (mtcut == "mtHigh"
-              && this->getMT() > Parameter.analysisCut.mTHigh
-              && this->getMT() < 200 )
-          )
-        && this->getNjets() == 2
-        && this->getMjj() > 300
-        && NtupleView->pt_2 > 30
-        )return 1;
-  }
-  else{
-    if(NtupleView->pt_1 > 50
-       && this->getNjets() >= 2
-       && abs(this->getJdeta()) > 2.5
-       && ( (doSvfit=="SVFIT"
-             && NtupleView->pt_sv > 100 )
-            || ( doSvfit=="woSVFIT"
-                 && this->CalcHPt() > 100 ) )
-       )return 1;
-  }
   return 0;
+
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+int GlobalClass::LowMt(TString iso){
+
+  if(NtupleView->mt_1 <  Parameter.analysisCut.mTLow){ 
+
+    if(iso == "OS" && NtupleView->byTightIsolationMVArun2v1DBoldDMwLT_2 ) return 1;
+    if(iso == "FF") return 1;
+  } 
+
+
+  return 0;
+}
+int GlobalClass::HighMt(TString iso){
+
+  if(NtupleView->mt_1 > Parameter.analysisCut.mTLow
+     && NtupleView->mt_1 < Parameter.analysisCut.mTHigh){
+
+     if(iso == "OS" && NtupleView->byTightIsolationMVArun2v1DBoldDMwLT_2) return 1;
+     if(iso == "FF") return 1;
+ }
+  return 0;
+  
+}
+int GlobalClass::LooseMt(TString iso){
+  if(NtupleView->mt_1 <  Parameter.analysisCut.mTHigh){
+
+    if(iso == "OS"
+       && !NtupleView->byTightIsolationMVArun2v1DBoldDMwLT_2
+       && NtupleView->byMediumIsolationMVArun2v1DBoldDMwLT_2) return 1;
+    if(iso == "FF") return 1;
+  }
+
+  return 0;
+}
 
 
 TH1D* GlobalClass::GetHistbyName(TString name, TString strVar){
@@ -284,7 +227,7 @@ TH1D* GlobalClass::JITHistoCreator(TString name, TString strVar){
     nbins = 1;
     nmin  = 80;
     nmax  = 200;
-    histograms.at(name) = new TH1D(name,"", nbins, nmin, nmax  ) ;
+    histograms[name] = new TH1D(name,"", nbins, nmin, nmax  ) ;
 
     return histograms.at(name);
   }
@@ -292,7 +235,7 @@ TH1D* GlobalClass::JITHistoCreator(TString name, TString strVar){
     nbins = 4;
     nmin  = 40;
     nmax  = 200;
-    histograms.at(name) = new TH1D(name,"", nbins, nmin, nmax  ) ;
+    histograms[name] = new TH1D(name,"", nbins, nmin, nmax  ) ;
 
 
     return histograms.at(name);
@@ -314,7 +257,7 @@ TH1D* GlobalClass::JITHistoCreator(TString name, TString strVar){
       nmin = 0;
       nmax = nbins;
     }
-    histograms.at(name) = new TH1D(name,"", nbins, nmin, nmax  ) ;
+    histograms[name] = new TH1D(name,"", nbins, nmin, nmax  ) ;
 
 
     return histograms.at(name);
@@ -335,7 +278,7 @@ TH1D* GlobalClass::JITHistoCreator(TString name, TString strVar){
       nmin = 0;
       nmax = nbins;
     }
-    histograms.at(name) = new TH1D(name,"", nbins, nmin, nmax  ) ;
+    histograms[name] = new TH1D(name,"", nbins, nmin, nmax  ) ;
 
 
     return histograms.at(name);
@@ -350,7 +293,7 @@ TH1D* GlobalClass::JITHistoCreator(TString name, TString strVar){
   if(strVar == s_mvis){
     if(Parameter.variable.m_vis.doVarBins) {
       usingVarBins = 1;
-      histograms.at(name) = this->getBinnedHisto(name,Parameter.variable.m_vis.varBins) ;
+      histograms[name] = this->getBinnedHisto(name,Parameter.variable.m_vis.varBins) ;
     }
     else{
       nbins = Parameter.variable.m_vis.nbins;
@@ -362,7 +305,7 @@ TH1D* GlobalClass::JITHistoCreator(TString name, TString strVar){
   if(strVar == s_msv){
     if(Parameter.variable.m_sv.doVarBins) {
       usingVarBins = 1;
-      histograms.at(name) = this->getBinnedHisto(name,Parameter.variable.m_sv.varBins) ;
+      histograms[name] = this->getBinnedHisto(name,Parameter.variable.m_sv.varBins) ;
     }
     else{
       nbins = Parameter.variable.m_sv.nbins;
@@ -374,7 +317,7 @@ TH1D* GlobalClass::JITHistoCreator(TString name, TString strVar){
   if(strVar == s_ptsv){
     if(Parameter.variable.pt_sv.doVarBins) {
       usingVarBins = 1;
-      histograms.at(name) = this->getBinnedHisto(name,Parameter.variable.pt_sv.varBins) ;
+      histograms[name] = this->getBinnedHisto(name,Parameter.variable.pt_sv.varBins) ;
     }
     else{
       nbins = Parameter.variable.pt_sv.nbins;
@@ -388,7 +331,7 @@ TH1D* GlobalClass::JITHistoCreator(TString name, TString strVar){
         ){
     if(Parameter.variable.jpt.doVarBins){
       usingVarBins = 1;
-      histograms.at(name) = this->getBinnedHisto(name,Parameter.variable.jpt.varBins) ;
+      histograms[name] = this->getBinnedHisto(name,Parameter.variable.jpt.varBins) ;
     }
     else{
       nbins = Parameter.variable.jpt.nbins;
@@ -399,7 +342,7 @@ TH1D* GlobalClass::JITHistoCreator(TString name, TString strVar){
   else if(strVar == s_pt1 || strVar == s_pt2){
     if(Parameter.variable.pt.doVarBins){
       usingVarBins = 1;
-      histograms.at(name) = this->getBinnedHisto(name,Parameter.variable.pt.varBins) ;
+      histograms[name] = this->getBinnedHisto(name,Parameter.variable.pt.varBins) ;
     }
     else{
       nbins = Parameter.variable.pt.nbins;
@@ -410,7 +353,7 @@ TH1D* GlobalClass::JITHistoCreator(TString name, TString strVar){
   else if(strVar == s_eta1 || strVar == s_eta2){
     if(Parameter.variable.eta.doVarBins){
       usingVarBins = 1;
-      histograms.at(name) = this->getBinnedHisto(name,Parameter.variable.eta.varBins) ;
+      histograms[name] = this->getBinnedHisto(name,Parameter.variable.eta.varBins) ;
     }
     else{
       nbins = Parameter.variable.eta.nbins;
@@ -421,7 +364,7 @@ TH1D* GlobalClass::JITHistoCreator(TString name, TString strVar){
   else if(strVar == s_jeta1 || strVar == s_jeta2){
     if(Parameter.variable.jeta.doVarBins){
       usingVarBins = 1;
-      histograms.at(name) = this->getBinnedHisto(name,Parameter.variable.jeta.varBins) ;
+      histograms[name] = this->getBinnedHisto(name,Parameter.variable.jeta.varBins) ;
     }
     else{
       nbins = Parameter.variable.jeta.nbins;
@@ -432,7 +375,7 @@ TH1D* GlobalClass::JITHistoCreator(TString name, TString strVar){
   else if(strVar == "jdeta"){
     if(Parameter.variable.jdeta.doVarBins){
       usingVarBins = 1;
-      histograms.at(name) = this->getBinnedHisto(name,Parameter.variable.jdeta.varBins) ; 
+      histograms[name] = this->getBinnedHisto(name,Parameter.variable.jdeta.varBins) ; 
     }
     else{
       nbins = Parameter.variable.jdeta.nbins;
@@ -443,7 +386,7 @@ TH1D* GlobalClass::JITHistoCreator(TString name, TString strVar){
   else if(strVar == s_mt1){
     if(Parameter.variable.mt_1.doVarBins){
       usingVarBins = 1;
-      histograms.at(name) = this->getBinnedHisto(name,Parameter.variable.mt_1.varBins) ;
+      histograms[name] = this->getBinnedHisto(name,Parameter.variable.mt_1.varBins) ;
     }
     else{
       nbins = Parameter.variable.mt_1.nbins;
@@ -454,7 +397,7 @@ TH1D* GlobalClass::JITHistoCreator(TString name, TString strVar){
   else if(strVar == s_met){
     if(Parameter.variable.met.doVarBins){
       usingVarBins = 1;
-      histograms.at(name) = this->getBinnedHisto(name,Parameter.variable.met.varBins) ;
+      histograms[name] = this->getBinnedHisto(name,Parameter.variable.met.varBins) ;
     }
     else{
       nbins = Parameter.variable.met.nbins;
@@ -465,7 +408,7 @@ TH1D* GlobalClass::JITHistoCreator(TString name, TString strVar){
   else if(strVar == s_mttot){
     if(Parameter.variable.mttot.doVarBins){
       usingVarBins = 1;
-      histograms.at(name) = this->getBinnedHisto(name,Parameter.variable.mttot.varBins) ;
+      histograms[name] = this->getBinnedHisto(name,Parameter.variable.mttot.varBins) ;
     }
     else{
       nbins = Parameter.variable.mttot.nbins;
@@ -476,7 +419,7 @@ TH1D* GlobalClass::JITHistoCreator(TString name, TString strVar){
   else if(strVar == s_Hpt){
     if(Parameter.variable.Hpt.doVarBins){
       usingVarBins = 1;
-      histograms.at(name) = this->getBinnedHisto(name,Parameter.variable.Hpt.varBins) ;
+      histograms[name] = this->getBinnedHisto(name,Parameter.variable.Hpt.varBins) ;
     }
     else{
       nbins = Parameter.variable.Hpt.nbins;
@@ -487,7 +430,7 @@ TH1D* GlobalClass::JITHistoCreator(TString name, TString strVar){
   else if(strVar == "High_mt_1"){
     if(Parameter.variable.High_mt_1.doVarBins){
       usingVarBins = 1;
-      histograms.at(name) = this->getBinnedHisto(name,Parameter.variable.High_mt_1.varBins) ;
+      histograms[name] = this->getBinnedHisto(name,Parameter.variable.High_mt_1.varBins) ;
     }
     else{
       nbins = Parameter.variable.High_mt_1.nbins;
@@ -498,7 +441,7 @@ TH1D* GlobalClass::JITHistoCreator(TString name, TString strVar){
   else if(strVar == "Low_mt_1"){
     if(Parameter.variable.Low_mt_1.doVarBins){
       usingVarBins = 1;
-      histograms.at(name) = this->getBinnedHisto(name,Parameter.variable.Low_mt_1.varBins) ;
+      histograms[name] = this->getBinnedHisto(name,Parameter.variable.Low_mt_1.varBins) ;
     }
     else{
       nbins = Parameter.variable.Low_mt_1.nbins;
@@ -509,7 +452,7 @@ TH1D* GlobalClass::JITHistoCreator(TString name, TString strVar){
   else if(strVar == "iso_1"){
     if(Parameter.variable.iso_1.doVarBins){
       usingVarBins = 1;
-      histograms.at(name) = this->getBinnedHisto(name,Parameter.variable.iso_1.varBins) ;
+      histograms[name] = this->getBinnedHisto(name,Parameter.variable.iso_1.varBins) ;
     }
     else{
       nbins = Parameter.variable.iso_1.nbins;
@@ -520,7 +463,7 @@ TH1D* GlobalClass::JITHistoCreator(TString name, TString strVar){
   else if(strVar == s_mjj){
     if(Parameter.variable.mjj.doVarBins){
       usingVarBins = 1;
-      histograms.at(name) = this->getBinnedHisto(name,Parameter.variable.mjj.varBins) ;
+      histograms[name] = this->getBinnedHisto(name,Parameter.variable.mjj.varBins) ;
     }
     else{
       nbins = Parameter.variable.mjj.nbins;
@@ -531,7 +474,7 @@ TH1D* GlobalClass::JITHistoCreator(TString name, TString strVar){
   else if(strVar == "jeta1eta2"){
     if(Parameter.variable.jeta1eta2.doVarBins){
       usingVarBins = 1;
-      histograms.at(name) = this->getBinnedHisto(name,Parameter.variable.jeta1eta2.varBins) ;
+      histograms[name] = this->getBinnedHisto(name,Parameter.variable.jeta1eta2.varBins) ;
     }
     else{
       nbins = Parameter.variable.jeta1eta2.nbins;
@@ -544,7 +487,7 @@ TH1D* GlobalClass::JITHistoCreator(TString name, TString strVar){
 
   if(!usingVarBins) histograms[name] = new TH1D(name,"", nbins, nmin, nmax  ) ;
 
-  return histograms[name];
+  return histograms.at(name);
 
 }
 
@@ -552,39 +495,7 @@ TH1D* GlobalClass::JITHistoCreator(TString name, TString strVar){
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 double GlobalClass::QCD_OSSS(TString cat){
-  if(channel == "mt"){
-    if(cat == s_0jet
-       || cat == s_inclusive
-       || cat == s_wjets_0jet_cr
-       || cat == s_0jet_low
-       || cat == s_0jet_high)  return Parameter.QCD_OSSS.mt.ZeroJet;
 
-    if(cat == s_boosted
-       || cat == s_wjets_boosted_cr
-       || cat == s_1jet_low
-       || cat == s_1jet_high)  return Parameter.QCD_OSSS.mt.Boosted;
-
-    if(cat == s_vbf
-       || cat == s_vbf_low
-       || cat == s_vbf_high)   return Parameter.QCD_OSSS.mt.VBF;
-  }
-  if(channel == "et"){
-    if(cat == s_0jet
-       || cat == s_inclusive
-       || cat == s_wjets_0jet_cr
-       || cat == s_0jet_low
-       || cat == s_0jet_high)  return Parameter.QCD_OSSS.et.ZeroJet;
-
-    if(cat == s_boosted
-       || cat == s_wjets_boosted_cr
-       || cat == s_1jet_low
-       || cat == s_1jet_high)  return Parameter.QCD_OSSS.et.Boosted;
-
-    if(cat == s_vbf
-       || cat == s_wjets_vbf_cr
-       || cat == s_vbf_low
-       || cat == s_vbf_high)   return Parameter.QCD_OSSS.et.VBF;
-  }
   return 1.0;
 }
 
@@ -660,22 +571,6 @@ int GlobalClass::SS_Low_relaxed(TString cat){
      && this->CategorySelection(cat, "wo")
      && this->Vetos()) return 1;
   return 0;
-}
-
-int GlobalClass::is1DCategories(TString category){
-  for( auto cat : Parameter.category.D1categories ){
-    if(category == cat) return 1;
-  }
-  return 0;
-  
-}
-
-int GlobalClass::is2DCategories(TString category){
-  for( auto cat : Parameter.category.D2categories ){
-    if(category == cat) return 1;
-  }
-  return 0;
-  
 }
 
 int GlobalClass::returnBin(vector<double> bins, double value){

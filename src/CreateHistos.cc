@@ -10,48 +10,64 @@ using namespace std;
 CreateHistos::CreateHistos(){
 
   files.clear();
-  
+  TString tmp = "";
   files.push_back({Parameter.dataset.Z,s_Z});
-  // files.push_back({Parameter.dataset.EWKZ,s_EWKZ});
-  // files.push_back({Parameter.dataset.W,s_W});
-  // files.push_back({Parameter.dataset.TT,s_TT});
-  // files.push_back({Parameter.dataset.VV,s_VV});
-  // if(channel=="mt" && !doMC )files.push_back({Parameter.dataset.data_mt,s_data});
-  // else if(channel=="mt" && doMC)files.push_back({Parameter.dataset.MCsum_mt,s_data});
-  // if(channel=="et")files.push_back({Parameter.dataset.data_et,s_data});
-  // if(channel=="tt")files.push_back({Parameter.dataset.data_tt,s_data});
-  // files.push_back({Parameter.dataset.ggH,s_ggH});
-  // files.push_back({Parameter.dataset.qqH,s_qqH});
-  // if(ptShift){
-  //   files.push_back({Parameter.dataset.ZtauUp,s_ZtauUp});
-  //   files.push_back({Parameter.dataset.ZtauDown,s_ZtauDown});
-  //   files.push_back({Parameter.dataset.EWKZtauUp,s_EWKZtauUp});
-  //   files.push_back({Parameter.dataset.EWKZtauDown,s_EWKZtauDown});
-  //   files.push_back({Parameter.dataset.TTtauUp,s_TTtauUp});
-  //   files.push_back({Parameter.dataset.TTtauDown,s_TTtauDown});
-  //   files.push_back({Parameter.dataset.VVtauUp,s_VVtauUp});
-  //   files.push_back({Parameter.dataset.VVtauDown,s_VVtauDown});
-  //   files.push_back({Parameter.dataset.ggHtauUp,s_ggHtauUp});
-  //   files.push_back({Parameter.dataset.ggHtauDown,s_ggHtauDown});
-  //   files.push_back({Parameter.dataset.qqHtauUp,s_qqHtauUp});
-  //   files.push_back({Parameter.dataset.qqHtauDown,s_qqHtauDown});
-  // }
-  // if(jecShift){
-  //   files.push_back({Parameter.dataset.Z,s_ZjecUp});
-  //   files.push_back({Parameter.dataset.Z,s_ZjecDown});
-  //   files.push_back({Parameter.dataset.EWKZ,s_EWKZjecUp});
-  //   files.push_back({Parameter.dataset.EWKZ,s_EWKZjecDown});
-  //   files.push_back({Parameter.dataset.W,s_WjecUp});
-  //   files.push_back({Parameter.dataset.W,s_WjecDown});
-  //   files.push_back({Parameter.dataset.TT,s_TTjecUp});
-  //   files.push_back({Parameter.dataset.TT,s_TTjecDown});
-  //   files.push_back({Parameter.dataset.VV,s_VVjecUp});
-  //   files.push_back({Parameter.dataset.VV,s_VVjecDown});
-  //   files.push_back({Parameter.dataset.ggH,s_ggHjecUp});
-  //   files.push_back({Parameter.dataset.ggH,s_ggHjecDown});
-  //   files.push_back({Parameter.dataset.qqH,s_qqHjecUp});
-  //   files.push_back({Parameter.dataset.qqH,s_qqHjecDown});
-  // }
+  files.push_back({Parameter.dataset.EWKZ,s_EWKZ});
+  files.push_back({Parameter.dataset.W,s_W});
+  files.push_back({Parameter.dataset.TT,s_TT});
+  files.push_back({Parameter.dataset.VV,s_VV});
+  if(channel=="mt" && !doMC )files.push_back({Parameter.dataset.data_mt,s_data});
+  else if(channel=="mt" && doMC)files.push_back({Parameter.dataset.MCsum_mt,s_data});
+  if(channel=="et")files.push_back({Parameter.dataset.data_et,s_data});
+  if(channel=="tt")files.push_back({Parameter.dataset.data_tt,s_data});
+  for(auto mass : Parameter.dataset.masspoints){
+    tmp = Parameter.dataset.H;
+    files.push_back({tmp.ReplaceAll("XXX",mass),s_H+mass});
+    tmp = Parameter.dataset.BBH;
+    files.push_back({tmp.ReplaceAll("XXX",mass),s_BBH+mass});
+  }
+  if(ptShift){
+    files.push_back({Parameter.dataset.ZtauUp,s_ZtauUp});
+    files.push_back({Parameter.dataset.ZtauDown,s_ZtauDown});
+    files.push_back({Parameter.dataset.EWKZtauUp,s_EWKZtauUp});
+    files.push_back({Parameter.dataset.EWKZtauDown,s_EWKZtauDown});
+    files.push_back({Parameter.dataset.TTtauUp,s_TTtauUp});
+    files.push_back({Parameter.dataset.TTtauDown,s_TTtauDown});
+    files.push_back({Parameter.dataset.VVtauUp,s_VVtauUp});
+    files.push_back({Parameter.dataset.VVtauDown,s_VVtauDown});
+    for(auto mass : Parameter.dataset.masspoints){
+      tmp = Parameter.dataset.HtauUp;
+      files.push_back({tmp.ReplaceAll("XXX",mass),s_HtauUp+mass});
+      tmp = Parameter.dataset.HtauDown;
+      files.push_back({tmp.ReplaceAll("XXX",mass),s_HtauDown+mass});
+      tmp = Parameter.dataset.BBHtauUp;
+      files.push_back({tmp.ReplaceAll("XXX",mass),s_BBHtauUp+mass});
+      tmp = Parameter.dataset.BBHtauDown;
+      files.push_back({tmp.ReplaceAll("XXX",mass),s_BBHtauDown+mass});
+    }
+  }
+  if(jecShift){
+    files.push_back({Parameter.dataset.Z,s_ZjecUp});
+    files.push_back({Parameter.dataset.Z,s_ZjecDown});
+    files.push_back({Parameter.dataset.EWKZ,s_EWKZjecUp});
+    files.push_back({Parameter.dataset.EWKZ,s_EWKZjecDown});
+    files.push_back({Parameter.dataset.W,s_WjecUp});
+    files.push_back({Parameter.dataset.W,s_WjecDown});
+    files.push_back({Parameter.dataset.TT,s_TTjecUp});
+    files.push_back({Parameter.dataset.TT,s_TTjecDown});
+    files.push_back({Parameter.dataset.VV,s_VVjecUp});
+    files.push_back({Parameter.dataset.VV,s_VVjecDown});
+    for(auto mass : Parameter.dataset.masspoints){
+      tmp = Parameter.dataset.H;
+      files.push_back({tmp.ReplaceAll("XXX",mass),s_HjecUp+mass});
+      tmp = Parameter.dataset.H;
+      files.push_back({tmp.ReplaceAll("XXX",mass),s_HjecDown+mass});
+      tmp = Parameter.dataset.BBH;
+      files.push_back({tmp.ReplaceAll("XXX",mass),s_BBHjecUp+mass});
+      tmp = Parameter.dataset.BBH;
+      files.push_back({tmp.ReplaceAll("XXX",mass),s_BBHjecDown+mass});
+    }
+  }
 
   for(int i=0; i<variables.size(); i++)      vars.push_back(variables.at(i));
   for(int i=0; i<categories.size(); i++)     cats.push_back(categories.at(i));
@@ -186,7 +202,6 @@ void CreateHistos::run(TString isTest){
         for(auto strVar : vars){
 
           var = -999;
-
           if(strVar == s_mvis)                                var = NtupleView->m_vis;
           else if(strVar == s_msv)                            var = NtupleView->m_sv;
           else if(strVar == s_ptsv)                           var = NtupleView->pt_sv;
@@ -199,7 +214,7 @@ void CreateHistos::run(TString isTest){
           else if(strVar == s_eta1)                           var = NtupleView->eta_1;
           else if(strVar == s_eta2)                           var = NtupleView->eta_2;
           else if(strVar == s_met)                            var = NtupleView->met;
-          //else if(strVar == s_mttot)                          var = NtupleView->mt_tot;
+          else if(strVar == s_mttot)                          var = NtupleView->mt_tot;
           else if(strVar == s_Hpt)                            var = this->CalcHPt(); 
 
 
@@ -238,32 +253,7 @@ void CreateHistos::run(TString isTest){
             else if( isSignalFile(files[i][1]) )           this->signalSelections(var, weight, cat, strVar, files[i][1]);
 
           }
-          
-
-          if(do2DFit){
-
-            if ( !this->is2DCategories(cat) ) continue;
-            if( channel == "tt"
-                && (cat.Contains(s_wjets)
-                    || cat.Contains(s_antiiso) )
-                ) continue;
-            
-            if( isZFile(files[i][1]) )                   this->DYSelections(var, weight, cat, strVar, files[i][1], "2D");
-
-            else if( isEWKZFile(files[i][1]) )           this->EWKZSelections(var, weight, cat, strVar, files[i][1], "2D");
-            
-            else if( isTTFile(files[i][1]) )             this->TSelections(var, weight, cat, strVar, files[i][1], "2D");
-            
-            else if( isVVFile(files[i][1]) )             this->VVSelections(var, weight, cat, strVar, files[i][1], "2D");
-              
-            else if( isWFile(files[i][1]) )              this->WSelections(var, weight, cat, strVar, files[i][1], "2D");
-              
-            else if( files[i][1] == s_data )             this->dataSelections(var, weight_data, cat, strVar, files[i][1], "2D");
-              
-            else if( isSignalFile(files[i][1]) )         this->signalSelections(var, weight, cat, strVar, files[i][1], "2D");
-            
-          }
-        }
+                  }
         
       }
     }
@@ -272,7 +262,6 @@ void CreateHistos::run(TString isTest){
     for(auto cat : cats){
       for(auto strVar : vars){
         this->Estimate_W_QCD(strVar, cat);
-        if( do2DFit && this->is2DCategories(cat) )      this->Estimate_W_QCD(strVar, cat, "2D"); 
       }
     }
   }
@@ -280,7 +269,6 @@ void CreateHistos::run(TString isTest){
     for(auto cat : cats){
       for(auto strVar : vars){
         if( !do2DFit || cat == s_inclusive )            this->EstimateFF(strVar, cat);
-        else if( do2DFit && this->is2DCategories(cat) ) this->EstimateFF(strVar, cat, "2D");
       }
     } 
   }
@@ -985,7 +973,6 @@ void CreateHistos::writeHistos( TString channel, vector<TString> cats, vector<TS
   if(do2DFit) D2+="-2D";
   if(doMC) D2+="-MCsum";
 
-
   for(auto var : vars){
     outfile_name << "histos/"  << "htt_" << channel << ".inputs-sm-13TeV-"<<var<<D2<<".root";
     outfile = new TFile(outfile_name.str().c_str(), "RECREATE") ;
@@ -1067,22 +1054,11 @@ void CreateHistos::writeHistos( TString channel, vector<TString> cats, vector<TS
           tmp.ReplaceAll(s_jetToTauFakeDown,s_CMSjetToTauFake+s_13TeVDown);
           histograms.at( name.first )->SetName(tmp);
 
-          if(do2DFit ){
-            if( is2DCategories(cat) ){
-              tmp.ReplaceAll("2D","");
-              this->resetZeroBins(histograms.at( name.first ));
-              histograms.at( name.first )->Write(tmp, TObject::kWriteDelete);
-            }
-            else if( cat == s_inclusive){
-              this->resetZeroBins(histograms.at( name.first ));
-              histograms.at( name.first )->Write(tmp, TObject::kWriteDelete);
-            }
-            else continue;
-          }
-          else {
-            this->resetZeroBins(histograms.at( name.first ));
-            histograms.at( name.first )->Write(tmp, TObject::kWriteDelete);
-          }
+
+          
+          this->resetZeroBins(histograms.at( name.first ));
+          histograms.at( name.first )->Write(tmp, TObject::kWriteDelete);
+          
 
         }
       }
@@ -1114,16 +1090,18 @@ int CreateHistos::isEWKZFile(TString fileName){
 }
 
 int CreateHistos::isSignalFile(TString fileName){
-  if(fileName == s_ggH) return 1;
-  if(fileName == s_ggHtauUp) return 1;
-  if(fileName == s_ggHtauDown) return 1;
-  if(fileName == s_ggHjecUp) return 1;
-  if(fileName == s_ggHjecDown) return 1;
-  if(fileName == s_qqH) return 1;
-  if(fileName == s_qqHtauUp) return 1;
-  if(fileName == s_qqHtauDown) return 1;
-  if(fileName == s_qqHjecUp) return 1;
-  if(fileName == s_qqHjecDown) return 1;
+  for(auto mass : Parameter.dataset.masspoints){
+    if(fileName == s_H+mass) return 1;
+    if(fileName == s_HtauUp+mass) return 1;
+    if(fileName == s_HtauDown+mass) return 1;
+    if(fileName == s_HjecUp+mass) return 1;
+    if(fileName == s_HjecDown+mass) return 1;
+    if(fileName == s_BBH+mass) return 1;
+    if(fileName == s_BBHtauUp+mass) return 1;
+    if(fileName == s_BBHtauDown+mass) return 1;
+    if(fileName == s_BBHjecUp+mass) return 1;
+    if(fileName == s_BBHjecDown+mass) return 1;
+  }
 
   return 0;
 }
