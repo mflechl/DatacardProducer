@@ -1,6 +1,7 @@
 #include "interface/GlobalClass.h"
 #include "TLorentzVector.h"
 #include <iostream>
+#include <utility>
 #include <sstream>
 #include <TObject.h>
 #include <algorithm>
@@ -9,6 +10,7 @@ using namespace std;
 
 GlobalClass::GlobalClass()
 {  
+  TH1::SetDefaultSumw2(1);
 }
 GlobalClass::~GlobalClass()
 {
@@ -57,41 +59,30 @@ float GlobalClass::CalcHPt(){
 }
 
 int GlobalClass::Baseline(TString sign, TString cat){
-    
-  if( NtupleView->q_1 * NtupleView->q_2 < 0
-      && ( cat != s_inclusive
-           || this->passMTCut() )
-      &&( ( cat.Contains(s_antiiso)
-            && this->passIso("antiiso")
-            )
-          || ( this->passIso("base") )
-          )
+
+  if( this->passIso("base") 
       && this->Vetos()
-      && this->CategorySelection(cat)
+      && this->CategorySelection(cat,sign)
       ){
-    if(channel == "tt"
-       && sign == "OS"
-       && NtupleView->byTightIsolationMVArun2v1DBoldDMwLT_1
-       && NtupleView->byTightIsolationMVArun2v1DBoldDMwLT_2
-       ) return 1;
-    else if( channel != "tt"
-             && sign == "OS"
-             && NtupleView->byTightIsolationMVArun2v1DBoldDMwLT_2
-             ) return 1;
-    if( sign == "FF"
-        && !NtupleView->byTightIsolationMVArun2v1DBoldDMwLT_2
-        && NtupleView->byVLooseIsolationMVArun2v1DBoldDMwLT_2
-        ) return 1;
-    if( sign == "FF1"
-        && NtupleView->byTightIsolationMVArun2v1DBoldDMwLT_2
-        && !NtupleView->byTightIsolationMVArun2v1DBoldDMwLT_1
-        && NtupleView->byVLooseIsolationMVArun2v1DBoldDMwLT_1
-        ) return 1;
-    if( sign == "FF2"
-        && NtupleView->byTightIsolationMVArun2v1DBoldDMwLT_1
-        && !NtupleView->byTightIsolationMVArun2v1DBoldDMwLT_2
-        && NtupleView->byVLooseIsolationMVArun2v1DBoldDMwLT_2
-        ) return 1;
+
+    if(NtupleView->q_1 * NtupleView->q_2 < 0){
+      if( sign == "OS") return 1;
+      if( sign == "FF"
+          && !NtupleView->byMediumIsolationMVArun2v1DBoldDMwLT_2
+          && NtupleView->byVLooseIsolationMVArun2v1DBoldDMwLT_2
+          ) return 1;
+      if( sign == "FF1"
+          && NtupleView->byTightIsolationMVArun2v1DBoldDMwLT_2
+          && !NtupleView->byTightIsolationMVArun2v1DBoldDMwLT_1
+          && NtupleView->byVLooseIsolationMVArun2v1DBoldDMwLT_1
+          ) return 1;
+      if( sign == "FF2"
+          && NtupleView->byTightIsolationMVArun2v1DBoldDMwLT_1
+          && !NtupleView->byTightIsolationMVArun2v1DBoldDMwLT_2
+          && NtupleView->byVLooseIsolationMVArun2v1DBoldDMwLT_2
+          ) return 1;
+    }
+    else if(sign == "SS" && NtupleView->q_1 * NtupleView->q_2 > 0) return 1;
   } 
   
    
@@ -132,220 +123,109 @@ int GlobalClass::Vetos(){
   return 0;
 }
 
-int GlobalClass::CategorySelection(TString cat, TString mtcut){
+int GlobalClass::CategorySelection(TString cat, TString iso){
 
+  if(cat == s_inclusive) return this->TightMt(iso);
   ///////////////////////  0jet category     ///////////////////////////////
-  if(cat == s_0jet) return this->Jet0(mtcut);
-  if(cat == s_wjets_0jet_cr) return this->Jet0("mtHigh");
-  if(cat == s_antiiso_0jet_cr) return this->Jet0(mtcut);
-  ///////////////////////  boosted category     ///////////////////////////////
-  if(cat == s_boosted) return this->Boosted(mtcut);
-  if(cat == s_wjets_boosted_cr) return this->Boosted("mtHigh");
-  if(cat == s_antiiso_boosted_cr) return this->Boosted(mtcut);
-  ///////////////////////  vbf category     ///////////////////////////////
-  if(cat == s_vbf) return this->VBF(mtcut);
-  if(cat == s_wjets_vbf_cr) return this->VBF("mtHigh");
-  if(cat == s_antiiso_vbf_cr) return this->VBF(mtcut);
+  if(cat == s_nobtag          )    return this->Btag("nobtag");
+  if(cat == s_btag            )    return this->Btag("btag");
+  if(cat == s_nobtag_tight    )    return this->Btag("nobtag") && this->TightMt(iso);
+  if(cat == s_btag_tight      )    return this->Btag("btag") && this->TightMt(iso);
+  if(cat == s_nobtag_looseiso )    return this->Btag("nobtag") && this->LooseIso(iso);
+  if(cat == s_btag_looseiso   )    return this->Btag("btag") && this->LooseIso(iso);
+  if(cat == s_nobtag_loosemt  )    return this->Btag("nobtag") && this->LooseMt(iso);
+  if(cat == s_btag_loosemt    )    return this->Btag("btag") && this->LooseMt(iso);
   
   return 0;
 }
-
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-int GlobalClass::VBF_low(TString mtcut){
+int GlobalClass::Btag(TString btag){
+
+  if(btag == "btag" 
+    && NtupleView->nbtag > 0
+    && NtupleView->njets <= 1) return 1;
+
+  if(btag == "nobtag" 
+     && NtupleView->nbtag ==0) return 1;
+
+  return 0;
+
+}
+
+int GlobalClass::TightMt(TString iso){
+
+  if(this->getMT() <  Parameter.analysisCut.mTLow){ 
+
+    if(iso == "OS"){
+      if(FFiso == "tight" && NtupleView->byTightIsolationMVArun2v1DBoldDMwLT_2 ) return 1;
+      if(FFiso == "vtight" && NtupleView->byVTightIsolationMVArun2v1DBoldDMwLT_2 ) return 1;
+    }
+    if(iso == "FF") return 1;
+  } 
 
 
-  if( (this->getMT() < Parameter.analysisCut.mTLow
-       || mtcut == "wo"
-      )
-      && this->getNjets() == 2
-      && NtupleView->pt_2 > 20
-      && this->getMjj() > 500
-      && (this->getMjj() < 800
-          || this->CalcHPt() < 100
-          )
-      )return 1;
   return 0;
 }
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-int GlobalClass::VBF_high(TString mtcut){
+int GlobalClass::LooseMt(TString iso){
 
-  if( (this->getMT() < Parameter.analysisCut.mTLow
-       || mtcut == "wo"
-      )
-      && this->getNjets() == 2
-      && NtupleView->pt_2 > 20
-      && this->getMjj() > 800
-      && this->CalcHPt() > 100
-      )return 1;
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  if(this->getMT() > Parameter.analysisCut.mTLow
+     && this->getMT() < Parameter.analysisCut.mTHigh){
+
+    if(iso == "OS"){
+      if(FFiso == "tight" && NtupleView->byVTightIsolationMVArun2v1DBoldDMwLT_2) return 1;
+      if(FFiso == "vtight" && NtupleView->byTightIsolationMVArun2v1DBoldDMwLT_2) return 1;
+    }
+  
+     if(iso == "FF") return 1;
+ }
   return 0;
+  
 }
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-int GlobalClass::Jet1_low(TString mtcut){
+int GlobalClass::LooseIso(TString iso){
+  if(this->getMT() <  Parameter.analysisCut.mTHigh){
 
-  if( (this->getMT() < Parameter.analysisCut.mTLow
-       || mtcut == "wo"
-      )
-      && (this->getNjets() == 1 
-          || (this->getNjets() == 2
-              && this->getMjj() < 500
-              ) 
-          )
-      && ( (NtupleView->pt_2 > 30
-            && NtupleView->pt_2 <40
-            )
-           || (NtupleView->pt_2 > 40
-               && this->CalcHPt() < 140
-               )
-           )
-      )return 1;
-  return 0;
-}
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-int GlobalClass::Jet1_high(TString mtcut){
-
-  if( (this->getMT() < Parameter.analysisCut.mTLow
-       || mtcut == "wo"
-      )
-      && (this->getNjets() == 1 
-          || (this->getNjets() == 2
-              && this->getMjj() < 500
-              ) 
-          )
-      && NtupleView->pt_2 > 40
-      && this->CalcHPt() > 140             
-      
-      )return 1;
-  return 0;
-}
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-int GlobalClass::Jet0_low(TString mtcut){
-
-  if( (this->getMT() < Parameter.analysisCut.mTLow
-       || mtcut == "wo"
-       )
-      && this->getNjets() == 0
-      && NtupleView->pt_2 > 20
-      && NtupleView->pt_2 < 50
-      )return 1;
-  return 0;
-}
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-int GlobalClass::Jet0_high(TString mtcut){
-
-  if( (this->getMT() < Parameter.analysisCut.mTLow
-       || mtcut == "wo"
-      )
-      && this->getNjets() == 0
-      && NtupleView->pt_2 > 50
-      )return 1;
-  return 0;
-}
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-int GlobalClass::Jet0(TString mtcut){
-
-  if( channel != "tt" ){
-    if( ( (mtcut == ""
-           && this->getMT() < Parameter.analysisCut.mTLow
-           )
-          || mtcut == "wo"
-          || (mtcut == "mtHigh"
-              && this->getMT() > Parameter.analysisCut.mTHigh
-              && this->getMT() < 200 )
-          )
-        && this->getNjets() == 0
-        && NtupleView->pt_2 > 30
-        )return 1;
+    if(iso == "OS"
+       && NtupleView->byMediumIsolationMVArun2v1DBoldDMwLT_2){
+      if(FFiso == "tight" && !NtupleView->byTightIsolationMVArun2v1DBoldDMwLT_2) return 1;
+      if(FFiso == "vtight" && !NtupleView->byVTightIsolationMVArun2v1DBoldDMwLT_2) return 1;
+    }
+    if(iso == "FF") return 1;
   }
-  else{
-    if( this->getNjets() == 0
-        && NtupleView->pt_1 > 50
-        )return 1;
+
+  return 0;
+}
+
+int GlobalClass::W_CR(TString sign, TString iso, TString cat, bool mtcut){
+  if(sign == "OS" && NtupleView->q_1 * NtupleView->q_2 > 0) return 0;
+  if(sign == "SS" && NtupleView->q_1 * NtupleView->q_2 < 0) return 0;
+  if(mtcut && this->getMT() < Parameter.analysisCut.mTHigh ) return 0;
+  if( cat.Contains("_nobtag") && NtupleView->nbtag > 0 ) return 0;
+  if( cat.Contains("_btag") && !(NtupleView->njets <= 1 && NtupleView->njetspt20 > 0) ) return 0;
+
+  if( this->passIso("base") 
+      && this->Vetos() ){
+
+    if(iso == "tight" && NtupleView->byTightIsolationMVArun2v1DBoldDMwLT_2) return 1;
+    if(iso == "loose"
+       && !NtupleView->byTightIsolationMVArun2v1DBoldDMwLT_2
+       && NtupleView->byMediumIsolationMVArun2v1DBoldDMwLT_2) return 1;
   }
   return 0;
+
 }
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-int GlobalClass::Boosted(TString mtcut){
-
-  if( channel != "tt" ){
-    if( ( (mtcut == ""
-           && this->getMT() < Parameter.analysisCut.mTLow
-           )
-          || mtcut == "wo"
-          || (mtcut == "mtHigh"
-              && this->getMT() > Parameter.analysisCut.mTHigh
-              && this->getMT() < 200 )
-          )
-        && (this->getNjets() == 1
-            || (this->getNjets()==2 && this->getMjj()<300)
-            || this->getNjets()>2
-            )
-        && NtupleView->pt_2 > 30
-        )return 1;
-  }
-  else{
-    if(NtupleView->pt_1 > 50 
-       && ( this->getNjets() == 1
-            || (this->getNjets()>=2
-                && !( abs(this->getJdeta()) > 2.5
-                      && ( (doSvfit=="SVFIT"
-                            && NtupleView->pt_sv > 100 )
-                           || ( doSvfit=="woSVFIT"
-                                && this->CalcHPt() > 100 ) ) ) )
-            )
-       )return 1;
-  }
-  return 0;
-}
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-int GlobalClass::VBF(TString mtcut){
-
-  if( channel != "tt"){
-    if( ( (mtcut == ""
-           && this->getMT() < Parameter.analysisCut.mTLow
-           )
-          || mtcut == "wo"
-          || (mtcut == "mtHigh"
-              && this->getMT() > Parameter.analysisCut.mTHigh
-              && this->getMT() < 200 )
-          )
-        && this->getNjets() == 2
-        && this->getMjj() > 300
-        && NtupleView->pt_2 > 30
-        )return 1;
-  }
-  else{
-    if(NtupleView->pt_1 > 50
-       && this->getNjets() >= 2
-       && abs(this->getJdeta()) > 2.5
-       && ( (doSvfit=="SVFIT"
-             && NtupleView->pt_sv > 100 )
-            || ( doSvfit=="woSVFIT"
-                 && this->CalcHPt() > 100 ) )
-       )return 1;
-  }
-  return 0;
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 
 TH1D* GlobalClass::GetHistbyName(TString name, TString strVar){
 
-   for(int i = 0;i<histo_names.size();i++){
-      if(histo_names.at(i) == name) return histos.at(i);
-   }
+  try{
+    return histograms.at(name);
+  }
+  catch(const out_of_range& err){
+    return this->JITHistoCreator(name, strVar);
+  }
 
-   return this->JITHistoCreator(name, strVar);
 
 }
 
@@ -369,74 +249,9 @@ TH1D* GlobalClass::JITHistoCreator(TString name, TString strVar){
   int nbins = 1;
   double nmin = 0;
   double nmax = 1;
+  TString binning = "default";
 
   int usingVarBins = 0;
-
-  if( name.Contains(s_wjets) ){
-    nbins = 1;
-    nmin  = 80;
-    nmax  = 200;
-    histos.push_back( new TH1D(name,"", nbins, nmin, nmax  ) );
-    histos.back()->Sumw2();
-    histo_names.push_back(name);
-
-    return histos.back();
-  }
-  if( name.Contains(s_antiiso) ){
-    nbins = 4;
-    nmin  = 40;
-    nmax  = 200;
-    histos.push_back( new TH1D(name,"", nbins, nmin, nmax  ) );
-    histos.back()->Sumw2();
-    histo_names.push_back(name);
-
-    return histos.back();
-  }
-
-  if( channel != "tt" && name.Contains("2D") ){
-    if( name.Contains(Parameter.variable2D.D2_0Jet.name) ){
-      nbins = ( Parameter.variable2D.D2_0Jet.binsX.size()-1 ) * ( Parameter.variable2D.D2_0Jet.binsY.size()-1 );
-      nmin = 0;
-      nmax = nbins;
-    }
-    else if( name.Contains(Parameter.variable2D.D2_boosted.name) ){
-      nbins = (doSvfit=="SVFIT") ? ( Parameter.variable2D.D2_boosted.binsX.size()-1 ) * ( Parameter.variable2D.D2_boosted.binsY_svfit.size()-1 ) : ( Parameter.variable2D.D2_boosted.binsX.size()-1 ) * ( Parameter.variable2D.D2_boosted.binsY_mvis.size()-1 );
-      nmin = 0;
-      nmax = nbins;
-    }
-    else if( name.Contains(Parameter.variable2D.D2_vbf.name) ){
-      nbins = (doSvfit=="SVFIT") ? ( Parameter.variable2D.D2_vbf.binsX.size()-1 ) * ( Parameter.variable2D.D2_vbf.binsY_svfit.size()-1 ) : ( Parameter.variable2D.D2_vbf.binsX.size()-1 ) * ( Parameter.variable2D.D2_vbf.binsY_mvis.size()-1 );
-      nmin = 0;
-      nmax = nbins;
-    }
-    histos.push_back( new TH1D(name,"", nbins, nmin, nmax  ) );
-    histos.back()->Sumw2();
-    histo_names.push_back(name);
-
-    return histos.back();
-  }
-  if( channel == "tt" && name.Contains("2D") ){
-    if( name.Contains(Parameter.variable2D_tt.D2_0Jet.name) ){
-      nbins = ( Parameter.variable2D_tt.D2_0Jet.binsX.size()-1 );
-      nmin = 0;
-      nmax = nbins;
-    }
-    else if( name.Contains(Parameter.variable2D_tt.D2_boosted.name) ){
-      nbins = (doSvfit=="SVFIT") ? ( Parameter.variable2D_tt.D2_boosted.binsX.size()-1 ) * ( Parameter.variable2D_tt.D2_boosted.binsY_svfit.size()-1 ) : ( Parameter.variable2D_tt.D2_boosted.binsX.size()-1 ) * ( Parameter.variable2D_tt.D2_boosted.binsY_mvis.size()-1 );
-      nmin = 0;
-      nmax = nbins;
-    }
-    else if( name.Contains(Parameter.variable2D_tt.D2_vbf.name) ){
-      nbins = (doSvfit=="SVFIT") ? ( Parameter.variable2D_tt.D2_vbf.binsX.size()-1 ) * ( Parameter.variable2D_tt.D2_vbf.binsY_svfit.size()-1 ) : ( Parameter.variable2D_tt.D2_vbf.binsX.size()-1 ) * ( Parameter.variable2D_tt.D2_vbf.binsY_mvis.size()-1 );
-      nmin = 0;
-      nmax = nbins;
-    }
-    histos.push_back( new TH1D(name,"", nbins, nmin, nmax  ) );
-    histos.back()->Sumw2();
-    histo_names.push_back(name);
-
-    return histos.back();
-  }
 
   if(strVar == s_norm){
     nbins = 4;
@@ -447,7 +262,13 @@ TH1D* GlobalClass::JITHistoCreator(TString name, TString strVar){
   if(strVar == s_mvis){
     if(Parameter.variable.m_vis.doVarBins) {
       usingVarBins = 1;
-      histos.push_back( this->getBinnedHisto(name,Parameter.variable.m_vis.varBins) );
+      if( name.Contains("_btag") ){
+        binning = "btag";
+      }
+      else if( name.Contains("_nobtag") ){
+        binning = "nobtag";
+      }
+      histograms[name] = this->getBinnedHisto(name,Parameter.variable.m_vis.varBins.at(binning)) ;
     }
     else{
       nbins = Parameter.variable.m_vis.nbins;
@@ -459,7 +280,7 @@ TH1D* GlobalClass::JITHistoCreator(TString name, TString strVar){
   if(strVar == s_msv){
     if(Parameter.variable.m_sv.doVarBins) {
       usingVarBins = 1;
-      histos.push_back( this->getBinnedHisto(name,Parameter.variable.m_sv.varBins) );
+      histograms[name] = this->getBinnedHisto(name,Parameter.variable.m_sv.varBins.at(binning)) ;
     }
     else{
       nbins = Parameter.variable.m_sv.nbins;
@@ -471,7 +292,7 @@ TH1D* GlobalClass::JITHistoCreator(TString name, TString strVar){
   if(strVar == s_ptsv){
     if(Parameter.variable.pt_sv.doVarBins) {
       usingVarBins = 1;
-      histos.push_back( this->getBinnedHisto(name,Parameter.variable.pt_sv.varBins) );
+      histograms[name] = this->getBinnedHisto(name,Parameter.variable.pt_sv.varBins.at(binning)) ;
     }
     else{
       nbins = Parameter.variable.pt_sv.nbins;
@@ -481,16 +302,11 @@ TH1D* GlobalClass::JITHistoCreator(TString name, TString strVar){
   }
 
   else if(strVar == s_jpt1
-     || strVar == s_jpt2
-     || strVar == "jpt_1_2"
-     || strVar == "jpt_1_2p5"
-     || strVar == "jpt_1_3"
-     || strVar == "jpt_2_2"
-     || strVar == "jpt_2_2p5"
-     || strVar == "jpt_2_3"){
+          || strVar == s_jpt2
+        ){
     if(Parameter.variable.jpt.doVarBins){
       usingVarBins = 1;
-      histos.push_back( this->getBinnedHisto(name,Parameter.variable.jpt.varBins) );
+      histograms[name] = this->getBinnedHisto(name,Parameter.variable.jpt.varBins.at(binning)) ;
     }
     else{
       nbins = Parameter.variable.jpt.nbins;
@@ -501,7 +317,13 @@ TH1D* GlobalClass::JITHistoCreator(TString name, TString strVar){
   else if(strVar == s_pt1 || strVar == s_pt2){
     if(Parameter.variable.pt.doVarBins){
       usingVarBins = 1;
-      histos.push_back( this->getBinnedHisto(name,Parameter.variable.pt.varBins) );
+      if( name.Contains("_btag") ){
+        binning = "btag";
+      }
+      else if( name.Contains("_nobtag") ){
+        binning = "nobtag";
+      }
+      histograms[name] = this->getBinnedHisto(name,Parameter.variable.pt.varBins.at(binning)) ;
     }
     else{
       nbins = Parameter.variable.pt.nbins;
@@ -512,7 +334,7 @@ TH1D* GlobalClass::JITHistoCreator(TString name, TString strVar){
   else if(strVar == s_eta1 || strVar == s_eta2){
     if(Parameter.variable.eta.doVarBins){
       usingVarBins = 1;
-      histos.push_back( this->getBinnedHisto(name,Parameter.variable.eta.varBins) );
+      histograms[name] = this->getBinnedHisto(name,Parameter.variable.eta.varBins.at(binning)) ;
     }
     else{
       nbins = Parameter.variable.eta.nbins;
@@ -523,7 +345,7 @@ TH1D* GlobalClass::JITHistoCreator(TString name, TString strVar){
   else if(strVar == s_jeta1 || strVar == s_jeta2){
     if(Parameter.variable.jeta.doVarBins){
       usingVarBins = 1;
-      histos.push_back( this->getBinnedHisto(name,Parameter.variable.jeta.varBins) );
+      histograms[name] = this->getBinnedHisto(name,Parameter.variable.jeta.varBins.at(binning)) ;
     }
     else{
       nbins = Parameter.variable.jeta.nbins;
@@ -534,7 +356,7 @@ TH1D* GlobalClass::JITHistoCreator(TString name, TString strVar){
   else if(strVar == "jdeta"){
     if(Parameter.variable.jdeta.doVarBins){
       usingVarBins = 1;
-      histos.push_back( this->getBinnedHisto(name,Parameter.variable.jdeta.varBins) ); 
+      histograms[name] = this->getBinnedHisto(name,Parameter.variable.jdeta.varBins.at(binning)) ; 
     }
     else{
       nbins = Parameter.variable.jdeta.nbins;
@@ -545,7 +367,7 @@ TH1D* GlobalClass::JITHistoCreator(TString name, TString strVar){
   else if(strVar == s_mt1){
     if(Parameter.variable.mt_1.doVarBins){
       usingVarBins = 1;
-      histos.push_back( this->getBinnedHisto(name,Parameter.variable.mt_1.varBins) );
+      histograms[name] = this->getBinnedHisto(name,Parameter.variable.mt_1.varBins.at(binning)) ;
     }
     else{
       nbins = Parameter.variable.mt_1.nbins;
@@ -556,7 +378,7 @@ TH1D* GlobalClass::JITHistoCreator(TString name, TString strVar){
   else if(strVar == s_met){
     if(Parameter.variable.met.doVarBins){
       usingVarBins = 1;
-      histos.push_back( this->getBinnedHisto(name,Parameter.variable.met.varBins) );
+      histograms[name] = this->getBinnedHisto(name,Parameter.variable.met.varBins.at(binning)) ;
     }
     else{
       nbins = Parameter.variable.met.nbins;
@@ -567,7 +389,13 @@ TH1D* GlobalClass::JITHistoCreator(TString name, TString strVar){
   else if(strVar == s_mttot){
     if(Parameter.variable.mttot.doVarBins){
       usingVarBins = 1;
-      histos.push_back( this->getBinnedHisto(name,Parameter.variable.mttot.varBins) );
+      if( name.Contains("_btag") ){
+        binning = channel + "_btag";
+      }
+      else if( name.Contains("_nobtag") ){
+        binning = channel + "_nobtag";
+      }
+      histograms[name] = this->getBinnedHisto(name,Parameter.variable.mttot.varBins.at(binning)) ;
     }
     else{
       nbins = Parameter.variable.mttot.nbins;
@@ -578,7 +406,7 @@ TH1D* GlobalClass::JITHistoCreator(TString name, TString strVar){
   else if(strVar == s_Hpt){
     if(Parameter.variable.Hpt.doVarBins){
       usingVarBins = 1;
-      histos.push_back( this->getBinnedHisto(name,Parameter.variable.Hpt.varBins) );
+      histograms[name] = this->getBinnedHisto(name,Parameter.variable.Hpt.varBins.at(binning)) ;
     }
     else{
       nbins = Parameter.variable.Hpt.nbins;
@@ -589,7 +417,7 @@ TH1D* GlobalClass::JITHistoCreator(TString name, TString strVar){
   else if(strVar == "High_mt_1"){
     if(Parameter.variable.High_mt_1.doVarBins){
       usingVarBins = 1;
-      histos.push_back( this->getBinnedHisto(name,Parameter.variable.High_mt_1.varBins) );
+      histograms[name] = this->getBinnedHisto(name,Parameter.variable.High_mt_1.varBins.at(binning)) ;
     }
     else{
       nbins = Parameter.variable.High_mt_1.nbins;
@@ -600,7 +428,7 @@ TH1D* GlobalClass::JITHistoCreator(TString name, TString strVar){
   else if(strVar == "Low_mt_1"){
     if(Parameter.variable.Low_mt_1.doVarBins){
       usingVarBins = 1;
-      histos.push_back( this->getBinnedHisto(name,Parameter.variable.Low_mt_1.varBins) );
+      histograms[name] = this->getBinnedHisto(name,Parameter.variable.Low_mt_1.varBins.at(binning)) ;
     }
     else{
       nbins = Parameter.variable.Low_mt_1.nbins;
@@ -611,7 +439,7 @@ TH1D* GlobalClass::JITHistoCreator(TString name, TString strVar){
   else if(strVar == "iso_1"){
     if(Parameter.variable.iso_1.doVarBins){
       usingVarBins = 1;
-      histos.push_back( this->getBinnedHisto(name,Parameter.variable.iso_1.varBins) );
+      histograms[name] = this->getBinnedHisto(name,Parameter.variable.iso_1.varBins.at(binning)) ;
     }
     else{
       nbins = Parameter.variable.iso_1.nbins;
@@ -622,7 +450,7 @@ TH1D* GlobalClass::JITHistoCreator(TString name, TString strVar){
   else if(strVar == s_mjj){
     if(Parameter.variable.mjj.doVarBins){
       usingVarBins = 1;
-      histos.push_back( this->getBinnedHisto(name,Parameter.variable.mjj.varBins) );
+      histograms[name] = this->getBinnedHisto(name,Parameter.variable.mjj.varBins.at(binning)) ;
     }
     else{
       nbins = Parameter.variable.mjj.nbins;
@@ -633,7 +461,7 @@ TH1D* GlobalClass::JITHistoCreator(TString name, TString strVar){
   else if(strVar == "jeta1eta2"){
     if(Parameter.variable.jeta1eta2.doVarBins){
       usingVarBins = 1;
-      histos.push_back( this->getBinnedHisto(name,Parameter.variable.jeta1eta2.varBins) );
+      histograms[name] = this->getBinnedHisto(name,Parameter.variable.jeta1eta2.varBins.at(binning)) ;
     }
     else{
       nbins = Parameter.variable.jeta1eta2.nbins;
@@ -644,143 +472,16 @@ TH1D* GlobalClass::JITHistoCreator(TString name, TString strVar){
   
   //else throw std::invalid_argument( "Cannot create histo: " + name + ". Binning not found"  );
 
-  if(!usingVarBins) histos.push_back( new TH1D(name,"", nbins, nmin, nmax  ) );
-  histos.back()->Sumw2();
-  histo_names.push_back(name);
+  if(!usingVarBins) histograms[name] = new TH1D(name,"", nbins, nmin, nmax  ) ;
 
-  return histos.back();
+  return histograms.at(name);
 
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-double GlobalClass::QCD_OSSS(TString cat){
-  if(channel == "mt"){
-    if(cat == s_0jet
-       || cat == s_inclusive
-       || cat == s_wjets_0jet_cr
-       || cat == s_0jet_low
-       || cat == s_0jet_high)  return Parameter.QCD_OSSS.mt.ZeroJet;
 
-    if(cat == s_boosted
-       || cat == s_wjets_boosted_cr
-       || cat == s_1jet_low
-       || cat == s_1jet_high)  return Parameter.QCD_OSSS.mt.Boosted;
-
-    if(cat == s_vbf
-       || cat == s_vbf_low
-       || cat == s_vbf_high)   return Parameter.QCD_OSSS.mt.VBF;
-  }
-  if(channel == "et"){
-    if(cat == s_0jet
-       || cat == s_inclusive
-       || cat == s_wjets_0jet_cr
-       || cat == s_0jet_low
-       || cat == s_0jet_high)  return Parameter.QCD_OSSS.et.ZeroJet;
-
-    if(cat == s_boosted
-       || cat == s_wjets_boosted_cr
-       || cat == s_1jet_low
-       || cat == s_1jet_high)  return Parameter.QCD_OSSS.et.Boosted;
-
-    if(cat == s_vbf
-       || cat == s_wjets_vbf_cr
-       || cat == s_vbf_low
-       || cat == s_vbf_high)   return Parameter.QCD_OSSS.et.VBF;
-  }
-  return 1.0;
-}
-
-int GlobalClass::OS_W(TString cat){
-
-  if(NtupleView->q_1 * NtupleView->q_2 < 0
-     &&( ( cat.Contains(s_antiiso)
-           && this->passIso("antiiso")
-           )
-         || ( this->passIso("base") )
-         )
-     && this->getMT() > Parameter.analysisCut.mTHigh
-     && NtupleView->byTightIsolationMVArun2v1DBoldDMwLT_2
-     && this->CategorySelection(cat, "wo")
-     && this->Vetos()) return 1;
-  return 0;
-}
-
-int GlobalClass::SS_W(TString cat){
-
-  if(NtupleView->q_1 * NtupleView->q_2 > 0
-     &&( ( cat.Contains(s_antiiso)
-           && this->passIso("antiiso")
-           )
-         || ( this->passIso("base") )
-         )
-     && this->getMT() > Parameter.analysisCut.mTHigh
-     && NtupleView->byTightIsolationMVArun2v1DBoldDMwLT_2
-     && this->CategorySelection(cat, "wo")
-     && this->Vetos()) return 1;
-  return 0;
-}
-
-int GlobalClass::relaxed_W(TString cat, TString mt){
-
-  if(NtupleView->q_1 * NtupleView->q_2 < 0
-     && this->passIso("relaxed")
-     && NtupleView->byMediumIsolationMVArun2v1DBoldDMwLT_2
-     && this->Vetos()
-     && this->CategorySelection(cat, "wo")){
-
-    if(mt == "low" && this->getMT() < Parameter.analysisCut.mTLow) return 1;
-    if(mt == "high" && this->getMT() > Parameter.analysisCut.mTHigh) return 1;
-  }
-  return 0;
-}
-
-int GlobalClass::SS_Low(TString cat){
-
-  if(NtupleView->q_1 * NtupleView->q_2 > 0
-     &&( ( cat.Contains(s_antiiso)
-           && this->passIso("antiiso")
-           )
-         || ( this->passIso("base") )
-         )
-     && this->getMT() < Parameter.analysisCut.mTLow
-     && NtupleView->byTightIsolationMVArun2v1DBoldDMwLT_2
-     && this->CategorySelection(cat, "wo")
-     && this->Vetos()) return 1;
-  return 0;
-}
-
-int GlobalClass::SS_Low_relaxed(TString cat){
-
-  if(NtupleView->q_1 * NtupleView->q_2 > 0
-     &&( ( cat.Contains(s_antiiso)
-           && this->passIso("antiiso")
-           )
-         || ( this->passIso("base") )
-         )
-     && this->getMT() < Parameter.analysisCut.mTLow
-     && NtupleView->byMediumIsolationMVArun2v1DBoldDMwLT_2
-     && this->CategorySelection(cat, "wo")
-     && this->Vetos()) return 1;
-  return 0;
-}
-
-int GlobalClass::is1DCategories(TString category){
-  for( auto cat : Parameter.category.D1categories ){
-    if(category == cat) return 1;
-  }
-  return 0;
-  
-}
-
-int GlobalClass::is2DCategories(TString category){
-  for( auto cat : Parameter.category.D2categories ){
-    if(category == cat) return 1;
-  }
-  return 0;
-  
-}
 
 int GlobalClass::returnBin(vector<double> bins, double value){
 
@@ -794,15 +495,7 @@ int GlobalClass::returnBin(vector<double> bins, double value){
 
 double GlobalClass::get2DVar(TString sub){
 
-  if( sub.Contains(s_wjets) ) return 80;
-  if (sub.Contains(s_antiiso) ){
-    int binX= (doSvfit=="SVFIT" &&
-               ( sub.Contains(s_boosted)
-                 || sub.Contains(s_vbf)
-                 )
-               ) ? this->returnBin(Parameter.variable2D.antiiso.binsX,NtupleView->m_sv) : this->returnBin(Parameter.variable2D.antiiso.binsX,NtupleView->m_vis);
-    return Parameter.variable2D.antiiso.binsX[binX-1];
-  }
+
 
   if( channel != "tt" ){
     if( sub.Contains(Parameter.variable2D.D2_0Jet.name) ){

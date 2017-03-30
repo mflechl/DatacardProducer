@@ -8,51 +8,85 @@
 using namespace std;
 
 CreateHistos::CreateHistos(){
+  TString tmp = "";
+  files[s_Z].first = Parameter.dataset.Z;
+  files[s_EWKZ].first = Parameter.dataset.EWKZ;
+  files[s_W].first = Parameter.dataset.W;
+  files[s_TT].first = Parameter.dataset.TT;
+  files[s_VV].first = Parameter.dataset.VV;
 
-  histos.clear();
-  files.clear();
-  histo_names.clear();
-  
-  files.push_back({Parameter.dataset.Z,s_Z});
-  files.push_back({Parameter.dataset.EWKZ,s_EWKZ});
-  files.push_back({Parameter.dataset.W,s_W});
-  files.push_back({Parameter.dataset.TT,s_TT});
-  files.push_back({Parameter.dataset.VV,s_VV});
-  if(channel=="mt" && !doMC )files.push_back({Parameter.dataset.data_mt,s_data});
-  else if(channel=="mt" && doMC)files.push_back({Parameter.dataset.MCsum_mt,s_data});
-  if(channel=="et")files.push_back({Parameter.dataset.data_et,s_data});
-  if(channel=="tt")files.push_back({Parameter.dataset.data_tt,s_data});
-  files.push_back({Parameter.dataset.ggH,s_ggH});
-  files.push_back({Parameter.dataset.qqH,s_qqH});
+  if(channel=="mt" && !doMC )files[s_data].first = Parameter.dataset.data_mt;
+  else if(channel=="mt" && doMC)files[s_data].first = Parameter.dataset.MCsum_mt;
+  if(channel=="et")files[s_data].first = Parameter.dataset.data_et;
+  if(channel=="tt")files[s_data].first = Parameter.dataset.data_tt;
+
+  for(auto mass : Parameter.dataset.masspoints){
+    tmp = Parameter.dataset.ggH;
+    files[s_ggH+mass].first = tmp.ReplaceAll("XXX",mass);
+    files[s_ggH+mass].second = mass;
+
+    tmp = Parameter.dataset.bbH;
+    files[s_bbH+mass].first = tmp.ReplaceAll("XXX",mass);
+    files[s_bbH+mass].second = mass;
+  }
+
   if(ptShift){
-    files.push_back({Parameter.dataset.ZtauUp,s_ZtauUp});
-    files.push_back({Parameter.dataset.ZtauDown,s_ZtauDown});
-    files.push_back({Parameter.dataset.EWKZtauUp,s_EWKZtauUp});
-    files.push_back({Parameter.dataset.EWKZtauDown,s_EWKZtauDown});
-    files.push_back({Parameter.dataset.TTtauUp,s_TTtauUp});
-    files.push_back({Parameter.dataset.TTtauDown,s_TTtauDown});
-    files.push_back({Parameter.dataset.VVtauUp,s_VVtauUp});
-    files.push_back({Parameter.dataset.VVtauDown,s_VVtauDown});
-    files.push_back({Parameter.dataset.ggHtauUp,s_ggHtauUp});
-    files.push_back({Parameter.dataset.ggHtauDown,s_ggHtauDown});
-    files.push_back({Parameter.dataset.qqHtauUp,s_qqHtauUp});
-    files.push_back({Parameter.dataset.qqHtauDown,s_qqHtauDown});
+    files[s_ZtauUp].first = Parameter.dataset.ZtauUp;
+    files[s_ZtauDown].first = Parameter.dataset.ZtauDown;
+    files[s_EWKZtauUp].first = Parameter.dataset.EWKZtauUp;
+    files[s_EWKZtauDown].first = Parameter.dataset.EWKZtauDown;
+    files[s_TTtauUp].first = Parameter.dataset.TTtauUp;
+    files[s_TTtauDown].first = Parameter.dataset.TTtauDown;
+    files[s_VVtauUp].first = Parameter.dataset.VVtauUp;
+    files[s_VVtauDown].first = Parameter.dataset.VVtauDown;
+
+    for(auto mass : Parameter.dataset.masspoints){
+      tmp = Parameter.dataset.ggHtauUp;
+      files[s_ggHtauUp+mass].first = tmp.ReplaceAll("XXX",mass);
+      files[s_ggHtauUp+mass].second = mass;
+
+      tmp = Parameter.dataset.ggHtauDown;
+      files[s_ggHtauDown+mass].first = tmp.ReplaceAll("XXX",mass);
+      files[s_ggHtauDown+mass].second = mass;
+
+      tmp = Parameter.dataset.bbHtauUp;
+      files[s_bbHtauUp+mass].first = tmp.ReplaceAll("XXX",mass);
+      files[s_bbHtauUp+mass].second = mass;
+
+      tmp = Parameter.dataset.bbHtauDown;
+      files[s_bbHtauDown+mass].first = tmp.ReplaceAll("XXX",mass);
+      files[s_bbHtauDown+mass].second = mass;
+    }
   }
   if(jecShift){
-    files.push_back({Parameter.dataset.Z,s_ZjecUp});
-    files.push_back({Parameter.dataset.Z,s_ZjecDown});
-    files.push_back({Parameter.dataset.EWKZ,s_EWKZjecUp});
-    files.push_back({Parameter.dataset.EWKZ,s_EWKZjecDown});
-    files.push_back({Parameter.dataset.W,s_WjecUp});
-    files.push_back({Parameter.dataset.W,s_WjecDown});
-    files.push_back({Parameter.dataset.TT,s_TTjecUp});
-    files.push_back({Parameter.dataset.TT,s_TTjecDown});
-    files.push_back({Parameter.dataset.VV,s_VVjecUp});
-    files.push_back({Parameter.dataset.VV,s_VVjecDown});
-    files.push_back({Parameter.dataset.ggH,s_ggHjecUp});
-    files.push_back({Parameter.dataset.ggH,s_ggHjecDown});
-    files.push_back({Parameter.dataset.qqH,s_qqHjecUp});
-    files.push_back({Parameter.dataset.qqH,s_qqHjecDown});
+    files[s_ZjecUp].first = Parameter.dataset.Z;
+    files[s_ZjecDown].first = Parameter.dataset.Z;
+    files[s_EWKZjecUp].first = Parameter.dataset.EWKZ;
+    files[s_EWKZjecDown].first = Parameter.dataset.EWKZ;
+    files[s_WjecUp].first = Parameter.dataset.W;
+    files[s_WjecDown].first = Parameter.dataset.W;
+    files[s_TTjecUp].first = Parameter.dataset.TT;
+    files[s_TTjecDown].first = Parameter.dataset.TT;
+    files[s_VVjecUp].first = Parameter.dataset.VV;
+    files[s_VVjecDown].first = Parameter.dataset.VV;
+
+    for(auto mass : Parameter.dataset.masspoints){
+      tmp = Parameter.dataset.ggH;
+      files[s_ggHjecUp+mass].first = tmp.ReplaceAll("XXX",mass);
+      files[s_ggHjecUp+mass].second = mass;
+
+      tmp = Parameter.dataset.ggH;
+      files[s_ggHjecDown+mass].first = tmp.ReplaceAll("XXX",mass);
+      files[s_ggHjecDown+mass].second = mass;
+
+      tmp = Parameter.dataset.bbH;
+      files[s_bbHjecUp+mass].first = tmp.ReplaceAll("XXX",mass);
+      files[s_bbHjecUp+mass].second = mass;
+
+      tmp = Parameter.dataset.bbH;
+      files[s_bbHjecDown+mass].first = tmp.ReplaceAll("XXX",mass);
+      files[s_bbHjecDown+mass].second = mass;
+    }
   }
 
   for(int i=0; i<variables.size(); i++)      vars.push_back(variables.at(i));
@@ -62,8 +96,6 @@ CreateHistos::CreateHistos(){
 }
 
 CreateHistos::~CreateHistos(){
-
-  histos.clear();
 
   cout << "Deleting instance of CreateHistos" << endl;
 
@@ -144,14 +176,22 @@ void CreateHistos::run(TString isTest){
     }
   }
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  
-  for(int i =0;i < files.size();i++){
+  TString filetype = "";
+  TString filename = "";
+  TString mass = "";
 
-    if(files[i][1].Contains(s_jecUp)) this->isJEC=1;
-    else if(files[i][1].Contains(s_jecDown)) this->isJEC=-1;
+  for (auto const& file : files){
+
+    filetype = file.first;
+    filename = file.second.first;
+    mass = file.second.second;
+    filetype.ReplaceAll( mass, "" );
+  
+    if(filetype.Contains(s_jecUp)) this->isJEC=1;
+    else if(filetype.Contains(s_jecDown)) this->isJEC=-1;
     else this->isJEC=0;
 
-    this->loadFile(files[i][0]);
+    this->loadFile(filename);
     Int_t nentries=0;
     if(isTest=="test"){
       nentries = min( Int_t(NtupleView->fChain->GetEntries()), Int_t( 10000 ) );
@@ -175,8 +215,8 @@ void CreateHistos::run(TString isTest){
  
       weight = NtupleView->stitchedWeight*NtupleView->puweight*NtupleView->effweight*NtupleView->genweight*NtupleView->antilep_tauscaling*usedLuminosity;
       if(!doMC){
-        if( isZFile(files[i][1]) || isEWKZFile(files[i][1]) ) weight *= NtupleView->ZWeight;
-        if( isTTFile(files[i][1]) ) weight *= NtupleView->topWeight;
+        if( isZFile(filetype) || isEWKZFile(filetype) ) weight *= NtupleView->ZWeight;
+        if( isTTFile(filetype) ) weight *= NtupleView->topWeight;
       }
       else if(doMC) weight_data=weight;
 
@@ -185,12 +225,11 @@ void CreateHistos::run(TString isTest){
 
       for(auto cat : cats){
 
-        if( !doMC && isZFile(files[i][1]) ) weight *= this->getZmumuWeight( cat );
+        if( !doMC && isZFile(filetype) ) weight *= this->getZmumuWeight( cat );
 
         for(auto strVar : vars){
 
           var = -999;
-
           if(strVar == s_mvis)                                var = NtupleView->m_vis;
           else if(strVar == s_msv)                            var = NtupleView->m_sv;
           else if(strVar == s_ptsv)                           var = NtupleView->pt_sv;
@@ -227,64 +266,37 @@ void CreateHistos::run(TString isTest){
 
           if( !do2DFit || cat == s_inclusive ){
 
-            if( isZFile(files[i][1]) )                     this->DYSelections(var, weight, cat, strVar, files[i][1]);
+            if( isZFile(filetype) )                     this->DYSelections(var, weight, cat, strVar, filetype);
             
-            else if( isEWKZFile(files[i][1]) )             this->EWKZSelections(var, weight, cat, strVar, files[i][1]);
+            else if( isEWKZFile(filetype) )             this->EWKZSelections(var, weight, cat, strVar, filetype);
           
-            else if( isTTFile(files[i][1]) )               this->TSelections(var, weight, cat, strVar, files[i][1]);
+            else if( isTTFile(filetype) )               this->TSelections(var, weight, cat, strVar, filetype);
             
-            else if( isVVFile(files[i][1]) )               this->VVSelections(var, weight, cat, strVar, files[i][1]);
+            else if( isVVFile(filetype) )               this->VVSelections(var, weight, cat, strVar, filetype);
 
-            else if( isWFile(files[i][1]) )                this->WSelections(var, weight, cat, strVar, files[i][1]);
+            else if( isWFile(filetype) )                this->WSelections(var, weight, cat, strVar, filetype);
 
-            else if( files[i][1] == s_data )               this->dataSelections(var, weight_data, cat, strVar, files[i][1]);
+            else if( filetype == s_data )               this->dataSelections(var, weight_data, cat, strVar, filetype);
 
-            else if( isSignalFile(files[i][1]) )           this->signalSelections(var, weight, cat, strVar, files[i][1]);
+            else if( isSignalFile(filetype) )           this->signalSelections(var, weight, cat, strVar, filetype, mass);
 
           }
-          
-
-          if(do2DFit){
-
-            if ( !this->is2DCategories(cat) ) continue;
-            if( channel == "tt"
-                && (cat.Contains(s_wjets)
-                    || cat.Contains(s_antiiso) )
-                ) continue;
-            
-            if( isZFile(files[i][1]) )                   this->DYSelections(var, weight, cat, strVar, files[i][1], "2D");
-
-            else if( isEWKZFile(files[i][1]) )           this->EWKZSelections(var, weight, cat, strVar, files[i][1], "2D");
-            
-            else if( isTTFile(files[i][1]) )             this->TSelections(var, weight, cat, strVar, files[i][1], "2D");
-            
-            else if( isVVFile(files[i][1]) )             this->VVSelections(var, weight, cat, strVar, files[i][1], "2D");
-              
-            else if( isWFile(files[i][1]) )              this->WSelections(var, weight, cat, strVar, files[i][1], "2D");
-              
-            else if( files[i][1] == s_data )             this->dataSelections(var, weight_data, cat, strVar, files[i][1], "2D");
-              
-            else if( isSignalFile(files[i][1]) )         this->signalSelections(var, weight, cat, strVar, files[i][1], "2D");
-            
-          }
-        }
+                  }
         
       }
     }
   }
-  if( channel != "tt" ){
-    for(auto cat : cats){
-      for(auto strVar : vars){
-        this->Estimate_W_QCD(strVar, cat);
-        if( do2DFit && this->is2DCategories(cat) )      this->Estimate_W_QCD(strVar, cat, "2D"); 
-      }
-    }
-  }
+  // if( channel != "tt" ){
+  //   for(auto cat : cats){
+  //     for(auto strVar : vars){
+  //       this->Estimate_W_QCD(strVar, cat);
+  //     }
+  //   }
+  // }
   if(calcFF){
     for(auto cat : cats){
       for(auto strVar : vars){
         if( !do2DFit || cat == s_inclusive )            this->EstimateFF(strVar, cat);
-        else if( do2DFit && this->is2DCategories(cat) ) this->EstimateFF(strVar, cat, "2D");
       }
     } 
   }
@@ -321,401 +333,6 @@ float CreateHistos::getAntiLep_tauscaling(){
     }
     return 1.0;
 
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CreateHistos::CreateQCD_osw(TString strVar, TString cat, TString extend){
-  TString sub = extend + "+" + strVar +"_" + cat + "+";
-
-  this->GetHistbyName("OS_W_"+s_QCD+sub,strVar)->Add( this->GetHistbyName("SS_W_"+s_data+sub,strVar)   );
-  this->GetHistbyName("OS_W_"+s_QCD+sub,strVar)->Add( this->GetHistbyName("SS_W_"+s_VV+sub,strVar), -1 );
-  this->GetHistbyName("OS_W_"+s_QCD+sub,strVar)->Add( this->GetHistbyName("SS_W_"+s_Z+sub,strVar),  -1 );
-  this->GetHistbyName("OS_W_"+s_QCD+sub,strVar)->Add( this->GetHistbyName("SS_W_"+s_TT+sub,strVar), -1 );
-  this->GetHistbyName("OS_W_"+s_QCD+sub,strVar)->Add( this->GetHistbyName("SS_W_"+s_EWKZ+sub,strVar),  -1 );
-  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  this->GetHistbyName("SS_W_"+s_W+s_WSFUncert+channel+"_"+s_13TeVUp+sub,strVar)->Add( this->GetHistbyName("SS_W_"+s_W+sub,strVar) );
-  this->GetHistbyName("SS_W_"+s_W+s_WSFUncert+channel+"_"+s_13TeVUp+sub,strVar)->Scale( 1.+this->getWSFUncertainty(cat) );
-  this->GetHistbyName("SS_W_"+s_W+s_WSFUncert+channel+"_"+s_13TeVDown+sub,strVar)->Add( this->GetHistbyName("SS_W_"+s_W+sub,strVar) );
-  this->GetHistbyName("SS_W_"+s_W+s_WSFUncert+channel+"_"+s_13TeVDown+sub,strVar)->Scale( 1.-this->getWSFUncertainty(cat) );
-  this->GetHistbyName("OS_W_"+s_QCD+s_WSFUncert+channel+"_"+s_13TeVUp+sub,strVar)->Add( this->GetHistbyName("OS_W_"+s_QCD+sub,strVar) );
-  this->GetHistbyName("OS_W_"+s_QCD+s_WSFUncert+channel+"_"+s_13TeVDown+sub,strVar)->Add( this->GetHistbyName("OS_W_"+s_QCD+sub,strVar) );
-  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  this->GetHistbyName("OS_W_"+s_QCD+sub,strVar)->Add( this->GetHistbyName("SS_W_"+s_W+sub,strVar),  -1 );
-  this->GetHistbyName("OS_W_"+s_QCD+sub,strVar)->Scale( this->QCD_OSSS(cat) );
-
-  this->resetZeroBins("OS_W_"+s_QCD+sub,strVar);
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  //WSFUncertainties
-  this->GetHistbyName("OS_W_"+s_QCD+s_WSFUncert+channel+this->return2DString(cat)+"_"+s_13TeVUp+sub,strVar)->Add( this->GetHistbyName("SS_W_"+s_W+s_WSFUncert+channel+"_"+s_13TeVUp+sub,strVar), -1  );
-  this->GetHistbyName("OS_W_"+s_QCD+s_WSFUncert+channel+this->return2DString(cat)+"_"+s_13TeVUp+sub,strVar)->Scale( this->QCD_OSSS(cat) );
-  this->resetZeroBins("OS_W_"+s_QCD+s_WSFUncert+channel+this->return2DString(cat)+"_"+s_13TeVUp+sub,strVar);
-  this->GetHistbyName("OS_W_"+s_QCD+s_WSFUncert+channel+this->return2DString(cat)+"_"+s_13TeVDown+sub,strVar)->Add( this->GetHistbyName("SS_W_"+s_W+s_WSFUncert+channel+"_"+s_13TeVDown+sub,strVar), -1  );
-  this->GetHistbyName("OS_W_"+s_QCD+s_WSFUncert+channel+this->return2DString(cat)+"_"+s_13TeVDown+sub,strVar)->Scale( this->QCD_OSSS(cat) );
-  this->resetZeroBins("OS_W_"+s_QCD+s_WSFUncert+channel+this->return2DString(cat)+"_"+s_13TeVDown+sub,strVar);
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  //QCDSFUncertainties
-  this->GetHistbyName("OS_W_"+s_QCD+s_QCDSFUncert+channel+this->return2DString(cat)+"_"+s_13TeVUp+sub,strVar)->Add( this->GetHistbyName("OS_W_"+s_QCD+sub,strVar) );
-  this->GetHistbyName("OS_W_"+s_QCD+s_QCDSFUncert+channel+this->return2DString(cat)+"_"+s_13TeVUp+sub,strVar)->Scale(1+this->getQCDSFUncertainty(cat) );
-  this->GetHistbyName("OS_W_"+s_QCD+s_QCDSFUncert+channel+this->return2DString(cat)+"_"+s_13TeVDown+sub,strVar)->Add( this->GetHistbyName("OS_W_"+s_QCD+sub,strVar) );
-  this->GetHistbyName("OS_W_"+s_QCD+s_QCDSFUncert+channel+this->return2DString(cat)+"_"+s_13TeVDown+sub,strVar)->Scale(1-this->getQCDSFUncertainty(cat) );
-  
-  if(jecShift){
-   this->GetHistbyName("OS_W_"+s_QCDjecUp+sub,strVar)->Add( this->GetHistbyName("SS_W_"+s_data+sub,strVar)   );
-   this->GetHistbyName("OS_W_"+s_QCDjecUp+sub,strVar)->Add( this->GetHistbyName("SS_W_"+s_VV+s_jecUp+sub,strVar), -1 );
-   this->GetHistbyName("OS_W_"+s_QCDjecUp+sub,strVar)->Add( this->GetHistbyName("SS_W_"+s_Z+s_jecUp+sub,strVar),  -1 );
-   this->GetHistbyName("OS_W_"+s_QCDjecUp+sub,strVar)->Add( this->GetHistbyName("SS_W_"+s_TT+s_jecUp+sub,strVar), -1 );
-   this->GetHistbyName("OS_W_"+s_QCDjecUp+sub,strVar)->Add( this->GetHistbyName("SS_W_"+s_W+s_jecUp+sub,strVar),  -1 );
-   this->GetHistbyName("OS_W_"+s_QCDjecUp+sub,strVar)->Add( this->GetHistbyName("SS_W_"+s_EWKZ+s_jecUp+sub,strVar),  -1 );
-   this->GetHistbyName("OS_W_"+s_QCDjecUp+sub,strVar)->Scale( this->QCD_OSSS(cat) );
-
-   this->resetZeroBins("OS_W_"+s_QCDjecUp+sub,strVar);
-   
-   this->GetHistbyName("OS_W_"+s_QCDjecDown+sub,strVar)->Add( this->GetHistbyName("SS_W_"+s_data+sub,strVar)   );
-   this->GetHistbyName("OS_W_"+s_QCDjecDown+sub,strVar)->Add( this->GetHistbyName("SS_W_"+s_VV+s_jecDown+sub,strVar), -1 );
-   this->GetHistbyName("OS_W_"+s_QCDjecDown+sub,strVar)->Add( this->GetHistbyName("SS_W_"+s_Z+s_jecDown+sub,strVar),  -1 );
-   this->GetHistbyName("OS_W_"+s_QCDjecDown+sub,strVar)->Add( this->GetHistbyName("SS_W_"+s_TT+s_jecDown+sub,strVar), -1 );
-   this->GetHistbyName("OS_W_"+s_QCDjecDown+sub,strVar)->Add( this->GetHistbyName("SS_W_"+s_W+s_jecDown+sub,strVar),  -1 );
-   this->GetHistbyName("OS_W_"+s_QCDjecDown+sub,strVar)->Add( this->GetHistbyName("SS_W_"+s_EWKZ+s_jecDown+sub,strVar),  -1 );
-   this->GetHistbyName("OS_W_"+s_QCDjecDown+sub,strVar)->Scale( this->QCD_OSSS(cat) );
-
-   this->resetZeroBins("OS_W_"+s_QCDjecDown+sub,strVar);
-   
-  }
-  
-}
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CreateHistos::CreateW(TString strVar, TString cat, TString extend){
-  TString sub = extend + "+" + strVar +"_" + cat + "+";
-
-  this->GetHistbyName(s_W+"_OSW"+sub,strVar)->Add( this->GetHistbyName("OS_W_"+s_data+sub,strVar)   );
-  this->GetHistbyName(s_W+"_OSW"+sub,strVar)->Add( this->GetHistbyName("OS_W_"+s_VV+sub,strVar), -1 );
-  this->GetHistbyName(s_W+"_OSW"+sub,strVar)->Add( this->GetHistbyName("OS_W_"+s_Z+sub,strVar),  -1 );
-  this->GetHistbyName(s_W+"_OSW"+sub,strVar)->Add( this->GetHistbyName("OS_W_"+s_TT+sub,strVar), -1 );
-  this->GetHistbyName(s_W+"_OSW"+sub,strVar)->Add( this->GetHistbyName("OS_W_"+s_EWKZ+sub,strVar), -1 );
-  this->GetHistbyName(s_W+"_OSW"+sub,strVar)->Add( this->GetHistbyName("OS_W_"+s_QCD+sub,strVar), -1 );
-
-  double w_normFactor = this->GetHistbyName(s_W+"_OSW"+sub,strVar)->Integral()  / this->GetHistbyName("relaxed_W_high_"+s_W+sub,strVar)->Integral();
-  double w_normFactorSR = this->GetHistbyName("SR_MC"+s_W+sub,strVar)->Integral()  / this->GetHistbyName("relaxed_W_low_"+s_W+sub,strVar)->Integral();
-  double w_normFactorCR = this->GetHistbyName("OS_W_"+s_W+sub,strVar)->Integral() / this->GetHistbyName("relaxed_W_high_"+s_W+sub,strVar)->Integral();
-
-  this->GetHistbyName(s_West+sub,strVar)->Add( this->GetHistbyName("relaxed_W_low_"+s_W+sub,strVar) );
-  this->GetHistbyName(s_West+sub,strVar)->Scale( w_normFactor );
-  this->GetHistbyName("SR_"+s_W+sub,strVar)->Add( this->GetHistbyName("relaxed_W_low_"+s_W+sub,strVar) );
-  this->GetHistbyName("SR_"+s_W+sub,strVar)->Scale( w_normFactorSR );
-  this->GetHistbyName("WCR_"+s_W+sub,strVar)->Add( this->GetHistbyName("relaxed_W_high_"+s_W+sub,strVar) );
-  this->GetHistbyName("WCR_"+s_W+sub,strVar)->Scale( w_normFactorCR );
-
-  this->resetZeroBins(s_West+sub,strVar);
-  this->resetZeroBins("SR_"+s_W+sub,strVar);
-  this->resetZeroBins("WCR_"+s_W+sub,strVar);
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  //WSFUncertainties
-  this->GetHistbyName(s_West+s_WSFUncert+channel+"_"+this->return2DString(cat)+s_13TeVUp+sub,strVar)->Add( this->GetHistbyName(s_West+sub,strVar) );
-  this->GetHistbyName(s_West+s_WSFUncert+channel+"_"+this->return2DString(cat)+s_13TeVUp+sub,strVar)->Scale( 1.+this->getWSFUncertainty(cat) );
-  this->GetHistbyName(s_West+s_WSFUncert+channel+"_"+this->return2DString(cat)+s_13TeVDown+sub,strVar)->Add( this->GetHistbyName(s_West+sub,strVar) );
-  this->GetHistbyName(s_West+s_WSFUncert+channel+"_"+this->return2DString(cat)+s_13TeVDown+sub,strVar)->Scale( 1.-this->getWSFUncertainty(cat) );
-  this->GetHistbyName("SR_"+s_W+s_WSFUncert+channel+"_"+this->return2DString(cat)+s_13TeVUp+sub,strVar)->Add( this->GetHistbyName("SR_"+s_W+sub,strVar) );
-  this->GetHistbyName("SR_"+s_W+s_WSFUncert+channel+"_"+this->return2DString(cat)+s_13TeVUp+sub,strVar)->Scale( 1.+this->getWSFUncertainty(cat) );
-  this->GetHistbyName("SR_"+s_W+s_WSFUncert+channel+"_"+this->return2DString(cat)+s_13TeVDown+sub,strVar)->Add( this->GetHistbyName("SR_"+s_W+sub,strVar) );
-  this->GetHistbyName("SR_"+s_W+s_WSFUncert+channel+"_"+this->return2DString(cat)+s_13TeVDown+sub,strVar)->Scale( 1.-this->getWSFUncertainty(cat) );
-  this->GetHistbyName("WCR_"+s_W+s_WSFUncert+channel+"_"+this->return2DString(cat)+s_13TeVUp+sub,strVar)->Add( this->GetHistbyName("WCR_"+s_W+sub,strVar) );
-  this->GetHistbyName("WCR_"+s_W+s_WSFUncert+channel+"_"+this->return2DString(cat)+s_13TeVUp+sub,strVar)->Scale( 1.+this->getWSFUncertainty(cat) );
-  this->GetHistbyName("WCR_"+s_W+s_WSFUncert+channel+"_"+this->return2DString(cat)+s_13TeVDown+sub,strVar)->Add( this->GetHistbyName("WCR_"+s_W+sub,strVar) );
-  this->GetHistbyName("WCR_"+s_W+s_WSFUncert+channel+"_"+this->return2DString(cat)+s_13TeVDown+sub,strVar)->Scale( 1.-this->getWSFUncertainty(cat) );
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  //QCDSFUncertainties
-  this->GetHistbyName(s_West+s_QCDSFUncert+channel+"_"+this->return2DString(cat)+s_13TeVUp+sub,strVar)->Add( this->GetHistbyName(s_West+sub,strVar) );
-  this->GetHistbyName(s_West+s_QCDSFUncert+channel+"_"+this->return2DString(cat)+s_13TeVDown+sub,strVar)->Add( this->GetHistbyName(s_West+sub,strVar) );
-  this->GetHistbyName("SR_"+s_W+s_QCDSFUncert+channel+"_"+this->return2DString(cat)+s_13TeVUp+sub,strVar)->Add( this->GetHistbyName("SR_"+s_W+sub,strVar) );
-  this->GetHistbyName("SR_"+s_W+s_QCDSFUncert+channel+"_"+this->return2DString(cat)+s_13TeVDown+sub,strVar)->Add( this->GetHistbyName("SR_"+s_W+sub,strVar) );
-  this->GetHistbyName("WCR_"+s_W+s_QCDSFUncert+channel+"_"+this->return2DString(cat)+s_13TeVUp+sub,strVar)->Add( this->GetHistbyName("WCR_"+s_W+sub,strVar) );
-  this->GetHistbyName("WCR_"+s_W+s_QCDSFUncert+channel+"_"+this->return2DString(cat)+s_13TeVDown+sub,strVar)->Add( this->GetHistbyName("WCR_"+s_W+sub,strVar) );
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  //jetToTauFakeShift Up
-  this->GetHistbyName(s_W+"_OSW"+s_jetToTauFakeUp+sub,strVar)->Add( this->GetHistbyName("OS_W_"+s_data+sub,strVar)   );
-  this->GetHistbyName(s_W+"_OSW"+s_jetToTauFakeUp+sub,strVar)->Add( this->GetHistbyName("OS_W_"+s_VV+sub,strVar), -1 );
-  this->GetHistbyName(s_W+"_OSW"+s_jetToTauFakeUp+sub,strVar)->Add( this->GetHistbyName("OS_W_"+s_Z+s_jetToTauFakeUp+sub,strVar),  -1 );
-  this->GetHistbyName(s_W+"_OSW"+s_jetToTauFakeUp+sub,strVar)->Add( this->GetHistbyName("OS_W_"+s_TT+s_jetToTauFakeUp+sub,strVar), -1 );
-  this->GetHistbyName(s_W+"_OSW"+s_jetToTauFakeUp+sub,strVar)->Add( this->GetHistbyName("OS_W_"+s_EWKZ+sub,strVar), -1 );
-  this->GetHistbyName(s_W+"_OSW"+s_jetToTauFakeUp+sub,strVar)->Add( this->GetHistbyName("OS_W_"+s_QCD+sub,strVar), -1 );
-
-  w_normFactor = this->GetHistbyName(s_W+"_OSW"+s_jetToTauFakeUp+sub,strVar)->Integral()  / this->GetHistbyName("relaxed_W_high_"+s_W+s_jetToTauFakeUp+sub,strVar)->Integral();
-  w_normFactorSR = this->GetHistbyName("SR_MC"+s_W+s_jetToTauFakeUp+sub,strVar)->Integral() / this->GetHistbyName("relaxed_W_low_"+s_W+s_jetToTauFakeUp+sub,strVar)->Integral();
-  w_normFactorCR = this->GetHistbyName("OS_W_"+s_W+s_jetToTauFakeUp+sub,strVar)->Integral() / this->GetHistbyName("relaxed_W_high_"+s_W+s_jetToTauFakeUp+sub,strVar)->Integral();
-
-  this->GetHistbyName(s_West+s_jetToTauFakeUp+sub,strVar)->Add( this->GetHistbyName("relaxed_W_low_"+s_W+s_jetToTauFakeUp+sub,strVar) );
-  this->GetHistbyName(s_West+s_jetToTauFakeUp+sub,strVar)->Scale( w_normFactor );
-  this->GetHistbyName("SR_"+s_W+s_jetToTauFakeUp+sub,strVar)->Add( this->GetHistbyName("relaxed_W_low_"+s_W+s_jetToTauFakeUp+sub,strVar) );
-  this->GetHistbyName("SR_"+s_W+s_jetToTauFakeUp+sub,strVar)->Scale( w_normFactorSR );
-  this->GetHistbyName("WCR_"+s_W+s_jetToTauFakeUp+sub,strVar)->Add( this->GetHistbyName("relaxed_W_high_"+s_W+s_jetToTauFakeUp+sub,strVar) );
-  this->GetHistbyName("WCR_"+s_W+s_jetToTauFakeUp+sub,strVar)->Scale( w_normFactorCR );
-
-  this->resetZeroBins(s_West+s_jetToTauFakeUp+sub,strVar);
-  this->resetZeroBins("SR_"+s_W+s_jetToTauFakeUp+sub,strVar);
-  this->resetZeroBins("WCR_"+s_W+s_jetToTauFakeUp+sub,strVar);
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  //jetToTauFakeShift Down
-  this->GetHistbyName(s_W+"_OSW"+s_jetToTauFakeDown+sub,strVar)->Add( this->GetHistbyName("OS_W_"+s_data+sub,strVar)   );
-  this->GetHistbyName(s_W+"_OSW"+s_jetToTauFakeDown+sub,strVar)->Add( this->GetHistbyName("OS_W_"+s_VV+sub,strVar), -1 );
-  this->GetHistbyName(s_W+"_OSW"+s_jetToTauFakeDown+sub,strVar)->Add( this->GetHistbyName("OS_W_"+s_Z+s_jetToTauFakeDown+sub,strVar),  -1 );
-  this->GetHistbyName(s_W+"_OSW"+s_jetToTauFakeDown+sub,strVar)->Add( this->GetHistbyName("OS_W_"+s_TT+s_jetToTauFakeDown+sub,strVar), -1 );
-  this->GetHistbyName(s_W+"_OSW"+s_jetToTauFakeDown+sub,strVar)->Add( this->GetHistbyName("OS_W_"+s_EWKZ+sub,strVar), -1 );
-  this->GetHistbyName(s_W+"_OSW"+s_jetToTauFakeDown+sub,strVar)->Add( this->GetHistbyName("OS_W_"+s_QCD+sub,strVar), -1 );
-  
-  w_normFactor = this->GetHistbyName(s_W+"_OSW"+s_jetToTauFakeDown+sub,strVar)->Integral()  / this->GetHistbyName("relaxed_W_high_"+s_W+s_jetToTauFakeDown+sub,strVar)->Integral();
-  w_normFactorSR = this->GetHistbyName("SR_MC"+s_W+s_jetToTauFakeDown+sub,strVar)->Integral() / this->GetHistbyName("relaxed_W_low_"+s_W+s_jetToTauFakeDown+sub,strVar)->Integral();
-  w_normFactorCR = this->GetHistbyName("OS_W_"+s_W+s_jetToTauFakeDown+sub,strVar)->Integral() / this->GetHistbyName("relaxed_W_high_"+s_W+s_jetToTauFakeDown+sub,strVar)->Integral();
-
-  this->GetHistbyName(s_West+s_jetToTauFakeDown+sub,strVar)->Add( this->GetHistbyName("relaxed_W_low_"+s_W+s_jetToTauFakeDown+sub,strVar) );
-  this->GetHistbyName(s_West+s_jetToTauFakeDown+sub,strVar)->Scale( w_normFactor );
-  this->GetHistbyName("SR_"+s_W+s_jetToTauFakeDown+sub,strVar)->Add( this->GetHistbyName("relaxed_W_low_"+s_W+s_jetToTauFakeDown+sub,strVar) );
-  this->GetHistbyName("SR_"+s_W+s_jetToTauFakeDown+sub,strVar)->Scale( w_normFactorSR );
-  this->GetHistbyName("WCR_"+s_W+s_jetToTauFakeDown+sub,strVar)->Add( this->GetHistbyName("relaxed_W_high_"+s_W+s_jetToTauFakeDown+sub,strVar) );
-  this->GetHistbyName("WCR_"+s_W+s_jetToTauFakeDown+sub,strVar)->Scale( w_normFactorCR );
-
-  this->resetZeroBins(s_West+s_jetToTauFakeDown+sub,strVar);
-  this->resetZeroBins("SR_"+s_W+s_jetToTauFakeDown+sub,strVar);
-  this->resetZeroBins("WCR_"+s_W+s_jetToTauFakeDown+sub,strVar);
-
-  if(jecShift){
-    this->GetHistbyName(s_WjecUp+"_OSW"+sub,strVar)->Add( this->GetHistbyName("OS_W_"+s_data+sub,strVar)   );
-    this->GetHistbyName(s_WjecUp+"_OSW"+sub,strVar)->Add( this->GetHistbyName("OS_W_"+s_VVjecUp+sub,strVar), -1 );
-    this->GetHistbyName(s_WjecUp+"_OSW"+sub,strVar)->Add( this->GetHistbyName("OS_W_"+s_ZjecUp+sub,strVar),  -1 );
-    this->GetHistbyName(s_WjecUp+"_OSW"+sub,strVar)->Add( this->GetHistbyName("OS_W_"+s_TTjecUp+sub,strVar), -1 );
-    this->GetHistbyName(s_WjecUp+"_OSW"+sub,strVar)->Add( this->GetHistbyName("OS_W_"+s_EWKZjecUp+sub,strVar), -1 );
-    this->GetHistbyName(s_WjecUp+"_OSW"+sub,strVar)->Add( this->GetHistbyName("OS_W_"+s_QCDjecUp+sub,strVar), -1 );
-    
-    w_normFactor = this->GetHistbyName(s_WjecUp+"_OSW"+sub,strVar)->Integral()  / this->GetHistbyName("relaxed_W_high_"+s_WjecUp+sub,strVar)->Integral();
-    w_normFactorSR = this->GetHistbyName("SR_MC"+s_WjecUp+sub,strVar)->Integral()  / this->GetHistbyName("relaxed_W_low_"+s_WjecUp+sub,strVar)->Integral();
-    w_normFactorCR = this->GetHistbyName("OS_W_"+s_WjecUp+sub,strVar)->Integral()  / this->GetHistbyName("relaxed_W_high_"+s_WjecUp+sub,strVar)->Integral();
-    
-    this->GetHistbyName(s_WestjecUp+sub,strVar)->Add( this->GetHistbyName("relaxed_W_low_"+s_WjecUp+sub,strVar) );
-    this->GetHistbyName(s_WestjecUp+sub,strVar)->Scale( w_normFactor );
-    this->GetHistbyName("SR_"+s_WjecUp+sub,strVar)->Add( this->GetHistbyName("relaxed_W_low_"+s_WjecUp+sub,strVar) );
-    this->GetHistbyName("SR_"+s_WjecUp+sub,strVar)->Scale( w_normFactorSR );
-    this->GetHistbyName("WCR_"+s_WjecUp+sub,strVar)->Add( this->GetHistbyName("relaxed_W_high_"+s_WjecUp+sub,strVar) );
-    this->GetHistbyName("WCR_"+s_WjecUp+sub,strVar)->Scale( w_normFactorCR );
-
-    this->resetZeroBins(s_WestjecUp+sub,strVar);
-    this->resetZeroBins("SR_"+s_WjecUp+sub,strVar);
-    this->resetZeroBins("WCR_"+s_WjecUp+sub,strVar);
-    
-    this->GetHistbyName(s_WjecDown+"_OSW"+sub,strVar)->Add( this->GetHistbyName("OS_W_"+s_data+sub,strVar)   );
-    this->GetHistbyName(s_WjecDown+"_OSW"+sub,strVar)->Add( this->GetHistbyName("OS_W_"+s_VVjecUp+sub,strVar), -1 );
-    this->GetHistbyName(s_WjecDown+"_OSW"+sub,strVar)->Add( this->GetHistbyName("OS_W_"+s_ZjecUp+sub,strVar),  -1 );
-    this->GetHistbyName(s_WjecDown+"_OSW"+sub,strVar)->Add( this->GetHistbyName("OS_W_"+s_TTjecUp+sub,strVar), -1 );
-    this->GetHistbyName(s_WjecDown+"_OSW"+sub,strVar)->Add( this->GetHistbyName("OS_W_"+s_EWKZjecUp+sub,strVar), -1 );
-    this->GetHistbyName(s_WjecDown+"_OSW"+sub,strVar)->Add( this->GetHistbyName("OS_W_"+s_QCDjecUp+sub,strVar), -1 );
-    
-    w_normFactor = this->GetHistbyName(s_WjecDown+"_OSW"+sub,strVar)->Integral()  / this->GetHistbyName("relaxed_W_high_"+s_WjecDown+sub,strVar)->Integral();
-    w_normFactorSR = this->GetHistbyName("SR_MC"+s_WjecDown+sub,strVar)->Integral()  / this->GetHistbyName("relaxed_W_low_"+s_WjecDown+sub,strVar)->Integral();
-    w_normFactorCR = this->GetHistbyName("OS_W_"+s_WjecDown+sub,strVar)->Integral()  / this->GetHistbyName("relaxed_W_high_"+s_WjecDown+sub,strVar)->Integral();
-    
-    this->GetHistbyName(s_WestjecDown+sub,strVar)->Add( this->GetHistbyName("relaxed_W_low_"+s_WjecDown+sub,strVar) );
-    this->GetHistbyName(s_WestjecDown+sub,strVar)->Scale( w_normFactor );
-    this->GetHistbyName("SR_"+s_WjecDown+sub,strVar)->Add( this->GetHistbyName("relaxed_W_low_"+s_WjecDown+sub,strVar) );
-    this->GetHistbyName("SR_"+s_WjecDown+sub,strVar)->Scale( w_normFactorSR );
-    this->GetHistbyName("WCR_"+s_WjecDown+sub,strVar)->Add( this->GetHistbyName("relaxed_W_high_"+s_WjecDown+sub,strVar) );
-    this->GetHistbyName("WCR_"+s_WjecDown+sub,strVar)->Scale( w_normFactorCR );
-    
-    this->resetZeroBins(s_WestjecDown+sub,strVar);
-    this->resetZeroBins("SR_"+s_WjecDown+sub,strVar);
-    this->resetZeroBins("WCR_"+s_WjecDown+sub,strVar);
-    
-  }
-  
-}
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CreateHistos::CreateQCD(TString strVar, TString cat, TString extend){
-  TString sub = extend + "+" + strVar +"_" + cat + "+";
-  
-  double W_SF = ( this->GetHistbyName("W_OSW"+sub,strVar)->Integral() > 0 )
-    ? this->GetHistbyName("W_OSW"+sub,strVar)->Integral() / this->GetHistbyName("OS_W_"+s_W+sub,strVar)->Integral() : 0;
-  double W_rel = ( this->GetHistbyName("SS_Low_"+s_W+sub,strVar)->Integral() > 0 )
-    ? this->GetHistbyName("SS_Low_"+s_W+sub,strVar)->Integral()  / this->GetHistbyName("SS_Low_relaxed_"+s_W+sub,strVar)->Integral() : 0;
-  double Z_rel = ( this->GetHistbyName("SS_Low_"+s_Z+sub,strVar)->Integral() > 0 )
-    ? this->GetHistbyName("SS_Low_"+s_Z+sub,strVar)->Integral()  / this->GetHistbyName("SS_Low_relaxed_"+s_Z+sub,strVar)->Integral() : 0;
-  double VV_rel = ( this->GetHistbyName("SS_Low_"+s_VV+sub,strVar)->Integral() > 0 )
-    ? this->GetHistbyName("SS_Low_"+s_VV+sub,strVar)->Integral() / this->GetHistbyName("SS_Low_relaxed_"+s_VV+sub,strVar)->Integral() : 0;
-  double TT_rel = ( this->GetHistbyName("SS_Low_"+s_TT+sub,strVar)->Integral() > 0 )
-    ? this->GetHistbyName("SS_Low_"+s_TT+sub,strVar)->Integral() / this->GetHistbyName("SS_Low_relaxed_"+s_TT+sub,strVar)->Integral() : 0;
-  double EWKZ_rel = ( this->GetHistbyName("SS_Low_"+s_EWKZ+sub,strVar)->Integral() > 0 )
-    ? this->GetHistbyName("SS_Low_"+s_EWKZ+sub,strVar)->Integral() / this->GetHistbyName("SS_Low_relaxed_"+s_EWKZ+sub,strVar)->Integral() : 0;
-
-  this->GetHistbyName("AICR_"+s_W+sub,strVar)->Add( this->GetHistbyName( "SR_MC"+s_W+sub,strVar ) );
-  this->GetHistbyName("AICR_"+s_W+sub,strVar)->Scale(W_SF);
-
-  if(cat.Contains(s_antiiso)){
-    W_rel=1;
-    Z_rel=1;
-    VV_rel=1;
-    TT_rel=1;
-    EWKZ_rel=1;
-  }
-  
-  this->GetHistbyName("SS_Low_relaxed_"+s_W+sub,strVar)->Scale(  W_SF   );
-  this->GetHistbyName("SS_Low_relaxed_"+s_W+sub,strVar)->Scale(  W_rel  );
-  this->GetHistbyName("SS_Low_relaxed_"+s_VV+sub,strVar)->Scale( VV_rel );
-  this->GetHistbyName("SS_Low_relaxed_"+s_Z+sub,strVar)->Scale(  Z_rel  );
-  this->GetHistbyName("SS_Low_relaxed_"+s_TT+sub,strVar)->Scale( TT_rel );
-  this->GetHistbyName("SS_Low_relaxed_"+s_EWKZ+sub,strVar)->Scale( EWKZ_rel );
-
-  this->GetHistbyName("SS_Low_relaxed_"+s_W+sub+s_WSFUncert+channel+"_"+s_13TeVUp,strVar)->Add( this->GetHistbyName("SS_Low_relaxed_"+s_W+sub,strVar) );
-  this->GetHistbyName("SS_Low_relaxed_"+s_W+sub+s_WSFUncert+channel+"_"+s_13TeVUp,strVar)->Scale( 1.+this->getWSFUncertainty(cat) );
-  this->GetHistbyName("SS_Low_relaxed_"+s_W+sub+s_WSFUncert+channel+"_"+s_13TeVDown,strVar)->Add( this->GetHistbyName("SS_Low_relaxed_"+s_W+sub,strVar) );
-  this->GetHistbyName("SS_Low_relaxed_"+s_W+sub+s_WSFUncert+channel+"_"+s_13TeVDown,strVar)->Scale( 1.-this->getWSFUncertainty(cat) );
-
-  this->GetHistbyName(s_QCDest+sub,strVar)->Add( this->GetHistbyName("SS_Low_"+s_data+sub,strVar)  );
-  this->GetHistbyName(s_QCDest+sub,strVar)->Add( this->GetHistbyName("SS_Low_relaxed_"+s_VV+sub,strVar), -1 );
-  this->GetHistbyName(s_QCDest+sub,strVar)->Add( this->GetHistbyName("SS_Low_relaxed_"+s_Z+sub,strVar),  -1 );
-  this->GetHistbyName(s_QCDest+sub,strVar)->Add( this->GetHistbyName("SS_Low_relaxed_"+s_TT+sub,strVar), -1 );
-  this->GetHistbyName(s_QCDest+sub,strVar)->Add( this->GetHistbyName("SS_Low_relaxed_"+s_EWKZ+sub,strVar),  -1 );
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  this->GetHistbyName(s_QCDest+s_WSFUncert+channel+"_"+this->return2DString(cat)+s_13TeVUp+sub,strVar)->Add( this->GetHistbyName(s_QCDest+sub,strVar) );
-  this->GetHistbyName(s_QCDest+s_WSFUncert+channel+"_"+this->return2DString(cat)+s_13TeVDown+sub,strVar)->Add( this->GetHistbyName(s_QCDest+sub,strVar) );
-  this->GetHistbyName(s_QCD+s_WSFUncert+channel+"_"+this->return2DString(cat)+s_13TeVUp+sub,strVar)->Add( this->GetHistbyName(s_QCDest+sub,strVar) );
-  this->GetHistbyName(s_QCD+s_WSFUncert+channel+"_"+this->return2DString(cat)+s_13TeVDown+sub,strVar)->Add( this->GetHistbyName(s_QCDest+sub,strVar) );
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  this->GetHistbyName(s_QCDest+sub,strVar)->Add( this->GetHistbyName("SS_Low_relaxed_"+s_W+sub,strVar),  -1 );
-  this->GetHistbyName(s_QCD+sub,strVar)->Add( this->GetHistbyName(s_QCDest+sub,strVar) );
-  this->GetHistbyName(s_QCDest+sub,strVar)->Scale( this->QCD_OSSS(cat) );
-
-  this->resetZeroBins(s_QCDest+sub,strVar);
-  this->resetZeroBins(s_QCD+sub,strVar);
-  this->resetZeroBins("AICR_"+s_W+sub,strVar);
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  //WSFUncertainties
-  this->GetHistbyName("AICR_"+s_W+s_WSFUncert+channel+"_"+this->return2DString(cat)+s_13TeVUp+sub,strVar)->Add( this->GetHistbyName("AICR_"+s_W+sub,strVar) );
-  this->GetHistbyName("AICR_"+s_W+s_WSFUncert+channel+"_"+this->return2DString(cat)+s_13TeVUp+sub,strVar)->Scale( 1.+this->getWSFUncertainty(cat) );
-  this->GetHistbyName("AICR_"+s_W+s_WSFUncert+channel+"_"+this->return2DString(cat)+s_13TeVDown+sub,strVar)->Add( this->GetHistbyName("AICR_"+s_W+sub,strVar) );
-  this->GetHistbyName("AICR_"+s_W+s_WSFUncert+channel+"_"+this->return2DString(cat)+s_13TeVDown+sub,strVar)->Scale( 1.-this->getWSFUncertainty(cat) );
-  this->GetHistbyName(s_QCDest+s_WSFUncert+channel+"_"+this->return2DString(cat)+s_13TeVUp+sub,strVar)->Add( this->GetHistbyName("SS_Low_relaxed_"+s_W+sub+s_WSFUncert+channel+"_"+s_13TeVUp,strVar), -1 );
-  this->GetHistbyName(s_QCDest+s_WSFUncert+channel+"_"+this->return2DString(cat)+s_13TeVDown+sub,strVar)->Add( this->GetHistbyName("SS_Low_relaxed_"+s_W+sub+s_WSFUncert+channel+"_"+s_13TeVDown,strVar), -1 );
-  this->GetHistbyName(s_QCDest+s_WSFUncert+channel+"_"+this->return2DString(cat)+s_13TeVUp+sub,strVar)->Scale( this->QCD_OSSS(cat) );
-  this->GetHistbyName(s_QCDest+s_WSFUncert+channel+"_"+this->return2DString(cat)+s_13TeVDown+sub,strVar)->Scale( this->QCD_OSSS(cat) );
-  this->resetZeroBins(s_QCDest+s_WSFUncert+channel+"_"+this->return2DString(cat)+s_13TeVUp+sub,strVar);
-  this->resetZeroBins(s_QCDest+s_WSFUncert+channel+"_"+this->return2DString(cat)+s_13TeVDown+sub,strVar);
-  this->GetHistbyName(s_QCD+s_WSFUncert+channel+"_"+this->return2DString(cat)+s_13TeVUp+sub,strVar)->Add( this->GetHistbyName("SS_Low_relaxed_"+s_W+sub+s_WSFUncert+channel+"_"+s_13TeVUp,strVar), -1 );
-  this->GetHistbyName(s_QCD+s_WSFUncert+channel+"_"+this->return2DString(cat)+s_13TeVDown+sub,strVar)->Add( this->GetHistbyName("SS_Low_relaxed_"+s_W+sub+s_WSFUncert+channel+"_"+s_13TeVDown,strVar), -1 );
-  this->resetZeroBins(s_QCD+s_WSFUncert+channel+"_"+this->return2DString(cat)+s_13TeVUp+sub,strVar);
-  this->resetZeroBins(s_QCD+s_WSFUncert+channel+"_"+this->return2DString(cat)+s_13TeVDown+sub,strVar);
-
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  //QCDSFUncertainties
-  this->GetHistbyName("AICR_"+s_W+s_QCDSFUncert+channel+"_"+this->return2DString(cat)+s_13TeVUp+sub,strVar)->Add( this->GetHistbyName("AICR_"+s_W+sub,strVar) );
-  this->GetHistbyName("AICR_"+s_W+s_QCDSFUncert+channel+"_"+this->return2DString(cat)+s_13TeVDown+sub,strVar)->Add( this->GetHistbyName("AICR_"+s_W+sub,strVar) );
-  this->GetHistbyName(s_QCDest+s_QCDSFUncert+channel+"_"+this->return2DString(cat)+s_13TeVUp+sub,strVar)->Add( this->GetHistbyName(s_QCDest+sub,strVar) );
-  this->GetHistbyName(s_QCDest+s_QCDSFUncert+channel+"_"+this->return2DString(cat)+s_13TeVUp+sub,strVar)->Scale( 1+this->getQCDSFUncertainty(cat) );
-  this->GetHistbyName(s_QCDest+s_QCDSFUncert+channel+"_"+this->return2DString(cat)+s_13TeVDown+sub,strVar)->Add( this->GetHistbyName(s_QCDest+sub,strVar) );
-  this->GetHistbyName(s_QCDest+s_QCDSFUncert+channel+"_"+this->return2DString(cat)+s_13TeVDown+sub,strVar)->Scale( 1-this->getQCDSFUncertainty(cat) );
-  this->GetHistbyName(s_QCD+s_QCDSFUncert+channel+"_"+this->return2DString(cat)+s_13TeVUp+sub,strVar)->Add( this->GetHistbyName(s_QCDest+sub,strVar) );
-  this->GetHistbyName(s_QCD+s_QCDSFUncert+channel+"_"+this->return2DString(cat)+s_13TeVUp+sub,strVar)->Scale( 1+this->getQCDSFUncertainty(cat) );
-  this->GetHistbyName(s_QCD+s_QCDSFUncert+channel+"_"+this->return2DString(cat)+s_13TeVDown+sub,strVar)->Add( this->GetHistbyName(s_QCDest+sub,strVar) );
-  this->GetHistbyName(s_QCD+s_QCDSFUncert+channel+"_"+this->return2DString(cat)+s_13TeVDown+sub,strVar)->Scale( 1-this->getQCDSFUncertainty(cat) );
-
-  if(jecShift){
-    W_SF = ( this->GetHistbyName(s_WjecUp+"_OSW"+sub,strVar)->Integral() > 0 )
-    ? this->GetHistbyName(s_WjecUp+"_OSW"+sub,strVar)->Integral() / this->GetHistbyName("OS_W_"+s_WjecUp+sub,strVar)->Integral() : 0;
-    W_rel = ( this->GetHistbyName("SS_Low_"+s_WjecUp+sub,strVar)->Integral() > 0 )
-    ? this->GetHistbyName("SS_Low_"+s_WjecUp+sub,strVar)->Integral()  / this->GetHistbyName("SS_Low_relaxed_"+s_WjecUp+sub,strVar)->Integral() : 0;
-    Z_rel = ( this->GetHistbyName("SS_Low_"+s_ZjecUp+sub,strVar)->Integral() > 0 )
-    ? this->GetHistbyName("SS_Low_"+s_ZjecUp+sub,strVar)->Integral()  / this->GetHistbyName("SS_Low_relaxed_"+s_ZjecUp+sub,strVar)->Integral() : 0;
-    VV_rel = ( this->GetHistbyName("SS_Low_"+s_VVjecUp+sub,strVar)->Integral() > 0 )
-    ? this->GetHistbyName("SS_Low_"+s_VVjecUp+sub,strVar)->Integral() / this->GetHistbyName("SS_Low_relaxed_"+s_VVjecUp+sub,strVar)->Integral() : 0;
-    TT_rel = ( this->GetHistbyName("SS_Low_"+s_TTjecUp+sub,strVar)->Integral() > 0 )
-    ? this->GetHistbyName("SS_Low_"+s_TTjecUp+sub,strVar)->Integral() / this->GetHistbyName("SS_Low_relaxed_"+s_TTjecUp+sub,strVar)->Integral() : 0;
-    EWKZ_rel = ( this->GetHistbyName("SS_Low_"+s_EWKZjecUp+sub,strVar)->Integral() > 0 )
-    ? this->GetHistbyName("SS_Low_"+s_EWKZjecUp+sub,strVar)->Integral() / this->GetHistbyName("SS_Low_relaxed_"+s_EWKZjecUp+sub,strVar)->Integral() : 0;
-
-    this->GetHistbyName("AICR_"+s_WjecUp+sub,strVar)->Add( this->GetHistbyName( "SR_MC"+s_WjecUp+sub,strVar ) );
-    this->GetHistbyName("AICR_"+s_WjecUp+sub,strVar)->Scale(W_SF);
-
-    if(cat.Contains(s_antiiso)){
-      W_rel=1;
-      Z_rel=1;
-      VV_rel=1;
-      TT_rel=1;
-      EWKZ_rel=1;
-    }
-    
-    this->GetHistbyName("SS_Low_relaxed_"+s_WjecUp+sub,strVar)->Scale(  W_SF   );
-    this->GetHistbyName("SS_Low_relaxed_"+s_WjecUp+sub,strVar)->Scale(  W_rel  );
-    this->GetHistbyName("SS_Low_relaxed_"+s_VVjecUp+sub,strVar)->Scale( VV_rel );
-    this->GetHistbyName("SS_Low_relaxed_"+s_ZjecUp+sub,strVar)->Scale(  Z_rel  );
-    this->GetHistbyName("SS_Low_relaxed_"+s_TTjecUp+sub,strVar)->Scale( TT_rel );
-    this->GetHistbyName("SS_Low_relaxed_"+s_EWKZjecUp+sub,strVar)->Scale( EWKZ_rel );
-
-    this->GetHistbyName(s_QCDestjecUp+sub,strVar)->Add( this->GetHistbyName("SS_Low_"+s_data+sub,strVar)  );
-    this->GetHistbyName(s_QCDestjecUp+sub,strVar)->Add( this->GetHistbyName("SS_Low_relaxed_"+s_VVjecUp+sub,strVar), -1 );
-    this->GetHistbyName(s_QCDestjecUp+sub,strVar)->Add( this->GetHistbyName("SS_Low_relaxed_"+s_ZjecUp+sub,strVar),  -1 );
-    this->GetHistbyName(s_QCDestjecUp+sub,strVar)->Add( this->GetHistbyName("SS_Low_relaxed_"+s_TTjecUp+sub,strVar), -1 );
-    this->GetHistbyName(s_QCDestjecUp+sub,strVar)->Add( this->GetHistbyName("SS_Low_relaxed_"+s_WjecUp+sub,strVar),  -1 );
-    this->GetHistbyName(s_QCDestjecUp+sub,strVar)->Add( this->GetHistbyName("SS_Low_relaxed_"+s_EWKZjecUp+sub,strVar),  -1 );
-    this->GetHistbyName(s_QCDjecUp+sub,strVar)->Add( this->GetHistbyName(s_QCDestjecUp+sub,strVar) );
-    this->GetHistbyName(s_QCDestjecUp+sub,strVar)->Scale( this->QCD_OSSS(cat) );
-
-    this->resetZeroBins(s_QCDestjecUp+sub,strVar);
-    this->resetZeroBins(s_QCDjecUp+sub,strVar);
-    this->resetZeroBins("AICR_"+s_WjecUp+sub,strVar);
-    
-    W_SF = ( this->GetHistbyName(s_WjecDown+"_OSW"+sub,strVar)->Integral() > 0 )
-    ? this->GetHistbyName(s_WjecDown+"_OSW"+sub,strVar)->Integral() / this->GetHistbyName("OS_W_"+s_WjecDown+sub,strVar)->Integral() : 0;
-    W_rel = ( this->GetHistbyName("SS_Low_"+s_WjecDown+sub,strVar)->Integral() > 0 )
-    ? this->GetHistbyName("SS_Low_"+s_WjecDown+sub,strVar)->Integral()  / this->GetHistbyName("SS_Low_relaxed_"+s_WjecDown+sub,strVar)->Integral() : 0;
-    Z_rel = ( this->GetHistbyName("SS_Low_"+s_ZjecDown+sub,strVar)->Integral() > 0 )
-    ? this->GetHistbyName("SS_Low_"+s_ZjecDown+sub,strVar)->Integral()  / this->GetHistbyName("SS_Low_relaxed_"+s_ZjecDown+sub,strVar)->Integral() : 0;
-    VV_rel = ( this->GetHistbyName("SS_Low_"+s_VVjecDown+sub,strVar)->Integral() > 0 )
-    ? this->GetHistbyName("SS_Low_"+s_VVjecDown+sub,strVar)->Integral() / this->GetHistbyName("SS_Low_relaxed_"+s_VVjecDown+sub,strVar)->Integral() : 0;
-    TT_rel = ( this->GetHistbyName("SS_Low_"+s_TTjecDown+sub,strVar)->Integral() > 0 )
-    ? this->GetHistbyName("SS_Low_"+s_TTjecDown+sub,strVar)->Integral() / this->GetHistbyName("SS_Low_relaxed_"+s_TTjecDown+sub,strVar)->Integral() : 0;
-    EWKZ_rel = ( this->GetHistbyName("SS_Low_"+s_EWKZjecDown+sub,strVar)->Integral() > 0 )
-    ? this->GetHistbyName("SS_Low_"+s_EWKZjecDown+sub,strVar)->Integral() / this->GetHistbyName("SS_Low_relaxed_"+s_EWKZjecDown+sub,strVar)->Integral() : 0;
-
-    this->GetHistbyName("AICR_"+s_WjecDown+sub,strVar)->Add( this->GetHistbyName( "SR_MC"+s_WjecDown+sub,strVar ) );
-    this->GetHistbyName("AICR_"+s_WjecDown+sub,strVar)->Scale(W_SF);
-
-    if(cat.Contains(s_antiiso)){
-      W_rel=1;
-      Z_rel=1;
-      VV_rel=1;
-      TT_rel=1;
-      EWKZ_rel=1;
-    }
-    
-    this->GetHistbyName("SS_Low_relaxed_"+s_WjecDown+sub,strVar)->Scale(  W_SF   );
-    this->GetHistbyName("SS_Low_relaxed_"+s_WjecDown+sub,strVar)->Scale(  W_rel  );
-    this->GetHistbyName("SS_Low_relaxed_"+s_VVjecDown+sub,strVar)->Scale( VV_rel );
-    this->GetHistbyName("SS_Low_relaxed_"+s_ZjecDown+sub,strVar)->Scale(  Z_rel  );
-    this->GetHistbyName("SS_Low_relaxed_"+s_TTjecDown+sub,strVar)->Scale( TT_rel );
-    this->GetHistbyName("SS_Low_relaxed_"+s_EWKZjecDown+sub,strVar)->Scale( EWKZ_rel );
-
-    this->GetHistbyName(s_QCDestjecDown+sub,strVar)->Add( this->GetHistbyName("SS_Low_"+s_data+sub,strVar)  );
-    this->GetHistbyName(s_QCDestjecDown+sub,strVar)->Add( this->GetHistbyName("SS_Low_relaxed_"+s_VVjecDown+sub,strVar), -1 );
-    this->GetHistbyName(s_QCDestjecDown+sub,strVar)->Add( this->GetHistbyName("SS_Low_relaxed_"+s_ZjecDown+sub,strVar),  -1 );
-    this->GetHistbyName(s_QCDestjecDown+sub,strVar)->Add( this->GetHistbyName("SS_Low_relaxed_"+s_TTjecDown+sub,strVar), -1 );
-    this->GetHistbyName(s_QCDestjecDown+sub,strVar)->Add( this->GetHistbyName("SS_Low_relaxed_"+s_WjecDown+sub,strVar),  -1 );
-    this->GetHistbyName(s_QCDestjecDown+sub,strVar)->Add( this->GetHistbyName("SS_Low_relaxed_"+s_EWKZjecDown+sub,strVar),  -1 );
-    this->GetHistbyName(s_QCDjecDown+sub,strVar)->Add( this->GetHistbyName(s_QCDestjecDown+sub,strVar) );
-    this->GetHistbyName(s_QCDestjecDown+sub,strVar)->Scale( this->QCD_OSSS(cat) );
-
-    this->resetZeroBins(s_QCDestjecDown+sub,strVar);
-    this->resetZeroBins(s_QCDjecDown+sub,strVar);
-    this->resetZeroBins("AICR_"+s_WjecDown+sub,strVar);
-    
-  }
-
-  
-
-}
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CreateHistos::Estimate_W_QCD(TString strVar, TString cat, TString extend){
-  this->CreateQCD_osw(strVar, cat, extend);
-  this->CreateW(strVar, cat, extend);
-  this->CreateQCD(strVar, cat, extend);
 }
 
 
@@ -976,7 +593,17 @@ void CreateHistos::EstimateFF(TString strVar, TString cat, TString extend){
   //cout << "//////////////////////////////////////" << endl;
 
 }
+// double GlobalClass::getQCD_osss(TString cat){
+//   return 1.0;
+// }
 
+// double GlobalClass::getW_osss(TString cat){
+//   return 1.0;
+// }
+
+// double GlobalClass::getW_mtHL(TString cat){
+//   return 1.0;
+// }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -989,9 +616,8 @@ void CreateHistos::writeHistos( TString channel, vector<TString> cats, vector<TS
   if(do2DFit) D2+="-2D";
   if(doMC) D2+="-MCsum";
 
-  
   for(auto var : vars){
-    outfile_name << "histos/"  << "htt_" << channel << ".inputs-sm-13TeV-"<<var<<D2<<".root";
+    outfile_name << "histos/"  << "tight_htt_" << channel << ".inputs-mssm-13TeV-"<<var<<D2<<".root";
     outfile = new TFile(outfile_name.str().c_str(), "RECREATE") ;
 
     for(auto cat : cats){
@@ -999,45 +625,45 @@ void CreateHistos::writeHistos( TString channel, vector<TString> cats, vector<TS
       outfile->cd(channel +"_"+ cat); 
       sub = "+" + var +"_" + cat + "+";
 
-      for( int i=0;i<histo_names.size();i++ ){
+      for (auto const& name : histograms){
 
-        if(histo_names.at(i).Contains(sub) ){
+        if(name.first.Contains(sub) ){
           if(!keepDebugHistos
-             && ( histo_names.at(i).Contains("SS_Low")
-                  || histo_names.at(i).Contains("relaxed")
-                  || histo_names.at(i).Contains("SS_"+s_W)
-                  //|| histo_names.at(i).Contains("OS_"+s_W)
-                  || histo_names.at(i).Contains(s_W+"_OSW")
-                  || histo_names.at(i).Contains(s_WjecUp+"_OSW")
-                  || histo_names.at(i).Contains(s_WjecDown+"_OSW")
+             && ( name.first.Contains("SS_Low")
+                  || name.first.Contains("relaxed")
+                  || name.first.Contains("SS_"+s_W)
+                  //|| name.first.Contains("OS_"+s_W)
+                  || name.first.Contains(s_W+"_OSW")
+                  || name.first.Contains(s_WjecUp+"_OSW")
+                  || name.first.Contains(s_WjecDown+"_OSW")
                   )
              ) continue;
           if(!keepFFDebugHistos
-             && ( histo_names.at(i).Contains(s_data+"_"+s_jetFakes)
-                  || histo_names.at(i).Contains(s_W+"_"+s_jetFakes)
-                  || histo_names.at(i).Contains(s_WjecUp+"_"+s_jetFakes)
-                  || histo_names.at(i).Contains(s_WjecDown+"_"+s_jetFakes)
-                  || histo_names.at(i).Contains(s_Z+"_"+s_jetFakes)
-                  || histo_names.at(i).Contains(s_ZjecUp+"_"+s_jetFakes)
-                  || histo_names.at(i).Contains(s_ZjecDown+"_"+s_jetFakes)
-                  || histo_names.at(i).Contains(s_TT+"_"+s_jetFakes)
-                  || histo_names.at(i).Contains(s_TTjecUp+"_"+s_jetFakes)
-                  || histo_names.at(i).Contains(s_TTjecDown+"_"+s_jetFakes)
-                  || histo_names.at(i).Contains(s_VV+"_"+s_jetFakes)
-                  || histo_names.at(i).Contains(s_VVjecUp+"_"+s_jetFakes)
-                  || histo_names.at(i).Contains(s_VVjecDown+"_"+s_jetFakes)
-                  || histo_names.at(i).Contains(s_EWKZ+"_"+s_jetFakes)
-                  || histo_names.at(i).Contains(s_EWKZjecUp+"_"+s_jetFakes)
-                  || histo_names.at(i).Contains(s_EWKZjecDown+"_"+s_jetFakes)                  
+             && ( name.first.Contains(s_data+"_"+s_jetFakes)
+                  || name.first.Contains(s_W+"_"+s_jetFakes)
+                  || name.first.Contains(s_WjecUp+"_"+s_jetFakes)
+                  || name.first.Contains(s_WjecDown+"_"+s_jetFakes)
+                  || name.first.Contains(s_Z+"_"+s_jetFakes)
+                  || name.first.Contains(s_ZjecUp+"_"+s_jetFakes)
+                  || name.first.Contains(s_ZjecDown+"_"+s_jetFakes)
+                  || name.first.Contains(s_TT+"_"+s_jetFakes)
+                  || name.first.Contains(s_TTjecUp+"_"+s_jetFakes)
+                  || name.first.Contains(s_TTjecDown+"_"+s_jetFakes)
+                  || name.first.Contains(s_VV+"_"+s_jetFakes)
+                  || name.first.Contains(s_VVjecUp+"_"+s_jetFakes)
+                  || name.first.Contains(s_VVjecDown+"_"+s_jetFakes)
+                  || name.first.Contains(s_EWKZ+"_"+s_jetFakes)
+                  || name.first.Contains(s_EWKZjecUp+"_"+s_jetFakes)
+                  || name.first.Contains(s_EWKZjecDown+"_"+s_jetFakes)                  
                   )
              ) continue;
           if(!keepZGenJetsSplitting
-             && ( histo_names.at(i).Contains("Z_0Jets")
-                  || histo_names.at(i).Contains("Z_1Jets")
-                  || histo_names.at(i).Contains("Z_ge2Jets")
+             && ( name.first.Contains("Z_0Jets")
+                  || name.first.Contains("Z_1Jets")
+                  || name.first.Contains("Z_ge2Jets")
                   )
              ) continue;
-          tmp = histo_names.at(i);
+          tmp = name.first;
           if( (cat.Contains(s_wjets)
                ||cat.Contains(s_antiiso) )
               && tmp.Contains(s_West) ) continue;
@@ -1069,23 +695,14 @@ void CreateHistos::writeHistos( TString channel, vector<TString> cats, vector<TS
           tmp.ReplaceAll(s_jecDown,s_CMSjecScale+s_13TeVDown);
           tmp.ReplaceAll(s_jetToTauFakeUp,s_CMSjetToTauFake+s_13TeVUp);
           tmp.ReplaceAll(s_jetToTauFakeDown,s_CMSjetToTauFake+s_13TeVDown);
-          histos.at(i)->SetName(tmp);
-          if(do2DFit ){
-            if( is2DCategories(cat) ){
-              tmp.ReplaceAll("2D","");
-              this->resetZeroBins(histos.at(i));
-              histos.at(i)->Write(tmp, TObject::kWriteDelete);
-            }
-            else if( cat == s_inclusive){
-              this->resetZeroBins(histos.at(i));
-              histos.at(i)->Write(tmp, TObject::kWriteDelete);
-            }
-            else continue;
-          }
-          else {
-            this->resetZeroBins(histos.at(i));
-            histos.at(i)->Write(tmp, TObject::kWriteDelete);
-          }
+          histograms.at( name.first )->SetName(tmp);
+
+
+          
+          this->resetZeroBins(histograms.at( name.first ));
+          histograms.at( name.first )->Write(tmp, TObject::kWriteDelete);
+          
+
         }
       }
     }
@@ -1116,16 +733,17 @@ int CreateHistos::isEWKZFile(TString fileName){
 }
 
 int CreateHistos::isSignalFile(TString fileName){
-  if(fileName == s_ggH) return 1;
-  if(fileName == s_ggHtauUp) return 1;
-  if(fileName == s_ggHtauDown) return 1;
-  if(fileName == s_ggHjecUp) return 1;
-  if(fileName == s_ggHjecDown) return 1;
-  if(fileName == s_qqH) return 1;
-  if(fileName == s_qqHtauUp) return 1;
-  if(fileName == s_qqHtauDown) return 1;
-  if(fileName == s_qqHjecUp) return 1;
-  if(fileName == s_qqHjecDown) return 1;
+
+    if(fileName == s_ggH) return 1;
+    if(fileName == s_ggHtauUp) return 1;
+    if(fileName == s_ggHtauDown) return 1;
+    if(fileName == s_ggHjecUp) return 1;
+    if(fileName == s_ggHjecDown) return 1;
+    if(fileName == s_bbH) return 1;
+    if(fileName == s_bbHtauUp) return 1;
+    if(fileName == s_bbHtauDown) return 1;
+    if(fileName == s_bbHjecUp) return 1;
+    if(fileName == s_bbHjecDown) return 1;
 
   return 0;
 }

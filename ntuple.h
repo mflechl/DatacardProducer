@@ -158,6 +158,7 @@ public :
    Int_t           decayModeFindingOldDMs_2;
    Int_t           decayMode_2;
    Float_t         pt_tt;
+   Double_t         mt_tot;
    Float_t         pfpt_tt;
    Float_t         m_vis;
    Float_t         pfpt_sum;
@@ -426,6 +427,7 @@ public :
    TBranch        *b_puCorrPtSum_2;   //!
    TBranch        *b_decayModeFindingOldDMs_2;   //!
    TBranch        *b_decayMode_2;   //!
+   TBranch        *b_mt_tot;   //!
    TBranch        *b_pt_tt;   //!
    TBranch        *b_pfpt_tt;   //!
    TBranch        *b_m_vis;   //!
@@ -807,6 +809,7 @@ void ntuple::Init(TTree *tree)
    fChain->SetBranchAddress("decayModeFindingOldDMs_2", &decayModeFindingOldDMs_2, &b_decayModeFindingOldDMs_2);
    fChain->SetBranchAddress("decayMode_2", &decayMode_2, &b_decayMode_2);
    fChain->SetBranchAddress("pt_tt", &pt_tt, &b_pt_tt);
+   fChain->SetBranchAddress("mt_tot", &mt_tot, &b_mt_tot);
    fChain->SetBranchAddress("pfpt_tt", &pfpt_tt, &b_pfpt_tt);
    fChain->SetBranchAddress("m_vis", &m_vis, &b_m_vis);
    fChain->SetBranchAddress("pfpt_sum", &pfpt_sum, &b_pfpt_sum);

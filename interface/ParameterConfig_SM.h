@@ -3,6 +3,7 @@
 const struct Parameter{
 
   struct dataset{
+
     TString data_mt="/data/higgs/data_2016/ntuples_"+version+"/"+channel+"/ntuples_"+doSvfit+"_merged/BASIS_ntuple_SingleMuon_"+channel+"_"+version+reduced+".root";
     TString MCsum_mt="/data/higgs/data_2016/ntuples_"+version+"/"+channel+"/ntuples_"+doSvfit+"_merged/BASIS_ntuple_MCsum_merged_MCSummer16_"+channel+"_"+version+reduced+".root";
     TString data_et="/data/higgs/data_2016/ntuples_"+version+"/"+channel+"/ntuples_"+doSvfit+"_merged/BASIS_ntuple_SingleElectron_"+channel+"_"+version+reduced+".root";
@@ -20,12 +21,14 @@ const struct Parameter{
     TString VV="/data/higgs/data_2016/ntuples_"+version+"/"+channel+"/ntuples_"+doSvfit+"_merged/BASIS_ntuple_VV_MCSummer16_"+channel+"_"+version+reduced+".root";
     TString VVtauUp="/data/higgs/data_2016/ntuples_"+version+"/"+channel+"/ntuples_"+doSvfit+"_merged/BASIS_ntuple_VV_MCSummer16_"+channel+"_"+version+"_TauPtUp"+reduced+".root";
     TString VVtauDown="/data/higgs/data_2016/ntuples_"+version+"/"+channel+"/ntuples_"+doSvfit+"_merged/BASIS_ntuple_VV_MCSummer16_"+channel+"_"+version+"_TauPtDown"+reduced+".root";
-    TString qqH="/data/higgs/data_2016/ntuples_"+version+"/"+channel+"/ntuples_"+doSvfit+"_merged/BASIS_ntuple_VBFHToTauTau_M125_powheg_MCSummer16_"+channel+"_"+version+reduced+".root";
-    TString qqHtauUp="/data/higgs/data_2016/ntuples_"+version+"/"+channel+"/ntuples_"+doSvfit+"_merged/BASIS_ntuple_VBFHToTauTau_M125_powheg_MCSummer16_"+channel+"_"+version+"_TauPtUp"+reduced+".root";
-    TString qqHtauDown="/data/higgs/data_2016/ntuples_"+version+"/"+channel+"/ntuples_"+doSvfit+"_merged/BASIS_ntuple_VBFHToTauTau_M125_powheg_MCSummer16_"+channel+"_"+version+"_TauPtDown"+reduced+".root";
-    TString ggH="/data/higgs/data_2016/ntuples_"+version+"/"+channel+"/ntuples_"+doSvfit+"_merged/BASIS_ntuple_GluGluHToTauTau_M125_powheg_MCSummer16_"+channel+"_"+version+reduced+".root";
-    TString ggHtauUp="/data/higgs/data_2016/ntuples_"+version+"/"+channel+"/ntuples_"+doSvfit+"_merged/BASIS_ntuple_GluGluHToTauTau_M125_powheg_MCSummer16_"+channel+"_"+version+"_TauPtUp"+reduced+".root";
-    TString ggHtauDown="/data/higgs/data_2016/ntuples_"+version+"/"+channel+"/ntuples_"+doSvfit+"_merged/BASIS_ntuple_GluGluHToTauTau_M125_powheg_MCSummer16_"+channel+"_"+version+"_TauPtDown"+reduced+".root";
+
+    vector<TString> masspoints = {"90","120","160","250","400","700","1000","1500","2000","2900"};
+    TString bbH="/data/higgs/data_2016/ntuples_"+version+"/"+channel+"/ntuples_"+doSvfit+"_merged/BASIS_ntuple_SUSYGluGluToBBHToTauTau_M_XXX_pythia8_MCSummer16_"+channel+"_"+version+reduced+".root";
+    TString bbHtauUp="/data/higgs/data_2016/ntuples_"+version+"/"+channel+"/ntuples_"+doSvfit+"_merged/BASIS_ntuple_SUSYGluGluToBBHToTauTau_M_XXX_pythia8_MCSummer16_"+channel+"_"+version+"_TauPtUp"+reduced+".root";
+    TString bbHtauDown="/data/higgs/data_2016/ntuples_"+version+"/"+channel+"/ntuples_"+doSvfit+"_merged/BASIS_ntuple_SUSYGluGluToBBHToTauTau_M_XXX_pythia8_MCSummer16_"+channel+"_"+version+"_TauPtDown"+reduced+".root";
+    TString ggH="/data/higgs/data_2016/ntuples_"+version+"/"+channel+"/ntuples_"+doSvfit+"_merged/BASIS_ntuple_SUSYGluGluToHToTauTau_M_XXX_pythia8_MCSummer16_"+channel+"_"+version+reduced+".root";
+    TString ggHtauUp="/data/higgs/data_2016/ntuples_"+version+"/"+channel+"/ntuples_"+doSvfit+"_merged/BASIS_ntuple_SUSYGluGluToHToTauTau_M_XXX_pythia8_MCSummer16_"+channel+"_"+version+"_TauPtUp"+reduced+".root";
+    TString ggHtauDown="/data/higgs/data_2016/ntuples_"+version+"/"+channel+"/ntuples_"+doSvfit+"_merged/BASIS_ntuple_SUSYGluGluToHToTauTau_M_XXX_pythia8_MCSummer16_"+channel+"_"+version+"_TauPtDown"+reduced+".root";
 
   } dataset;
   struct variable{
@@ -34,120 +37,139 @@ const struct Parameter{
       int nbins = 20;
       double nmin = 0;
       double nmax = 200;
-      int doVarBins = 0;
-      vector<double> varBins = {50,55,60,65,80};
+      int doVarBins = 1;
+      std::map<TString, vector<double> > varBins = {
+        {"default", {50,55,60,65,80} },
+        {"btag", {10,30,50,70,90,110,130,150,170,190,210,230,250} },
+        {"nobtag", {10,25,40,55,70,85,100,115,130,145,160,175,190,205,220,235,250} } 
+      };
     } m_vis;
     struct m_sv{
       int nbins = 25;
       double nmin = 0;
       double nmax = 250;
       int doVarBins = 0;
-      vector<double> varBins = {0,20,25,30};
+      std::map<TString, vector<double> > varBins = { {"default", {50,55,60,65,80}} };
     } m_sv;
     struct pt_sv{
       int nbins = 20;
       double nmin = 0;
       double nmax = 200;
       int doVarBins = 0;
-      vector<double> varBins = {0,20,25,30};
+      std::map<TString, vector<double> > varBins = { {"default", {50,55,60,65,80}} };
     } pt_sv;
     struct jpt{
       int nbins = 70;
       double nmin = 0;
       double nmax = 350;
       int doVarBins = 0;
-      vector<double> varBins = {50,55,60,65,80};
+      std::map<TString, vector<double> > varBins = { {"default", {50,55,60,65,80}} };
     } jpt;
     struct pt{
       int nbins = 25;
       double nmin = 30;
       double nmax = 100;
-      int doVarBins = 0;
-      vector<double> varBins = {50,55,60,65,80};
+      int doVarBins = 1;
+      std::map<TString, vector<double> > varBins = {
+        {"default", {50,55,60,65,80} },
+        {"btag", {30, 37, 44, 51, 58, 65, 72, 79, 86, 93, 100} },
+        {"nobtag", {30, 33, 36, 39, 42, 45, 48, 51, 54, 57, 60, 63, 66, 69, 72, 75, 78, 81, 84, 87, 90, 93, 96, 100} } 
+      };
     } pt;
     struct eta{
       int nbins = 25;
       double nmin = -2.5;
       double nmax = 2.5;
       int doVarBins = 0;
-      vector<double> varBins = {50,55,60,65,80};
+      std::map<TString, vector<double> > varBins = { {"default", {50,55,60,65,80}} };
     } eta;
     struct jeta{
       int nbins = 40;
       double nmin = -5;
       double nmax = 5;
       int doVarBins = 0;
-      vector<double> varBins = {50,55,60,65,80};
+      std::map<TString, vector<double> > varBins = { {"default", {50,55,60,65,80}} };
     } jeta;
     struct jdeta{
       int nbins = 40;
       double nmin = 0;
       double nmax = 10;
       int doVarBins = 0;
-      vector<double> varBins = {50,55,60,65,80};
+      std::map<TString, vector<double> > varBins = { {"default", {50,55,60,65,80}} };
     } jdeta;
     struct mt_1{
-      int nbins = 25;
+      int nbins = 35;
       double nmin = 0;
-      double nmax = 250;
+      double nmax = 350;
       int doVarBins = 0;
-      vector<double> varBins = {50,55,60,65,80};
+      std::map<TString, vector<double> > varBins = { {"default", {50,55,60,65,80}} };
     } mt_1;
     struct met{
       int nbins = 25;
       double nmin = 0;
       double nmax = 250;
       int doVarBins = 0;
-      vector<double> varBins = {50,55,60,65,80};
+      std::map<TString, vector<double> > varBins = { {"default", {50,55,60,65,80}} };
     } met;
     struct mttot{
-      int nbins = 25;
+      int nbins = 50;
       double nmin = 0;
-      double nmax = 250;
-      int doVarBins = 0;
-      vector<double> varBins = {50,55,60,65,80};
+      double nmax = 500;
+      int doVarBins = 1;
+      std::map<TString, vector<double> > varBins = 
+      { {"default", {0,10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200,225,250,275,300,325,350,400,500,700,1100,3900} },
+        //{"mt_nobtag", {0,10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200,225,250,275,300,325,350,400,500,700,1100,3900} },
+        {"mt_nobtag", {0,10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200,225,250,275,300,325,350,400,500} },
+        {"et_nobtag", {0,10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200,225,250,275,300,325,350,400,500,700,3900} },
+        {"tt_nobtag", {0,10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200,225,250,275,300,325,350,400,500,900,3900} },
+        {"et_btag", {0,20,40,60,80,100,120,140,160,180,200,250,300,350,400,500,3900} },
+        //{"mt_btag", {0,20,40,60,80,100,120,140,160,180,200,250,300,350,400,500,3900} },
+        {"mt_btag", {0,20,40,60,80,100,120,140,160,180,200,250,300,350,400,500} },       
+        {"tt_btag", {0,20,40,60,80,100,120,140,160,180,200,250,300,350,500,3900} }
+      };
+
     } mttot;
     struct Hpt{
       int nbins = 20;
       double nmin = 0;
       double nmax = 200;
       int doVarBins = 0;
-      vector<double> varBins = {0,200};
+      std::map<TString, vector<double> > varBins = { {"default", {50,55,60,65,80}} };
     } Hpt;
     struct Low_mt_1{
       int nbins = 25;
       double nmin = 0;
       double nmax = 50;
       int doVarBins = 0;
-      vector<double> varBins = {50,55,60,65,80};
+      std::map<TString, vector<double> > varBins = { {"default", {50,55,60,65,80}} };
     } Low_mt_1;
     struct High_mt_1{
       int nbins = 40;
       double nmin = 80;
       double nmax = 1000;
       int doVarBins = 0;
-      vector<double> varBins = {50,55,60,65,80};
+      std::map<TString, vector<double> > varBins = { {"default", {50,55,60,65,80}} };
     } High_mt_1;
     struct iso_1{
       int nbins = 25;
       double nmin = 0;
       double nmax = 0.5;
       int doVarBins = 0;
-      vector<double> varBins = {50,55,60,65,80};
+      std::map<TString, vector<double> > varBins = { {"default", {50,55,60,65,80}} };
     } iso_1;
     struct mjj{
       int nbins = 70;
       double nmin = 0;
       double nmax = 1400;
       int doVarBins = 1;
-      vector<double> varBins = {0,20,40,60,80,100,120,140,160,180,200,220,240,260,280,300,320,340,360,380,400,420,440,460,480,500,520,540,560,580,600,625,650,675,700,725,750,775,800,850,900,950,1000,1100,1200,1400};
+      std::map<TString, vector<double> > varBins = { {"default",  {0,20,40,60,80,100,120,140,160,180,200,220,240,260,280,300,320,340,360,380,400,420,440,460,480,500,520,540,560,580,600,625,650,675,700,725,750,775,800,850,900,950,1000,1100,1200,1400} } };
     } mjj;
     struct jeta1eta2{
       int nbins = 40;
       double nmin = -10;
       double nmax = 10;
       int doVarBins = 0;
-      vector<double> varBins = {50,55,60,65,80};
+      std::map<TString, vector<double> > varBins = { {"default", {50,55,60,65,80}} };
     } jeta1eta2;
 
   } variable;
@@ -198,8 +220,8 @@ const struct Parameter{
   } variable2D_tt;  
 
   struct analysisCut{
-    double mTHigh = 80;
-    double mTLow  = 50;
+    double mTHigh = 70;
+    double mTLow  = 40;
     double muIso_base = 0.15;
     double muIso_relaxed = 0.3;
     double muIso_antiIsoLow = 0.15;
@@ -210,9 +232,9 @@ const struct Parameter{
     double elIso_antiIsoHigh = 0.3;
   } analysisCut;
 
-  struct category{
-    vector<TString> D1categories = {s_inclusive,s_0jet_low,s_0jet_high,s_1jet_low,s_1jet_high,s_vbf_low,s_vbf_high};
-    vector<TString> D2categories = {s_0jet,s_boosted,s_vbf,s_wjets_0jet_cr,s_wjets_boosted_cr,s_wjets_vbf_cr,s_antiiso_0jet_cr,s_antiiso_boosted_cr,s_antiiso_vbf_cr};
+   struct category{
+    vector<TString> categoriesForFF = {s_nobtag, s_btag, s_nobtag_tight,s_btag_tight,s_nobtag_looseiso,s_btag_looseiso,s_nobtag_loosemt,s_btag_loosemt};
+    //vector<TString> D2categories = {s_0jet,s_boosted,s_vbf,s_wjets_0jet_cr,s_wjets_boosted_cr,s_wjets_vbf_cr,s_antiiso_0jet_cr,s_antiiso_boosted_cr,s_antiiso_vbf_cr};
     //FIXME: add PU jet categories
   } category;
 

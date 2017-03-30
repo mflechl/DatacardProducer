@@ -7,13 +7,13 @@
 #include "TH1D.h"
 #include "ParameterConfig_SM.h"
 
+
 class GlobalClass{
  public:
+
   GlobalClass();
   ~GlobalClass();
 
-  int is1DCategories(TString category);
-  int is2DCategories(TString category);
   double get2DVar(TString sub);
   int returnBin(vector<double> bins, double value);
 
@@ -28,7 +28,11 @@ class GlobalClass{
   int passMTCut();
   int passIso(TString type);
   int Vetos();
-  int CategorySelection(TString cat, TString mtcut = "");
+  int CategorySelection(TString cat, TString iso = "");
+  int Btag(TString btag);
+  int TightMt(TString iso);
+  int LooseMt(TString iso);
+  int LooseIso(TString iso);
 
   double getWSFUncertainty( TString cat );
   double getQCDSFUncertainty( TString cat );
@@ -37,22 +41,7 @@ class GlobalClass{
   double applyZmumuUncertainty( TString cat );
   TString return2DString( TString cat );
 
-  int VBF_low(TString mtcut = "");
-  int VBF_high(TString mtcut = "");
-  int Jet1_low(TString mtcut = "");
-  int Jet1_high(TString mtcut = "");
-  int Jet0_low(TString mtcut = "");
-  int Jet0_high(TString mtcut = "");
-  int Jet0(TString mtcut = "");
-  int Boosted(TString mtcut = "");
-  int VBF(TString mtcut = "");
-
-  double QCD_OSSS(TString cat);
-  int OS_W(TString cat);
-  int SS_W(TString cat);
-  int relaxed_W(TString cat, TString mt);
-  int SS_Low(TString cat);
-  int SS_Low_relaxed(TString cat);
+  int W_CR(TString sign, TString iso, TString cat, bool mtcut=true );
 
   TH1D* GetHistbyName(TString name, TString strVar="");
   TH1D* JITHistoCreator(TString name, TString strVar);
@@ -62,12 +51,13 @@ class GlobalClass{
   void resetZeroBins(TString hist, TString var);
   void resetZeroBins(TH1D* hist);
 
-  vector<TH1D*> histos;
-  vector<TString> histo_names = {};
+  
+  map<TString, TH1D*> histograms;
 
   vector<TString> cats;
   vector<TString> vars;
-  vector< vector<TString> > files; 
+  //vector< vector<TString> > files; 
+  map<TString, pair<TString,TString> > files;
 
   ntuple *NtupleView;
   Int_t isJEC=0; //0->no correction; 1->jecUp; -1->jecDown;
@@ -76,3 +66,5 @@ class GlobalClass{
 
 
 #endif
+
+

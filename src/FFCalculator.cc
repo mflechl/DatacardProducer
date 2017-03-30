@@ -2,7 +2,7 @@
 
 using namespace std;
 
-FFCalculator::FFCalculator(){  
+FFCalculator::FFCalculator(){
 }
 
 FFCalculator::~FFCalculator(){
@@ -10,7 +10,7 @@ FFCalculator::~FFCalculator(){
 
 void FFCalculator::initFakeFactors(){
   for(auto cat : cats){
-    if( !this->is1DCategories(cat) && !this->is2DCategories(cat) ) continue;
+    if( std::find(Parameter.category.categoriesForFF.begin(), Parameter.category.categoriesForFF.end(), cat) == Parameter.category.categoriesForFF.end() ) continue;
     TString catSuffix = cat;
     if(cat == s_wjets_0jet_cr) catSuffix = s_0jet;
     if(cat == s_wjets_boosted_cr) catSuffix = s_boosted;
@@ -30,12 +30,13 @@ void FFCalculator::applyFF(float var, float weight, TString cat, TString strVar,
 
   TString sub = extend + "+" + strVar +"_" + cat + "+";
   float usedVar=var;
+  bool validCat =  std::find(Parameter.category.categoriesForFF.begin(), Parameter.category.categoriesForFF.end(), cat) != Parameter.category.categoriesForFF.end() ;
   if(extend=="2D") usedVar = this->get2DVar(sub)+0.1;
   /////////////////////////////////////////////////////////////////////////////////////////////////////////
   /////////////////////////////////////////////////////////////////////////////////////////////////////////
   if(isJEC==0){
     if( channel != "tt" ){
-      if( this->Baseline("FF",cat) &&  ( is1DCategories(cat) || is2DCategories(cat) ) ){
+      if(  validCat && this->Baseline("FF",cat)){
         if( isData || NtupleView->gen_match_2 < 6 ){
           FFinputs.clear();
           this->getFFInputs(FFinputs);
@@ -60,7 +61,7 @@ void FFCalculator::applyFF(float var, float weight, TString cat, TString strVar,
     }
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     else{
-      if( this->Baseline("FF1",cat) &&  ( is1DCategories(cat) || is2DCategories(cat) ) ){
+      if( this->Baseline("FF1",cat) &&  validCat  ){
         if( isData || NtupleView->gen_match_1 < 6 ){
           FFinputs.clear();
           this->getFF1Inputs(FFinputs);
@@ -82,7 +83,7 @@ void FFCalculator::applyFF(float var, float weight, TString cat, TString strVar,
           }
         }
       }
-      if( this->Baseline("FF2",cat) &&  ( is1DCategories(cat) || is2DCategories(cat) ) ){
+      if( this->Baseline("FF2",cat) &&  validCat  ){
         if( isData || NtupleView->gen_match_2 < 6 ){
           FFinputs.clear();
           this->getFF2Inputs(FFinputs);
@@ -110,7 +111,7 @@ void FFCalculator::applyFF(float var, float weight, TString cat, TString strVar,
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   else if(isJEC==1){
     if( channel != "tt" ){
-      if( this->Baseline("FF",cat) &&  ( is1DCategories(cat) || is2DCategories(cat) ) ){
+      if( this->Baseline("FF",cat) &&  validCat ){
         if( isData || NtupleView->gen_match_2 < 6 ){
           FFinputs.clear();
           this->getFFInputs(FFinputs);
@@ -120,14 +121,14 @@ void FFCalculator::applyFF(float var, float weight, TString cat, TString strVar,
     }
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     else{
-      if( this->Baseline("FF1",cat) &&  ( is1DCategories(cat) || is2DCategories(cat) ) ){
+      if( this->Baseline("FF1",cat) &&  validCat ){
         if( isData || NtupleView->gen_match_1 < 6 ){
           FFinputs.clear();
           this->getFF1Inputs(FFinputs);
           this->GetHistbyName( fname+"_"+s_jetFakes+sub,strVar)->Fill(usedVar, 0.5*weight*FFObj[cat]->value(FFinputs) );
         }
       }
-      if( this->Baseline("FF2",cat) &&  ( is1DCategories(cat) || is2DCategories(cat) ) ){
+      if( this->Baseline("FF2",cat) && validCat  ){
         if( isData || NtupleView->gen_match_2 < 6 ){
           FFinputs.clear();
           this->getFF2Inputs(FFinputs);
@@ -140,7 +141,7 @@ void FFCalculator::applyFF(float var, float weight, TString cat, TString strVar,
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   else if(isJEC==-1){
     if( channel != "tt" ){
-      if( this->Baseline("FF",cat) &&  ( is1DCategories(cat) || is2DCategories(cat) ) ){
+      if( this->Baseline("FF",cat) &&  validCat  ){
         if( isData || NtupleView->gen_match_2 < 6 ){
           FFinputs.clear();
           this->getFFInputs(FFinputs);
@@ -150,14 +151,14 @@ void FFCalculator::applyFF(float var, float weight, TString cat, TString strVar,
     }
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     else{
-      if( this->Baseline("FF1",cat) &&  ( is1DCategories(cat) || is2DCategories(cat) ) ){
+      if( this->Baseline("FF1",cat) &&  validCat  ){
         if( isData || NtupleView->gen_match_1 < 6 ){
           FFinputs.clear();
           this->getFF1Inputs(FFinputs);
           this->GetHistbyName( fname+"_"+s_jetFakes+sub,strVar)->Fill(usedVar, 0.5*weight*FFObj[cat]->value(FFinputs) );
         }
       }
-      if( this->Baseline("FF2",cat) &&  ( is1DCategories(cat) || is2DCategories(cat) ) ){
+      if( this->Baseline("FF2",cat) &&  validCat ){
         if( isData || NtupleView->gen_match_2 < 6 ){
           FFinputs.clear();
           this->getFF2Inputs(FFinputs);
