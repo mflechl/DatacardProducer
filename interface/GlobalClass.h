@@ -30,9 +30,9 @@ class GlobalClass{
   int Vetos();
   int CategorySelection(TString cat, TString iso = "");
   int Btag(TString btag);
-  int LowMt(TString iso);
+  int TightMt(TString iso);
   int LooseMt(TString iso);
-  int HighMt(TString iso);
+  int LooseIso(TString iso);
 
   double getWSFUncertainty( TString cat );
   double getQCDSFUncertainty( TString cat );
@@ -41,12 +41,7 @@ class GlobalClass{
   double applyZmumuUncertainty( TString cat );
   TString return2DString( TString cat );
 
-  double QCD_OSSS(TString cat);
-  int OS_W(TString cat);
-  int SS_W(TString cat);
-  int relaxed_W(TString cat, TString mt);
-  int SS_Low(TString cat);
-  int SS_Low_relaxed(TString cat);
+  int W_CR(TString sign, TString iso, TString cat, bool mtcut=true );
 
   TH1D* GetHistbyName(TString name, TString strVar="");
   TH1D* JITHistoCreator(TString name, TString strVar);
@@ -61,7 +56,8 @@ class GlobalClass{
 
   vector<TString> cats;
   vector<TString> vars;
-  vector< vector<TString> > files; 
+  //vector< vector<TString> > files; 
+  map<TString, pair<TString,TString> > files;
 
   ntuple *NtupleView;
   Int_t isJEC=0; //0->no correction; 1->jecUp; -1->jecDown;

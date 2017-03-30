@@ -8,9 +8,10 @@ const int doMC=0;
 const double usedLuminosity=35.9; 
 const TString doSvfit="woSVFIT";
 const TString reduced="";//"";//"_reduced";
-const TString FFversion="fakeFactors_20170324.root";
+const TString FFversion="fakeFactors_20170328_tight.root";
+const TString FFiso = "tight";
 const vector<TString> variables={s_mttot}; //s_mvis,s_met,s_pt1,s_pt2
-const vector<TString> categories={s_nobtagLow,s_btagLow,s_nobtagLoose,s_btagLoose,s_nobtagHigh,s_btagHigh};
+const vector<TString> categories={s_nobtag_tight,s_btag_tight,s_nobtag_tight_wjets_cr,s_btag_tight_wjets_cr};
 //const vector<TString> categories={s_inclusive,s_0jet,s_wjets_0jet_cr,s_antiiso_0jet_cr,s_boosted,s_wjets_boosted_cr,s_antiiso_boosted_cr,s_vbf,s_wjets_vbf_cr,s_antiiso_vbf_cr};
 ///////////////////////////////////////////////////////////////////////////
 const int applyMTCut=1;//MTcut in inclusive selection, default==1 for mt&et, default==0 for tt
@@ -24,4 +25,5 @@ const int calcFF=1;
 const int keepDebugHistos=0;
 const int keepFFDebugHistos=0;
 const int keepZGenJetsSplitting=0;
+
 
