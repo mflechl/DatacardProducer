@@ -18,10 +18,13 @@ class CreateHistos : public SelectionAnalyzer{
   int isWFile(TString fileName);
   int isVVFile(TString fileName); 
 
-  void CreateQCD_osw(TString strVar, TString cat, TString extend="");
-  void CreateW(TString strVar, TString cat, TString extend="");
-  void CreateQCD(TString strVar, TString cat, TString extend="");
+  double getQCD_osss(TString cat);
+  double getW_osss(TString strVar, TString cat);
+  double getW_mtHL(TString strVar, TString cat);
+  double getW_BtagConv(TString strVar, TString cat);
   void Estimate_W_QCD(TString strVar, TString cat, TString extend="");
+  void EstimateW(TString strVar, TString cat);
+  void EstimateQCD(TString strVar, TString cat);
   void EstimateFF(TString strVar, TString cat, TString extend="");
 
   void loadFile(TString filename);

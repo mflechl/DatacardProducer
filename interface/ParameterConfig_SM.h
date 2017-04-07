@@ -39,7 +39,7 @@ const struct Parameter{
       double nmax = 200;
       int doVarBins = 1;
       std::map<TString, vector<double> > varBins = {
-        {"default", {50,55,60,65,80} },
+        {"default", {10,25,40,55,70,85,100,115,130,145,160,175,190,205,220,235,250} },
         {"btag", {10,30,50,70,90,110,130,150,170,190,210,230,250} },
         {"nobtag", {10,25,40,55,70,85,100,115,130,145,160,175,190,205,220,235,250} } 
       };
@@ -117,9 +117,9 @@ const struct Parameter{
       double nmax = 500;
       int doVarBins = 1;
       std::map<TString, vector<double> > varBins = 
-      { {"default", {0,10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200,225,250,275,300,325,350,400,500,700,1100,3900} },
+      { {"default", {0,10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200,225,250,275,300,325,350,400,500,700,900,1100,1300,1500,1700,1900,2100,2300,2500,2700,2900,3100,3300,3500,3700,3900} },
         //{"mt_nobtag", {0,10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200,225,250,275,300,325,350,400,500,700,1100,3900} },
-        {"mt_nobtag", {0,10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200,225,250,275,300,325,350,400,500} },
+        //{"default", {0,10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200,225,250,275,300,325,350,400,500} },
         {"et_nobtag", {0,10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200,225,250,275,300,325,350,400,500,700,3900} },
         {"tt_nobtag", {0,10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200,225,250,275,300,325,350,400,500,900,3900} },
         {"et_btag", {0,20,40,60,80,100,120,140,160,180,200,250,300,350,400,500,3900} },
@@ -233,7 +233,7 @@ const struct Parameter{
   } analysisCut;
 
    struct category{
-    vector<TString> categoriesForFF = {s_nobtag, s_btag, s_nobtag_tight,s_btag_tight,s_nobtag_looseiso,s_btag_looseiso,s_nobtag_loosemt,s_btag_loosemt};
+    vector<TString> categoriesForQCDest = {s_inclusive, s_nobtag, s_btag, s_nobtag_tight,s_btag_tight,s_nobtag_looseiso,s_btag_looseiso,s_nobtag_loosemt,s_btag_loosemt};
     //vector<TString> D2categories = {s_0jet,s_boosted,s_vbf,s_wjets_0jet_cr,s_wjets_boosted_cr,s_wjets_vbf_cr,s_antiiso_0jet_cr,s_antiiso_boosted_cr,s_antiiso_vbf_cr};
     //FIXME: add PU jet categories
   } category;

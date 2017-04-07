@@ -57,7 +57,7 @@ const TString s_tauDown =                s_tau+s_down;
 const TString s_jecUp =                  s_jec+s_up;
 const TString s_jecDown =                s_jec+s_down;
 
-const TString s_data =                   "data";
+const TString s_data =                   "data_obs";
 const TString s_Z =                      "Z";
 const TString s_ZtauUp =                 s_Z+s_tauUp;
 const TString s_ZtauDown =               s_Z+s_tauDown;

@@ -41,6 +41,7 @@ CreateHistos::CreateHistos(){
     files[s_VVtauDown].first = Parameter.dataset.VVtauDown;
 
     for(auto mass : Parameter.dataset.masspoints){
+
       tmp = Parameter.dataset.ggHtauUp;
       files[s_ggHtauUp+mass].first = tmp.ReplaceAll("XXX",mass);
       files[s_ggHtauUp+mass].second = mass;
@@ -89,8 +90,24 @@ CreateHistos::CreateHistos(){
     }
   }
 
-  for(int i=0; i<variables.size(); i++)      vars.push_back(variables.at(i));
-  for(int i=0; i<categories.size(); i++)     cats.push_back(categories.at(i));
+  for(auto var : variables)      vars.push_back(var);
+  for(auto cat : categories){
+    cats.push_back(cat);
+    if(channel != "tt"){
+      cats.push_back(cat+"_wjets_cr");
+      cats.push_back(cat+"_wjets_ss_cr");
+      cats.push_back(cat+"_qcd_cr");
+      cats.push_back(cat+"_loosebtag");
+      //cats.push_back(cat+"_loosebtag_ss");
+      cats.push_back(cat+"_loosebtag_wjets_cr");
+      cats.push_back(cat+"_loosebtag_wjets_ss_cr");
+    }
+    else{
+      cats.push_back(cat+"_loose");
+      cats.push_back(cat+"_qcd_cr");
+      cats.push_back(cat+"_loose_qcd_cr");
+    }
+  };
   
   
 }
@@ -212,7 +229,10 @@ void CreateHistos::run(TString isTest){
       }
 
       NtupleView->GetEntry(jentry);
- 
+
+      if( channel=="et" && !NtupleView->trg_singleelectron ) continue;
+      if( channel=="tt" && !( NtupleView->trg_doubletau || NtupleView->trg_singletau ) ) continue;
+
       weight = NtupleView->stitchedWeight*NtupleView->puweight*NtupleView->effweight*NtupleView->genweight*NtupleView->antilep_tauscaling*usedLuminosity;
       if(!doMC){
         if( isZFile(filetype) || isEWKZFile(filetype) ) weight *= NtupleView->ZWeight;
@@ -286,15 +306,16 @@ void CreateHistos::run(TString isTest){
       }
     }
   }
-  // if( channel != "tt" ){
-  //   for(auto cat : cats){
-  //     for(auto strVar : vars){
-  //       this->Estimate_W_QCD(strVar, cat);
-  //     }
-  //   }
-  // }
-  if(calcFF){
+  if( channel != "tt" ){
     for(auto cat : cats){
+      for(auto strVar : vars){
+        this->EstimateW(strVar, cat);
+        this->EstimateQCD(strVar, cat);
+      }
+    }
+  }
+  if(calcFF){
+    for(auto cat : categories){
       for(auto strVar : vars){
         if( !do2DFit || cat == s_inclusive )            this->EstimateFF(strVar, cat);
       }
@@ -593,19 +614,159 @@ void CreateHistos::EstimateFF(TString strVar, TString cat, TString extend){
   //cout << "//////////////////////////////////////" << endl;
 
 }
-// double GlobalClass::getQCD_osss(TString cat){
-//   return 1.0;
-// }
+double CreateHistos::getQCD_osss(TString cat){
+  if(channel == "mt"){
+    if(cat.Contains("looseiso")){
+      if(cat.Contains("btag") && !cat.Contains("nobtag") ) return 0.95;
+      if(cat.Contains("nobtag") ) return 1.20;
+      if(cat.Contains("inclusive") ) return 1.19;
+    }
+    else{
+      if(cat.Contains("btag") && !cat.Contains("nobtag") ) return 1.08;
+      if(cat.Contains("nobtag") ) return 1.12;
+      if(cat.Contains("inclusive") ) return 1.10;      
+    }
+  }
+  if(channel == "et"){
+    if(cat.Contains("looseiso")){
+      if(cat.Contains("btag") && !cat.Contains("nobtag") ) return 0.84;
+      if(cat.Contains("nobtag") ) return 0.97;
+      if(cat.Contains("inclusive") ) return 0.99;
+    }
+    else{
+      if(cat.Contains("btag") && !cat.Contains("nobtag") ) return 1.21;
+      if(cat.Contains("nobtag") ) return 1.02;
+      if(cat.Contains("inclusive") ) return 1.04;      
+    }
+  }
 
-// double GlobalClass::getW_osss(TString cat){
-//   return 1.0;
-// }
+  return 1.0;
+}
+double CreateHistos::getW_osss(TString strVar, TString cat){
 
-// double GlobalClass::getW_mtHL(TString cat){
-//   return 1.0;
-// }
+  TString sub = "+" + strVar +"_" + cat+"_wjets_cr+";
+  if(cat.Contains("btag") && !cat.Contains("nobtag") ) sub = "+" + strVar +"_" + cat+"_loosebtag_wjets_cr+";
+  
+  return this->GetHistbyName("OS_incl_"+s_W+sub,strVar)->Integral() / this->GetHistbyName("SS_incl_"+s_W+sub,strVar)->Integral();
+}
+double CreateHistos::getW_mtHL(TString strVar, TString cat){
+  TString sub = "+" + strVar +"_" + cat;
+  if(cat.Contains("btag") && !cat.Contains("nobtag") ) sub = "+" + strVar +"_" + cat+"_loosebtag";
+
+  return this->GetHistbyName(s_W+ "_MC"+ sub + "+",strVar)->Integral() / this->GetHistbyName(s_W+ "_MC"+ sub+"_wjets_cr+",strVar)->Integral();
+}
+double CreateHistos::getW_BtagConv(TString strVar, TString cat){
+  TString sub = "+" + strVar +"_" + cat +"+";
+  return this->GetHistbyName(s_W+ "_MC" + sub,strVar)->Integral() / this->GetHistbyName("SR_looseB_MC_"+s_W+sub,strVar)->Integral();
+}
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CreateHistos::EstimateW(TString strVar, TString cat){
+  if(cat.Contains("wjets_cr") || cat.Contains("loosebtag") || cat.Contains("wjets_ss_cr") || cat.Contains("qcd_cr") ) return;
+
+  double R_W = this->getW_osss(strVar, cat);
+  double R_QCD = this->getQCD_osss(cat);
+  double HLExt = this->getW_mtHL(strVar, cat);
+  double BConv_SR = this->getW_BtagConv(strVar, cat);
+  double BConv_CR = this->getW_BtagConv(strVar, cat + "_wjets_cr");
+    cout << "  "<<BConv_CR<< "     "<<BConv_SR<< "     " << endl;
+  //double BConv = 1; //FIXME after SS_W ist calculated correctly using loose btag regions for ALL histos conv scale can be applied
+
+  TString bt = "";
+  if(cat.Contains("btag") && !cat.Contains("nobtag")) bt = "_loosebtag";
+  TString sub = "+" + strVar +"_" + cat;
+
+  cout << R_W << "  " << R_QCD << "  " << HLExt << "  "<< this->getW_BtagConv(strVar, cat)<< "  " << endl;
+
+  this->GetHistbyName("data_os_obs"+sub+"_wjets_cr+",strVar)->Add( this->GetHistbyName(s_data + sub + bt +"_wjets_cr+",strVar)   );
+  this->GetHistbyName("backgrounds_os"+sub+"_wjets_cr+",strVar)->Add( this->GetHistbyName(s_Z + sub + bt +"_wjets_cr+",strVar) );
+  this->GetHistbyName("backgrounds_os"+sub+"_wjets_cr+",strVar)->Add( this->GetHistbyName(s_EWKZ + sub + bt +"_wjets_cr+",strVar));
+  this->GetHistbyName("backgrounds_os"+sub+"_wjets_cr+",strVar)->Add( this->GetHistbyName(s_VV + sub + bt +"_wjets_cr+",strVar) );
+  this->GetHistbyName("backgrounds_os"+sub+"_wjets_cr+",strVar)->Add( this->GetHistbyName(s_TT + sub + bt +"_wjets_cr+",strVar) );
+
+  this->GetHistbyName("data_ss_obs"+sub+"_wjets_ss_cr+",strVar)->Add( this->GetHistbyName(s_data + sub + bt +"_wjets_ss_cr+",strVar)   );
+  this->GetHistbyName("backgrounds_ss"+sub+"_wjets_ss_cr+",strVar)->Add( this->GetHistbyName(s_Z + sub + bt +"_wjets_ss_cr+",strVar) );
+  this->GetHistbyName("backgrounds_ss"+sub+"_wjets_ss_cr+",strVar)->Add( this->GetHistbyName(s_EWKZ + sub + bt +"_wjets_ss_cr+",strVar));
+  this->GetHistbyName("backgrounds_ss"+sub+"_wjets_ss_cr+",strVar)->Add( this->GetHistbyName(s_VV + sub + bt +"_wjets_ss_cr+",strVar) );
+  this->GetHistbyName("backgrounds_ss"+sub+"_wjets_ss_cr+",strVar)->Add( this->GetHistbyName(s_TT + sub + bt +"_wjets_ss_cr+",strVar) );
+
+  double wjets_ss_cr_norm  = this->GetHistbyName("data_os_obs"+sub+"_wjets_cr+",strVar)->Integral() - this->GetHistbyName("backgrounds_os"+sub+"_wjets_cr+",strVar)->Integral();
+         wjets_ss_cr_norm -= (this->GetHistbyName("data_ss_obs"+sub+"_wjets_ss_cr+",strVar)->Integral() - this->GetHistbyName("backgrounds_ss"+sub+"_wjets_ss_cr+",strVar)->Integral() ) * R_QCD;
+         wjets_ss_cr_norm *= ( 1 /  ( R_W - R_QCD ) );
+
+
+
+  this->GetHistbyName(s_W+sub+"_wjets_ss_cr+",strVar)->Add( this->GetHistbyName(s_W+"_MC"+sub+bt+"_wjets_ss_cr+",strVar) );
+  this->GetHistbyName(s_W+sub+"_wjets_ss_cr+",strVar)->Scale( (wjets_ss_cr_norm * BConv_CR) / this->GetHistbyName(s_W+sub+"_wjets_ss_cr+",strVar)->Integral() );
+
+  this->GetHistbyName(s_W+sub+"_wjets_cr+",strVar)->Add( this->GetHistbyName(s_W +"_MC"+sub+bt+"_wjets_cr+",strVar) );
+  this->GetHistbyName(s_W+sub+"_wjets_cr+",strVar)->Scale( (R_W * wjets_ss_cr_norm* BConv_CR) / this->GetHistbyName(s_W+sub+"_wjets_cr+",strVar)->Integral() );
+
+  this->GetHistbyName(s_W +sub +"_qcd_cr+",strVar)->Add( this->GetHistbyName(s_W+ "_MC" +sub +"_qcd_cr+",strVar) );
+  this->GetHistbyName(s_W +sub +"_qcd_cr+",strVar)->Scale( (wjets_ss_cr_norm * HLExt* BConv_SR) / this->GetHistbyName(s_W +sub +"_qcd_cr+",strVar)->Integral() );
+
+  this->GetHistbyName(s_W +sub +"+",strVar)->Add( this->GetHistbyName(s_W+ "_MC" +sub +"+",strVar) ); 
+  this->GetHistbyName(s_W +sub +"+",strVar)->Scale( (wjets_ss_cr_norm * HLExt * R_W* BConv_SR ) / this->GetHistbyName(s_W +sub +"+",strVar)->Integral() );
+
+
+
+  TString w_FakeShape_up="W_CMS_htt_wFakeShape_13TeVUp";
+  TString w_FakeShape_down="W_CMS_htt_wFakeShape_13TeVDown";
+
+  this->GetHistbyName(w_FakeShape_up +sub+"+",strVar)->Add( this->GetHistbyName(s_W+ "_MC_fakeShapeUp_" +sub +"+",strVar) );
+  this->GetHistbyName(w_FakeShape_down +sub+"+",strVar)->Add( this->GetHistbyName(s_W+ "_MC_fakeShapeDown_" +sub +"+",strVar) );
+
+
+  this->GetHistbyName(w_FakeShape_up +sub +"+",strVar)->Scale( (wjets_ss_cr_norm * HLExt * R_W* BConv_SR ) / this->GetHistbyName(w_FakeShape_up +sub +"+",strVar)->Integral() );
+  this->GetHistbyName(w_FakeShape_down +sub +"+",strVar)->Scale( (wjets_ss_cr_norm * HLExt * R_W* BConv_SR ) / this->GetHistbyName(w_FakeShape_down +sub +"+",strVar)->Integral() );
+}
+
+void CreateHistos::EstimateQCD(TString strVar, TString cat){
+  if(cat.Contains("wjets_cr") || cat.Contains("loosebtag") || cat.Contains("wjets_ss_cr") || cat.Contains("qcd_cr") ) return;
+  TString sub = "+" + strVar +"_" + cat + "_qcd_cr+";
+
+  double CR_QCD_norm = this->GetHistbyName(s_data+sub,strVar)->Integral();
+  CR_QCD_norm  -= this->GetHistbyName(s_W+sub,strVar)->Integral();
+  CR_QCD_norm  -= this->GetHistbyName(s_Z+sub,strVar)->Integral();
+  CR_QCD_norm  -= this->GetHistbyName(s_EWKZ+sub,strVar)->Integral();
+  CR_QCD_norm  -= this->GetHistbyName(s_VV+sub,strVar)->Integral();
+  CR_QCD_norm  -= this->GetHistbyName(s_TT+sub,strVar)->Integral();
+  TString bt = "";
+  if(cat.Contains("btag") && !cat.Contains("nobtag")) bt = "_loosebtag";
+
+  double SR_QCD_norm = CR_QCD_norm * this->getQCD_osss(cat);
+
+  this->GetHistbyName("QCD+" + strVar +"_" + cat +"+" ,strVar)->Add( this->GetHistbyName(s_data+sub,strVar));
+  this->GetHistbyName("QCD+" + strVar +"_" + cat +"+" ,strVar)->Add( this->GetHistbyName(s_Z+sub,strVar), -1);
+  this->GetHistbyName("QCD+" + strVar +"_" + cat +"+" ,strVar)->Add( this->GetHistbyName(s_EWKZ+sub,strVar), -1);
+  this->GetHistbyName("QCD+" + strVar +"_" + cat +"+" ,strVar)->Add( this->GetHistbyName(s_VV+sub,strVar), -1);
+  this->GetHistbyName("QCD+" + strVar +"_" + cat +"+" ,strVar)->Add( this->GetHistbyName(s_TT+sub,strVar), -1);
+  this->GetHistbyName("QCD+" + strVar +"_" + cat +"+" ,strVar)->Add( this->GetHistbyName(s_W+ "_MC" +sub ,strVar), -1);
+
+  // this->GetHistbyName("QCD+" + strVar +"_" + cat +"_wjets_cr+",strVar)->Add( this->GetHistbyName(s_data + "+" + strVar +"_" + cat + bt +"_wjets_cr+",strVar)   );
+  // this->GetHistbyName("QCD+" + strVar +"_" + cat +"_wjets_cr+",strVar)->Add( this->GetHistbyName(s_Z + "+" + strVar +"_" + cat +bt +"_wjets_cr+",strVar), -1 );
+  // this->GetHistbyName("QCD+" + strVar +"_" + cat +"_wjets_cr+",strVar)->Add( this->GetHistbyName(s_EWKZ + "+" + strVar +"_" + cat +bt +"_wjets_cr+",strVar), -1 );
+  // this->GetHistbyName("QCD+" + strVar +"_" + cat +"_wjets_cr+",strVar)->Add( this->GetHistbyName(s_VV + "+" + strVar +"_" + cat +bt +"_wjets_cr+",strVar), -1 );
+  // this->GetHistbyName("QCD+" + strVar +"_" + cat +"_wjets_cr+",strVar)->Add( this->GetHistbyName(s_TT + "+" + strVar +"_" + cat +bt +"_wjets_cr+",strVar), -1 );
+  // this->GetHistbyName("QCD+" + strVar +"_" + cat +"_wjets_cr+",strVar)->Add( this->GetHistbyName(s_W +"+" + strVar +"_" + cat +bt +"_wjets_cr+",strVar), -1 );
+
+
+  this->GetHistbyName("QCD+" + strVar +"_" + cat +"_wjets_ss_cr+",strVar)->Add( this->GetHistbyName(s_data + "+" + strVar +"_" + cat +"_wjets_ss_cr+",strVar)   );
+  this->GetHistbyName("QCD+" + strVar +"_" + cat +"_wjets_ss_cr+",strVar)->Add( this->GetHistbyName(s_Z + "+" + strVar +"_" + cat +"_wjets_ss_cr+",strVar), -1 );
+  this->GetHistbyName("QCD+" + strVar +"_" + cat +"_wjets_ss_cr+",strVar)->Add( this->GetHistbyName(s_EWKZ + "+" + strVar +"_" + cat +"_wjets_ss_cr+",strVar), -1 );
+  this->GetHistbyName("QCD+" + strVar +"_" + cat +"_wjets_ss_cr+",strVar)->Add( this->GetHistbyName(s_VV + "+" + strVar +"_" + cat +"_wjets_ss_cr+",strVar), -1 );
+  this->GetHistbyName("QCD+" + strVar +"_" + cat +"_wjets_ss_cr+",strVar)->Add( this->GetHistbyName(s_TT + "+" + strVar +"_" + cat +"_wjets_ss_cr+",strVar), -1 );
+  this->GetHistbyName("QCD+" + strVar +"_" + cat +"_wjets_ss_cr+",strVar)->Add( this->GetHistbyName(s_W + "+" + strVar +"_" + cat +"_wjets_ss_cr+",strVar), -1 );
+
+  this->GetHistbyName("QCD+" + strVar +"_" + cat +"_wjets_cr+",strVar)->Add( this->GetHistbyName("QCD+" + strVar +"_" + cat +"_wjets_ss_cr+",strVar) );
+  this->GetHistbyName("QCD+" + strVar +"_" + cat +"_wjets_cr+",strVar)->Scale( this->getQCD_osss(cat) );
+
+  this->GetHistbyName("QCD"+ sub ,strVar)->Add( this->GetHistbyName("QCD+" + strVar +"_" + cat +"+" ,strVar) );
+  this->GetHistbyName("QCD"+ sub ,strVar)->Scale(CR_QCD_norm / this->GetHistbyName("QCD"+ sub ,strVar)->Integral());
+
+  this->GetHistbyName("QCD+" + strVar +"_" + cat +"+" ,strVar)->Scale(SR_QCD_norm / this->GetHistbyName("QCD+" + strVar +"_" + cat +"+" ,strVar)->Integral());
+
+}
 
 void CreateHistos::writeHistos( TString channel, vector<TString> cats, vector<TString> vars ){
 
@@ -617,10 +778,12 @@ void CreateHistos::writeHistos( TString channel, vector<TString> cats, vector<TS
   if(doMC) D2+="-MCsum";
 
   for(auto var : vars){
-    outfile_name << "histos/"  << "tight_htt_" << channel << ".inputs-mssm-13TeV-"<<var<<D2<<".root";
+    //outfile_name << "histos/FF/"  << "htt_" << channel << ".inputs-mssm-13TeV-"<<var<<D2<<".root";
+    outfile_name << "histos/"<<channel <<"_"<<UseIso  << "/htt_" << channel << ".inputs-mssm-13TeV-"<<var<<D2<<".root";
     outfile = new TFile(outfile_name.str().c_str(), "RECREATE") ;
 
     for(auto cat : cats){
+      //if(cat.Contains("loosebtag") ) continue;
       outfile->mkdir(channel +"_"+ cat );
       outfile->cd(channel +"_"+ cat); 
       sub = "+" + var +"_" + cat + "+";
@@ -685,9 +848,9 @@ void CreateHistos::writeHistos( TString channel, vector<TString> cats, vector<TS
                    || tmp.Contains("AICR_"+s_W) ) continue;
           if( cat.Contains(s_wjets)
               && tmp.Contains("OS_W_"+s_QCD ) ) tmp.ReplaceAll("OS_W_","");
-          else if( cat.Contains(s_wjets)
-                   && !tmp.Contains(s_QCDSFUncert)
-                   && tmp.Contains(s_QCD) ) continue;
+          // else if( cat.Contains(s_wjets)
+          //          && !tmp.Contains(s_QCDSFUncert)
+          //          && tmp.Contains(s_QCD) ) continue;
 
           if(tmp.Contains("OS_"+s_W)) continue;
           tmp.ReplaceAll(sub, "");
@@ -696,9 +859,6 @@ void CreateHistos::writeHistos( TString channel, vector<TString> cats, vector<TS
           tmp.ReplaceAll(s_jetToTauFakeUp,s_CMSjetToTauFake+s_13TeVUp);
           tmp.ReplaceAll(s_jetToTauFakeDown,s_CMSjetToTauFake+s_13TeVDown);
           histograms.at( name.first )->SetName(tmp);
-
-
-          
           this->resetZeroBins(histograms.at( name.first ));
           histograms.at( name.first )->Write(tmp, TObject::kWriteDelete);
           

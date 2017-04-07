@@ -10,7 +10,7 @@ FFCalculator::~FFCalculator(){
 
 void FFCalculator::initFakeFactors(){
   for(auto cat : cats){
-    if( std::find(Parameter.category.categoriesForFF.begin(), Parameter.category.categoriesForFF.end(), cat) == Parameter.category.categoriesForFF.end() ) continue;
+    if( std::find(Parameter.category.categoriesForQCDest.begin(), Parameter.category.categoriesForQCDest.end(), cat) == Parameter.category.categoriesForQCDest.end() ) continue;
     TString catSuffix = cat;
     if(cat == s_wjets_0jet_cr) catSuffix = s_0jet;
     if(cat == s_wjets_boosted_cr) catSuffix = s_boosted;
@@ -30,7 +30,7 @@ void FFCalculator::applyFF(float var, float weight, TString cat, TString strVar,
 
   TString sub = extend + "+" + strVar +"_" + cat + "+";
   float usedVar=var;
-  bool validCat =  std::find(Parameter.category.categoriesForFF.begin(), Parameter.category.categoriesForFF.end(), cat) != Parameter.category.categoriesForFF.end() ;
+  bool validCat =  std::find(Parameter.category.categoriesForQCDest.begin(), Parameter.category.categoriesForQCDest.end(), cat) != Parameter.category.categoriesForQCDest.end() ;
   if(extend=="2D") usedVar = this->get2DVar(sub)+0.1;
   /////////////////////////////////////////////////////////////////////////////////////////////////////////
   /////////////////////////////////////////////////////////////////////////////////////////////////////////

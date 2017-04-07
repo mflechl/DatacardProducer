@@ -169,6 +169,9 @@ public :
    Float_t         lep_etacentrality;
    Float_t         sphericity;
    Int_t           nadditionalMu;
+   Int_t           trg_singletau;
+   Int_t           trg_singleelectron;
+   Int_t           trg_doubletau;
    std::vector<double>  *addmuon_pt;
    std::vector<double>  *addmuon_eta;
    std::vector<double>  *addmuon_phi;
@@ -293,6 +296,9 @@ public :
    Float_t         bcsv_2;
 
    // List of branches
+   TBranch        *b_trg_singletau;
+   TBranch        *b_trg_singleelectron;
+   TBranch        *b_trg_doubletau;
    TBranch        *b_fileEntry;   //!
    TBranch        *b_run;   //!
    TBranch        *b_lumi;   //!
@@ -673,7 +679,9 @@ void ntuple::Init(TTree *tree)
    fChain = tree;
    fCurrent = -1;
    fChain->SetMakeClass(1);
-
+   fChain->SetBranchAddress("trg_singletau", &trg_singletau, &b_trg_singletau);
+   fChain->SetBranchAddress("trg_singleelectron", &trg_singleelectron, &b_trg_singleelectron);
+   fChain->SetBranchAddress("trg_doubletau", &trg_doubletau, &b_trg_doubletau);
    fChain->SetBranchAddress("fileEntry", &fileEntry, &b_fileEntry);
    fChain->SetBranchAddress("run", &run, &b_run);
    fChain->SetBranchAddress("lumi", &lumi, &b_lumi);
