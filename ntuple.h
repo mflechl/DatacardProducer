@@ -34,6 +34,7 @@ public :
    Float_t         trigweight_1;
    Float_t         trigweight_2;
    Float_t         idisoweight_1;
+   Float_t         trk_sf;
    Float_t         anti_idisoweight_1;
    Float_t         idisoweight_2;
    Float_t         effweight;
@@ -310,6 +311,7 @@ public :
    TBranch        *b_trigweight_1;   //!
    TBranch        *b_trigweight_2;   //!
    TBranch        *b_idisoweight_1;   //!
+   TBranch        *b_trk_sf;   //!
    TBranch        *b_anti_idisoweight_1;   //!
    TBranch        *b_idisoweight_2;   //!
    TBranch        *b_effweight;   //!
@@ -695,6 +697,7 @@ void ntuple::Init(TTree *tree)
    fChain->SetBranchAddress("idisoweight_1", &idisoweight_1, &b_idisoweight_1);
    fChain->SetBranchAddress("anti_idisoweight_1", &anti_idisoweight_1, &b_anti_idisoweight_1);
    fChain->SetBranchAddress("idisoweight_2", &idisoweight_2, &b_idisoweight_2);
+   //fChain->SetBranchAddress("trk_sf", &trk_sf, &b_trk_sf);
    fChain->SetBranchAddress("effweight", &effweight, &b_effweight);
    fChain->SetBranchAddress("stitchedWeight", &stitchedWeight, &b_stitchedWeight);
    fChain->SetBranchAddress("topWeight", &topWeight, &b_topWeight);

@@ -12,12 +12,9 @@ void FFCalculator::initFakeFactors(){
   for(auto cat : cats){
     if( std::find(Parameter.category.categoriesForQCDest.begin(), Parameter.category.categoriesForQCDest.end(), cat) == Parameter.category.categoriesForQCDest.end() ) continue;
     TString catSuffix = cat;
-    if(cat == s_wjets_0jet_cr) catSuffix = s_0jet;
-    if(cat == s_wjets_boosted_cr) catSuffix = s_boosted;
-    if(cat == s_wjets_vbf_cr) catSuffix = s_vbf;
-    if(cat == s_antiiso_0jet_cr) catSuffix = s_0jet;
-    if(cat == s_antiiso_boosted_cr) catSuffix = s_boosted;
-    if(cat == s_antiiso_vbf_cr) catSuffix = s_vbf;
+    if(cat == s_inclusive && channel != "tt") catSuffix = s_nobtag_tight;
+    if(cat == s_inclusive && channel == "tt") catSuffix = s_nobtag;
+
     FFfile[cat] = TFile::Open("HTTutilities/Jet2TauFakes/data/"+channel+"/"+catSuffix+"/"+FFversion);
     FFObj[cat] = (FakeFactor*)FFfile[cat]->Get("ff_comb");
   }
@@ -61,6 +58,7 @@ void FFCalculator::applyFF(float var, float weight, TString cat, TString strVar,
     }
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     else{
+
       if( this->Baseline("FF1",cat) &&  validCat  ){
         if( isData || NtupleView->gen_match_1 < 6 ){
           FFinputs.clear();
