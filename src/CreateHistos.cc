@@ -165,6 +165,8 @@ void CreateHistos::run(TString isTest){
   cout << doSvfit << endl;
   cout << "Reduced string: " << reduced << endl;
   cout << endl;
+  if(channel == "tt" && applyMTCut ) cout << "##### WARNING ######    mt cut applied in tt channel!!" << endl;
+  else if(channel != "tt" && !applyMTCut) cout << "##### WARNING ######  NO  mt cut applied in mt and et channel!!" << endl;
 
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
   if(doInitialize){

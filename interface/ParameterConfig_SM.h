@@ -98,16 +98,16 @@ const struct Parameter{
       std::map<TString, vector<double> > varBins = { {"default", {50,55,60,65,80}} };
     } jdeta;
     struct mt_1{
-      int nbins = 35;
+      int nbins = 20;
       double nmin = 0;
-      double nmax = 350;
+      double nmax = 200;
       int doVarBins = 0;
       std::map<TString, vector<double> > varBins = { {"default", {50,55,60,65,80}} };
     } mt_1;
     struct met{
-      int nbins = 25;
+      int nbins = 20;
       double nmin = 0;
-      double nmax = 250;
+      double nmax = 200;
       int doVarBins = 0;
       std::map<TString, vector<double> > varBins = { {"default", {50,55,60,65,80}} };
     } met;

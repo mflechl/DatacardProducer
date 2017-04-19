@@ -242,8 +242,10 @@ int GlobalClass::TauIso(TString Tiso){
 
 int GlobalClass::TightMt(TString iso,TString mt){
 
-  if( mt == "SR" && this->getMT() >  Parameter.analysisCut.mTLow) return 0;
-  if( mt == "CR" && this->getMT() <  Parameter.analysisCut.mTHigh) return 0;
+  if(applyMTCut){
+    if( mt == "SR" && this->getMT() >  Parameter.analysisCut.mTLow) return 0;
+    if( mt == "CR" && this->getMT() <  Parameter.analysisCut.mTHigh) return 0;
+  }
 
     if(iso == "OS" || iso == "SS"){
       if(FFiso == "tight" && NtupleView->byTightIsolationMVArun2v1DBoldDMwLT_2 ) return 1;
@@ -257,12 +259,13 @@ int GlobalClass::TightMt(TString iso,TString mt){
 }
 int GlobalClass::LooseMt(TString iso,TString mt){
 
-  if( mt == "SR" 
-      && !(this->getMT() > Parameter.analysisCut.mTLow
-           && this->getMT() < Parameter.analysisCut.mTHigh) ) return 0;
+  if(applyMTCut){
+    if( mt == "SR" 
+        && !(this->getMT() > Parameter.analysisCut.mTLow
+             && this->getMT() < Parameter.analysisCut.mTHigh) ) return 0;
 
-  if( mt == "CR" && this->getMT() <  Parameter.analysisCut.mTHigh) return 0;
-
+    if( mt == "CR" && this->getMT() <  Parameter.analysisCut.mTHigh) return 0;
+  }
 
 
   if(iso == "OS" || iso == "SS"){
@@ -276,9 +279,10 @@ int GlobalClass::LooseMt(TString iso,TString mt){
 }
 int GlobalClass::LooseIso(TString iso,TString mt){
 
-  if( mt == "SR" && this->getMT() >  Parameter.analysisCut.mTHigh) return 0;
-  if( mt == "CR" && this->getMT() <  Parameter.analysisCut.mTHigh) return 0;
-
+  if(applyMTCut){
+    if( mt == "SR" && this->getMT() >  Parameter.analysisCut.mTHigh) return 0;
+    if( mt == "CR" && this->getMT() <  Parameter.analysisCut.mTHigh) return 0;
+  }
     if(iso == "OS" || iso == "SS"){
 
       if(UseIso == "standard" && !NtupleView->byLooseIsolationMVArun2v1DBoldDMwLT_2) return 0;
