@@ -16,6 +16,12 @@ CreateHistos::CreateHistos(){
   files[s_TT].first = Parameter.dataset.TT;
   files[s_VV].first = Parameter.dataset.VV;
 
+  files[s_SMggH].first = Parameter.dataset.SMggH;
+  files[s_SMvbf].first = Parameter.dataset.SMvbf;
+  files[s_SMWminus].first = Parameter.dataset.SMWminus;
+  files[s_SMWplus].first = Parameter.dataset.SMWplus;
+  files[s_SMZH].first = Parameter.dataset.SMZH;
+
   if(channel=="mt" && !doMC )files[s_data].first = Parameter.dataset.data_mt;
   else if(channel=="mt" && doMC)files[s_data].first = Parameter.dataset.MCsum_mt;
   if(channel=="et")files[s_data].first = Parameter.dataset.data_et;
@@ -40,6 +46,18 @@ CreateHistos::CreateHistos(){
     files[s_TTtauDown].first = Parameter.dataset.TTtauDown;
     files[s_VVtauUp].first = Parameter.dataset.VVtauUp;
     files[s_VVtauDown].first = Parameter.dataset.VVtauDown;
+
+    files[s_SMggHtauUp].first = Parameter.dataset.SMggHtauUp;
+    files[s_SMvbftauUp].first = Parameter.dataset.SMvbftauUp;
+    files[s_SMWminustauUp].first = Parameter.dataset.SMWminustauUp;
+    files[s_SMWplustauUp].first = Parameter.dataset.SMWplustauUp;
+    files[s_SMZHtauUp].first = Parameter.dataset.SMZHtauUp;
+
+    files[s_SMggHtauDown].first = Parameter.dataset.SMggHtauDown;
+    files[s_SMvbftauDown].first = Parameter.dataset.SMvbftauDown;
+    files[s_SMWminustauDown].first = Parameter.dataset.SMWminustauDown;
+    files[s_SMWplustauDown].first = Parameter.dataset.SMWplustauDown;
+    files[s_SMZHtauDown].first = Parameter.dataset.SMZHtauDown;
 
     for(auto mass : Parameter.dataset.masspoints){
 
@@ -71,6 +89,18 @@ CreateHistos::CreateHistos(){
     files[s_TTjecDown].first = Parameter.dataset.TT;
     files[s_VVjecUp].first = Parameter.dataset.VV;
     files[s_VVjecDown].first = Parameter.dataset.VV;
+
+    files[s_SMggHjecUp].first = Parameter.dataset.SMggH;
+    files[s_SMvbfjecUp].first = Parameter.dataset.SMvbf;
+    files[s_SMWminusjecUp].first = Parameter.dataset.SMWminus;
+    files[s_SMWplusjecUp].first = Parameter.dataset.SMWplus;
+    files[s_SMZHjecUp].first = Parameter.dataset.SMZH;
+
+    files[s_SMggHjecDown].first = Parameter.dataset.SMggH;
+    files[s_SMvbfjecDown].first = Parameter.dataset.SMvbf;
+    files[s_SMWminusjecDown].first = Parameter.dataset.SMWminus;
+    files[s_SMWplusjecDown].first = Parameter.dataset.SMWplus;
+    files[s_SMZHjecDown].first = Parameter.dataset.SMZH;
 
     for(auto mass : Parameter.dataset.masspoints){
       tmp = Parameter.dataset.ggH;
@@ -229,13 +259,14 @@ void CreateHistos::run(TString isTest){
       if( channel=="et" && !NtupleView->trg_singleelectron ) continue;
       if( channel=="tt" && !( NtupleView->trg_doubletau || NtupleView->trg_singletau ) ) continue;
 
+
       weight = NtupleView->stitchedWeight;
       weight *= NtupleView->puweight;
       weight *= this->recalcEffweight();
       weight *= NtupleView->genweight;
       weight *= NtupleView->antilep_tauscaling;
+      weight *= NtupleView->trk_sf;
       weight *= usedLuminosity;
-
 
       if(!doMC){
         if( isZFile(filetype) || isEWKZFile(filetype) ) weight *= NtupleView->ZWeight;
@@ -340,7 +371,6 @@ float CreateHistos::recalcEffweight(){
     else if(NtupleView->gen_match_2 == 5 && (NtupleView->byLooseIsolationMVArun2v1DBoldDMwLT_2 || NtupleView->byVLooseIsolationMVArun2v1DBoldDMwLT_2) ) idiso_2 = 0.99;
     else idiso_2 = 1.;
   }
-
   return NtupleView->trigweight_1 * NtupleView->trigweight_2 * idiso_1 * idiso_2 ;
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -938,6 +968,34 @@ int CreateHistos::isSignalFile(TString fileName){
     if(fileName == s_bbHtauDown) return 1;
     if(fileName == s_bbHjecUp) return 1;
     if(fileName == s_bbHjecDown) return 1;
+
+    if(fileName == s_SMggH ) return 1;
+    if(fileName == s_SMvbf ) return 1;
+    if(fileName == s_SMWminus ) return 1;
+    if(fileName == s_SMWplus ) return 1;
+    if(fileName == s_SMZH ) return 1;
+
+    if(fileName == s_SMggHtauUp ) return 1;
+    if(fileName == s_SMvbftauUp ) return 1;
+    if(fileName == s_SMWminustauUp ) return 1;
+    if(fileName == s_SMWplustauUp ) return 1;
+    if(fileName == s_SMZHtauUp ) return 1;
+    if(fileName == s_SMggHtauDown ) return 1;
+    if(fileName == s_SMvbftauDown ) return 1;
+    if(fileName == s_SMWminustauDown ) return 1;
+    if(fileName == s_SMWplustauDown ) return 1;
+    if(fileName == s_SMZHtauDown ) return 1;
+
+    if(fileName == s_SMggHjecUp ) return 1;
+    if(fileName == s_SMvbfjecUp ) return 1;
+    if(fileName == s_SMWminusjecUp ) return 1;
+    if(fileName == s_SMWplusjecUp ) return 1;
+    if(fileName == s_SMZHjecUp ) return 1;
+    if(fileName == s_SMggHjecDown ) return 1;
+    if(fileName == s_SMvbfjecDown ) return 1;
+    if(fileName == s_SMWminusjecDown ) return 1;
+    if(fileName == s_SMWplusjecDown ) return 1;
+    if(fileName == s_SMZHjecDown ) return 1;
 
   return 0;
 }

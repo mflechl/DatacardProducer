@@ -593,7 +593,12 @@ void SelectionAnalyzer::signalSelections(float var, float weight, TString cat, T
   float usedVar=var;
 
   if(fname == s_ggH
-     || fname == s_bbH){
+     || fname == s_bbH
+     || fname ==  s_SMggH
+     || fname ==  s_SMvbf
+     || fname ==  s_SMWminus
+     || fname ==  s_SMWplus
+     || fname ==  s_SMZH){
 
     if( this->Baseline("OS",cat) ){
       this->GetHistbyName(fname+mass+sub,strVar)->Fill(usedVar, weight);
@@ -622,24 +627,44 @@ void SelectionAnalyzer::signalSelections(float var, float weight, TString cat, T
     return;
   }
   else if(fname == s_ggHjecUp
-     || fname == s_bbHjecUp){
+     || fname == s_bbHjecUp
+     || fname ==  s_SMggHjecUp
+     || fname ==  s_SMvbfjecUp
+     || fname ==  s_SMWminusjecUp
+     || fname ==  s_SMWplusjecUp
+     || fname ==  s_SMZHjecUp     ){
 
     if( this->Baseline("OS",cat) )                   this->GetHistbyName(fname.ReplaceAll(s_jecUp,mass+s_jecUp)+sub,strVar)->Fill(usedVar, weight);
     return;
   }
   else if(fname == s_ggHjecDown
-     || fname == s_bbHjecDown){
+     || fname == s_bbHjecDown
+     || fname ==  s_SMggHjecDown
+     || fname ==  s_SMvbfjecDown
+     || fname ==  s_SMWminusjecDown
+     || fname ==  s_SMWplusjecDown
+     || fname ==  s_SMZHjecDown     ){
 
     if( this->Baseline("OS",cat) )                   this->GetHistbyName(fname.ReplaceAll(s_jecDown,mass+s_jecDown)+sub,strVar)->Fill(usedVar, weight);
     return;
   }
   else if(fname == s_ggHtauUp
-          || fname == s_bbHtauUp){
+          || fname == s_bbHtauUp
+          || fname ==  s_SMggHtauUp
+          || fname ==  s_SMvbftauUp
+          || fname ==  s_SMWminustauUp
+          || fname ==  s_SMWplustauUp
+          || fname ==  s_SMZHtauUp){
     if( this->Baseline("OS",cat) )                   this->GetHistbyName(fname.ReplaceAll(s_tauUp,mass)+s_CMStauScale+channel+"_"+s_13TeVUp+sub,strVar)->Fill(usedVar, weight);
     return;
   }
   else if(fname == s_ggHtauDown
-          || fname == s_bbHtauDown){
+          || fname == s_bbHtauDown
+          || fname ==  s_SMggHtauDown
+          || fname ==  s_SMvbftauDown
+          || fname ==  s_SMWminustauDown
+          || fname ==  s_SMWplustauDown
+          || fname ==  s_SMZHtauDown          ){
     if( this->Baseline("OS",cat) )                   this->GetHistbyName(fname.ReplaceAll(s_tauDown,mass)+s_CMStauScale+channel+"_"+s_13TeVDown+sub,strVar)->Fill(usedVar, weight);
     return;
   }
