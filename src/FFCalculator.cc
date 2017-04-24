@@ -182,7 +182,7 @@ void FFCalculator::getFF1Inputs(vector<double>&inputs){
   inputs.push_back( NtupleView->decayMode_1 );
   inputs.push_back( this->getNjets() );
   inputs.push_back( NtupleView->m_vis );
-  inputs.push_back( 0 );
+  inputs.push_back( NtupleView->mt_tot );
 }
 void FFCalculator::getFF2Inputs(vector<double>&inputs){
   inputs.push_back( NtupleView->pt_2 );
@@ -190,7 +190,7 @@ void FFCalculator::getFF2Inputs(vector<double>&inputs){
   inputs.push_back( NtupleView->decayMode_2 );
   inputs.push_back( this->getNjets() );
   inputs.push_back( NtupleView->m_vis );
-  inputs.push_back( 0 );
+  inputs.push_back( NtupleView->mt_tot );
 }
 
 
