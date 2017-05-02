@@ -23,8 +23,8 @@ const struct Parameter{
     TString VVtauDown="/data/higgs/data_2016/ntuples_"+version+"/"+channel+"/ntuples_"+doSvfit+"_merged/BASIS_ntuple_VV_MCSummer16_"+channel+"_"+version+"_TauPtDown"+reduced+".root";
 
     TString SMWminus="/data/higgs/data_2016/ntuples_"+version+"/"+channel+"/ntuples_"+doSvfit+"_merged/BASIS_ntuple_WminusHToTauTau_M125_powheg_MCSummer16_"+channel+"_"+version+reduced+".root";
-    TString SMWminustauUp="/data/higgs/data_2016/ntuples_"+version+"/"+channel+"/ntuples_"+doSvfit+"_merged/BASIS_ntuple_WminusHToTauTau_M125_powheg__MCSummer16_"+channel+"_"+version+"_TauPtUp"+reduced+".root";
-    TString SMWminustauDown="/data/higgs/data_2016/ntuples_"+version+"/"+channel+"/ntuples_"+doSvfit+"_merged/BASIS_ntuple_WminusHToTauTau_M125_powheg__MCSummer16_"+channel+"_"+version+"_TauPtDown"+reduced+".root";
+    TString SMWminustauUp="/data/higgs/data_2016/ntuples_"+version+"/"+channel+"/ntuples_"+doSvfit+"_merged/BASIS_ntuple_WminusHToTauTau_M125_powheg_MCSummer16_"+channel+"_"+version+"_TauPtUp"+reduced+".root";
+    TString SMWminustauDown="/data/higgs/data_2016/ntuples_"+version+"/"+channel+"/ntuples_"+doSvfit+"_merged/BASIS_ntuple_WminusHToTauTau_M125_powheg_MCSummer16_"+channel+"_"+version+"_TauPtDown"+reduced+".root";
 
     TString SMWplus="/data/higgs/data_2016/ntuples_"+version+"/"+channel+"/ntuples_"+doSvfit+"_merged/BASIS_ntuple_WplusHToTauTau_M125_powheg_MCSummer16_"+channel+"_"+version+reduced+".root";
     TString SMWplustauUp="/data/higgs/data_2016/ntuples_"+version+"/"+channel+"/ntuples_"+doSvfit+"_merged/BASIS_ntuple_WplusHToTauTau_M125_powheg_MCSummer16_"+channel+"_"+version+"_TauPtUp"+reduced+".root";
@@ -43,7 +43,7 @@ const struct Parameter{
     TString SMggHtauDown="/data/higgs/data_2016/ntuples_"+version+"/"+channel+"/ntuples_"+doSvfit+"_merged/BASIS_ntuple_GluGluHToTauTau_M125_powheg_MCSummer16_"+channel+"_"+version+"_TauPtDown"+reduced+".root";
 
 
-    vector<TString> masspoints = {"1000","100","110","1200","120","130","1400","140","1500","1600","160","1800","180","2000","200","2300","250","2600","2900","300","3200","350","400","450","500","600","700","800","80","900","90"};
+    vector<TString> masspoints = {"80","90","100","110","120","130","140","160","180","200","250","300","350","400","450","500","600","700","800","900","1000","1200","1400","1500","1600","1800","2000","2300","2600","2900","3200"};
     //vector<TString> masspoints = {"1000"};
     TString bbH="/data/higgs/data_2016/ntuples_"+version+"/"+channel+"/ntuples_"+doSvfit+"_merged/BASIS_ntuple_SUSYGluGluToBBHToTauTau_M_XXX_pythia8_MCSummer16_"+channel+"_"+version+reduced+".root";
     TString bbHtauUp="/data/higgs/data_2016/ntuples_"+version+"/"+channel+"/ntuples_"+doSvfit+"_merged/BASIS_ntuple_SUSYGluGluToBBHToTauTau_M_XXX_pythia8_MCSummer16_"+channel+"_"+version+"_TauPtUp"+reduced+".root";
@@ -88,14 +88,15 @@ const struct Parameter{
       std::map<TString, vector<double> > varBins = { {"default", {50,55,60,65,80}} };
     } jpt;
     struct pt{
-      int nbins = 25;
+      int nbins = 14;
       double nmin = 30;
       double nmax = 100;
-      int doVarBins = 1;
+      int doVarBins = 0;
       std::map<TString, vector<double> > varBins = {
-        {"default", {30, 33, 36, 39, 42, 45, 48, 51, 54, 57, 60, 63, 66, 69, 72, 75, 78, 81, 84, 87, 90, 93, 96, 100} },
-        {"btag", {30, 37, 44, 51, 58, 65, 72, 79, 86, 93, 100} },
-        {"nobtag", {30, 33, 36, 39, 42, 45, 48, 51, 54, 57, 60, 63, 66, 69, 72, 75, 78, 81, 84, 87, 90, 93, 96, 100} } 
+        {"default", {30,35,40,45,50,55,60,65,70,75,80,85,90,95,100} },
+        {"mt", {30,35,40,45,50,55,60,65,70,75,80,85,90,95,100} },
+        {"et", {30,35,40,45,50,55,60,65,70,75,80,85,90,95,100} },
+        {"tt", {40,45,50,55,60,65,70,75,80,85,90,95,100} } 
       };
     } pt;
     struct eta{
@@ -120,12 +121,19 @@ const struct Parameter{
       std::map<TString, vector<double> > varBins = { {"default", {50,55,60,65,80}} };
     } jdeta;
     struct mt_1{
+      int nbins = 14;
+      double nmin = 0;
+      double nmax = 70;
+      int doVarBins = 1;
+      std::map<TString, vector<double> > varBins = { {"default", {0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,500}} };
+    } mt_1;
+    struct mt_2{
       int nbins = 20;
       double nmin = 0;
-      double nmax = 200;
-      int doVarBins = 0;
-      std::map<TString, vector<double> > varBins = { {"default", {50,55,60,65,80}} };
-    } mt_1;
+      double nmax = 100;
+      int doVarBins = 1;
+      std::map<TString, vector<double> > varBins = { {"default", {0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100,110,120,130,140,150,160,170,180,190,200}} };
+    } mt_2;
     struct met{
       int nbins = 20;
       double nmin = 0;
@@ -273,10 +281,10 @@ const struct Parameter{
       vector<string> syst = {"ff_qcd_syst_up","ff_qcd_syst_down","ff_qcd_dm0_njet0_stat_up","ff_qcd_dm0_njet0_stat_down","ff_qcd_dm0_njet1_stat_up","ff_qcd_dm0_njet1_stat_down","ff_qcd_dm1_njet0_stat_up","ff_qcd_dm1_njet0_stat_down","ff_qcd_dm1_njet1_stat_up","ff_qcd_dm1_njet1_stat_down","ff_w_syst_up","ff_w_syst_down","ff_w_dm0_njet0_stat_up","ff_w_dm0_njet0_stat_down","ff_w_dm0_njet1_stat_up","ff_w_dm0_njet1_stat_down","ff_w_dm1_njet0_stat_up","ff_w_dm1_njet0_stat_down","ff_w_dm1_njet1_stat_up","ff_w_dm1_njet1_stat_down","ff_tt_syst_up","ff_tt_syst_down","ff_tt_dm0_njet0_stat_up","ff_tt_dm0_njet0_stat_down","ff_tt_dm0_njet1_stat_up","ff_tt_dm0_njet1_stat_down","ff_tt_dm1_njet0_stat_up","ff_tt_dm1_njet0_stat_down","ff_tt_dm1_njet1_stat_up","ff_tt_dm1_njet1_stat_down"};
     } et;
     struct tt{
-      vector<string> syst = {"ff_qcd_syst_up","ff_qcd_syst_down","ff_qcd_dm0_njet0_stat_up","ff_qcd_dm0_njet0_stat_down","ff_qcd_dm0_njet1_stat_up","ff_qcd_dm0_njet1_stat_down","ff_qcd_dm1_njet0_stat_up","ff_qcd_dm1_njet0_stat_down","ff_qcd_dm1_njet1_stat_up","ff_qcd_dm1_njet1_stat_down","ff_w_syst_up","ff_w_syst_down","ff_tt_syst_up","ff_tt_syst_down"};
+      vector<string> syst = {"ff_qcd_syst_up","ff_qcd_syst_down","ff_qcd_dm0_njet0_stat_up","ff_qcd_dm0_njet0_stat_down","ff_qcd_dm0_njet1_stat_up","ff_qcd_dm0_njet1_stat_down","ff_qcd_dm1_njet0_stat_up","ff_qcd_dm1_njet0_stat_down","ff_qcd_dm1_njet1_stat_up","ff_qcd_dm1_njet1_stat_down","ff_w_syst_up","ff_w_syst_down","ff_tt_syst_up","ff_tt_syst_down","ff_w_frac_syst_up","ff_dy_frac_syst_up","ff_tt_frac_syst_up","ff_w_frac_syst_down" ,"ff_dy_frac_syst_down","ff_tt_frac_syst_down"};
     } tt;
   } FFsystematics;
-  
+
   struct QCD_OSSS
   {
     struct mt

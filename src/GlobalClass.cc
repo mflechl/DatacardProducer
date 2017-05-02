@@ -69,10 +69,10 @@ int GlobalClass::Baseline(TString sign, TString cat){
   } 
   else{
     if( cat.Contains("wjets_cr") ){
-      return this->W_CR("OS", "tight", cat, 1);
+      return this->W_CR("OS", FFiso, cat, 1);
     }
     if( cat.Contains("wjets_ss_cr") ){
-      return this->W_CR("SS", "tight", cat, 1);
+      return this->W_CR("SS", FFiso, cat, 1);
     }
   }
 
@@ -98,6 +98,16 @@ int GlobalClass::Baseline(TString sign, TString cat){
           && !NtupleView->byTightIsolationMVArun2v1DBoldDMwLT_2
           && NtupleView->byVLooseIsolationMVArun2v1DBoldDMwLT_2
           ) return 1;
+      // if( sign == "FF1"
+      //     && NtupleView->byMediumIsolationMVArun2v1DBoldDMwLT_2
+      //     && !NtupleView->byMediumIsolationMVArun2v1DBoldDMwLT_1
+      //     && NtupleView->byVLooseIsolationMVArun2v1DBoldDMwLT_1
+      //     ) return 1;
+      // if( sign == "FF2"
+      //     && NtupleView->byMediumIsolationMVArun2v1DBoldDMwLT_1
+      //     && !NtupleView->byMediumIsolationMVArun2v1DBoldDMwLT_2
+      //     && NtupleView->byVLooseIsolationMVArun2v1DBoldDMwLT_2
+      //     ) return 1;
 
   }
   
@@ -165,13 +175,13 @@ int GlobalClass::CategorySelection(TString cat, TString iso){
 
   
   if(tmp == s_nobtag          )    return this->Btag("nobtag") && this->TauIso(Tiso);
-  if(tmp == s_btag            )    return this->Btag("btag") && this->TauIso(Tiso);
+  if(tmp == s_btag            )    return this->Btag("btag")   && this->TauIso(Tiso);
   if(tmp == s_nobtag_tight    )    return this->Btag("nobtag") && this->TightMt(iso);
-  if(tmp == s_btag_tight      )    return this->Btag("btag") && this->TightMt(iso);
+  if(tmp == s_btag_tight      )    return this->Btag("btag")   && this->TightMt(iso);
   if(tmp == s_nobtag_looseiso )    return this->Btag("nobtag") && this->LooseIso(iso);
-  if(tmp == s_btag_looseiso   )    return this->Btag("btag") && this->LooseIso(iso);
+  if(tmp == s_btag_looseiso   )    return this->Btag("btag")   && this->LooseIso(iso);
   if(tmp == s_nobtag_loosemt  )    return this->Btag("nobtag") && this->LooseMt(iso);
-  if(tmp == s_btag_loosemt    )    return this->Btag("btag") && this->LooseMt(iso);
+  if(tmp == s_btag_loosemt    )    return this->Btag("btag")   && this->LooseMt(iso);
   
   return 0;
 }
@@ -192,11 +202,11 @@ int GlobalClass::LooseBtagCategory(TString iso,TString cat){
       if(tmp == s_nobtag          )    return this->LooseBtag("nobtag");
       if(tmp == s_btag            )    return this->LooseBtag("btag");
       if(tmp == s_nobtag_tight    )    return this->LooseBtag("nobtag") && this->TightMt(iso,mt);
-      if(tmp == s_btag_tight      )    return this->LooseBtag("btag") && this->TightMt(iso,mt);
+      if(tmp == s_btag_tight      )    return this->LooseBtag("btag")   && this->TightMt(iso,mt);
       if(tmp == s_nobtag_looseiso )    return this->LooseBtag("nobtag") && this->LooseIso(iso,mt);
-      if(tmp == s_btag_looseiso   )    return this->LooseBtag("btag") && this->LooseIso(iso,mt);
+      if(tmp == s_btag_looseiso   )    return this->LooseBtag("btag")   && this->LooseIso(iso,mt);
       if(tmp == s_nobtag_loosemt  )    return this->LooseBtag("nobtag") && this->LooseMt(iso,mt);
-      if(tmp == s_btag_loosemt    )    return this->LooseBtag("btag") && this->LooseMt(iso,mt);
+      if(tmp == s_btag_loosemt    )    return this->LooseBtag("btag")   && this->LooseMt(iso,mt);
 
   }
   
@@ -235,16 +245,30 @@ int GlobalClass::TauIso(TString Tiso){
     if(NtupleView->byTightIsolationMVArun2v1DBoldDMwLT_1 
        && NtupleView->byTightIsolationMVArun2v1DBoldDMwLT_2 ) return 1;
   }
+  // if(Tiso == "tight"){
+  //   if(NtupleView->byMediumIsolationMVArun2v1DBoldDMwLT_1 
+  //      && NtupleView->byMediumIsolationMVArun2v1DBoldDMwLT_2 ) return 1;
+  // }
   if(Tiso == "medium"){
     if( NtupleView->byTightIsolationMVArun2v1DBoldDMwLT_1
         && !NtupleView->byTightIsolationMVArun2v1DBoldDMwLT_2
         && NtupleView->byMediumIsolationMVArun2v1DBoldDMwLT_2 ) return 1;
-  }
+	}
+  // if(Tiso == "medium"){
+  //   if( NtupleView->byMediumIsolationMVArun2v1DBoldDMwLT_1
+  //       && !NtupleView->byMediumIsolationMVArun2v1DBoldDMwLT_2
+  //       && NtupleView->byLooseIsolationMVArun2v1DBoldDMwLT_2 ) return 1;
+  // }
   if(Tiso == "loose"){
     if( NtupleView->byTightIsolationMVArun2v1DBoldDMwLT_1
         && !NtupleView->byTightIsolationMVArun2v1DBoldDMwLT_2
         && NtupleView->byLooseIsolationMVArun2v1DBoldDMwLT_2 ) return 1;
-  }
+	}
+  // if(Tiso == "loose"){
+  //   if( NtupleView->byMediumIsolationMVArun2v1DBoldDMwLT_1
+  //       && !NtupleView->byMediumIsolationMVArun2v1DBoldDMwLT_2
+  //       && NtupleView->byVLooseIsolationMVArun2v1DBoldDMwLT_2 ) return 1;
+  // }
   if(Tiso == "no") return 1;
 }
 
@@ -256,6 +280,13 @@ int GlobalClass::TightMt(TString iso,TString mt){
   }
 
     if(iso == "OS" || iso == "SS"){
+
+      if(FFiso == "loose_new" && NtupleView->NewMVAIDLoose_2 ) return 1;
+      if(FFiso == "medium_new" && NtupleView->NewMVAIDMedium_2 ) return 1;
+      if(FFiso == "tight_new" && NtupleView->NewMVAIDTight_2 ) return 1;
+
+      if(FFiso == "loose" && NtupleView->byLooseIsolationMVArun2v1DBoldDMwLT_2 ) return 1;
+      if(FFiso == "medium" && NtupleView->byMediumIsolationMVArun2v1DBoldDMwLT_2 ) return 1;
       if(FFiso == "tight" && NtupleView->byTightIsolationMVArun2v1DBoldDMwLT_2 ) return 1;
       if(FFiso == "vtight" && NtupleView->byVTightIsolationMVArun2v1DBoldDMwLT_2 ) return 1;
     }
@@ -276,6 +307,13 @@ int GlobalClass::LooseMt(TString iso,TString mt){
 
 
   if(iso == "OS" || iso == "SS"){
+
+      if(FFiso == "loose_new" && NtupleView->NewMVAIDLoose_2 ) return 1;
+      if(FFiso == "medium_new" && NtupleView->NewMVAIDMedium_2 ) return 1;
+      if(FFiso == "tight_new" && NtupleView->NewMVAIDTight_2 ) return 1;
+
+      if(FFiso == "loose" && NtupleView->byLooseIsolationMVArun2v1DBoldDMwLT_2 ) return 1;
+      if(FFiso == "medium" && NtupleView->byMediumIsolationMVArun2v1DBoldDMwLT_2 ) return 1;
       if(FFiso == "tight" && NtupleView->byTightIsolationMVArun2v1DBoldDMwLT_2) return 1;
       if(FFiso == "vtight" && NtupleView->byVTightIsolationMVArun2v1DBoldDMwLT_2) return 1;
   }
@@ -315,6 +353,11 @@ int GlobalClass::W_CR(TString sign, TString iso, TString cat, bool mtcut){
   if( this->passIso("base") 
       && this->Vetos() ){
 
+    //if(NtupleView->NewMVAIDMedium_2) return 1;
+    if(iso == "medium" && NtupleView->byMediumIsolationMVArun2v1DBoldDMwLT_2) return 1;
+    //if(iso == "loose_new" && NtupleView->NewMVAIDLoose_2) return 1;
+    //if(iso == "loose" && NtupleView->NewMVAIDLoose_2) return 1;
+    //if(iso == "medium" && NtupleView->NewMVAIDMedium_2 ) return 1;
     if(iso == "tight" && NtupleView->byTightIsolationMVArun2v1DBoldDMwLT_2) return 1;
     if(iso == "loose" && !NtupleView->byTightIsolationMVArun2v1DBoldDMwLT_2){
       if(UseIso == "loose" && NtupleView->byLooseIsolationMVArun2v1DBoldDMwLT_2) return 1;
@@ -417,12 +460,9 @@ TH1D* GlobalClass::JITHistoCreator(TString name, TString strVar){
   else if(strVar == s_pt1 || strVar == s_pt2){
     if(Parameter.variable.pt.doVarBins){
       usingVarBins = 1;
-      if( name.Contains("_btag") ){
-        binning = "btag";
-      }
-      else if( name.Contains("_nobtag") ){
-        binning = "nobtag";
-      }
+
+      binning = channel;
+
       histograms[name] = this->getBinnedHisto(name,Parameter.variable.pt.varBins.at(binning)) ;
     }
     else{
@@ -473,6 +513,17 @@ TH1D* GlobalClass::JITHistoCreator(TString name, TString strVar){
       nbins = Parameter.variable.mt_1.nbins;
       nmin  = Parameter.variable.mt_1.nmin;
       nmax  = Parameter.variable.mt_1.nmax;
+    }
+  }
+  else if(strVar == s_mt2){
+    if(Parameter.variable.mt_2.doVarBins){
+      usingVarBins = 1;
+      histograms[name] = this->getBinnedHisto(name,Parameter.variable.mt_2.varBins.at(binning)) ;
+    }
+    else{
+      nbins = Parameter.variable.mt_2.nbins;
+      nmin  = Parameter.variable.mt_2.nmin;
+      nmax  = Parameter.variable.mt_2.nmax;
     }
   }
   else if(strVar == s_met){

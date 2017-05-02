@@ -213,7 +213,8 @@ void FFCalculator::doSystUncertaintyReplace( TString &replaceString ){
   if( replaceString.Contains("ff_qcd") ) replaceString.ReplaceAll("syst",channel+"_syst");
   if( channel == "tt"
       && ( replaceString.Contains("ff_w")
-           || replaceString.Contains("ff_tt") ) ) replaceString.ReplaceAll("syst",channel+"_syst");
+           || replaceString.Contains("ff_tt")
+           || replaceString.Contains("ff_dy") ) ) replaceString.ReplaceAll("syst",channel+"_syst");
   
 }
  

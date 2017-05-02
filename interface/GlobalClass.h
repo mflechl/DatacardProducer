@@ -62,7 +62,8 @@ class GlobalClass{
   //vector< vector<TString> > files; 
   map<TString, pair<TString,TString> > files;
 
-  ntuple *NtupleView;
+  //ntuple *NtupleView;
+  std::unique_ptr<ntuple> NtupleView;
   Int_t isJEC=0; //0->no correction; 1->jecUp; -1->jecDown;
 };
 

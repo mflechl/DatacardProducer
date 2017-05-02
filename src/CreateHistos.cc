@@ -166,9 +166,11 @@ CreateHistos::~CreateHistos(){
 void CreateHistos::loadFile(TString filename){
 
   TChain *tchain = new TChain("TauCheck");
+  //std::unique_ptr<TChain> tchain( new TChain("TauCheck") );
   tchain->Add(filename);
   
-  NtupleView = new ntuple(tchain);
+  //NtupleView = new ntuple(tchain);
+  NtupleView = std::unique_ptr<ntuple>(new ntuple(tchain ) );
   cout<<"File: "<<filename<<" loaded"<<endl;
  
 }
@@ -199,7 +201,7 @@ void CreateHistos::run(TString isTest){
   cout << "Reduced string: " << reduced << endl;
   cout << endl;
   if(channel == "tt" && applyMTCut ) cout << "##### WARNING ######    mt cut applied in tt channel!!" << endl;
-  else if(channel != "tt" && !applyMTCut) cout << "##### WARNING ######  NO  mt cut applied in mt and et channel!!" << endl;
+  else if(channel != "tt" && !applyMTCut) cout << "##### WARNING ######  NO  mt cut applied in mt or et channel!!" << endl;
 
 
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -286,6 +288,7 @@ void CreateHistos::run(TString isTest){
           else if(strVar == s_msv)                            var = NtupleView->m_sv;
           else if(strVar == s_ptsv)                           var = NtupleView->pt_sv;
           else if(strVar == s_mt1)                            var = this->getMT();
+          else if(strVar == s_mt2)                            var = this->getMT2();
           else if(strVar == s_jpt1)                           var = NtupleView->jpt_1;
           else if(strVar == s_jpt2)                           var = NtupleView->jpt_2;
           
@@ -359,15 +362,18 @@ float CreateHistos::recalcEffweight(){
 
   if(channel == "tt"){
     if(NtupleView->gen_match_1 == 5 && NtupleView->byTightIsolationMVArun2v1DBoldDMwLT_1) idiso_1 = 0.95;
+    //if(NtupleView->gen_match_1 == 5 && NtupleView->byMediumIsolationMVArun2v1DBoldDMwLT_1) idiso_1 = 0.97;
     else if(NtupleView->gen_match_1 == 5 && (NtupleView->byLooseIsolationMVArun2v1DBoldDMwLT_1 || NtupleView->byVLooseIsolationMVArun2v1DBoldDMwLT_1) ) idiso_1 = 0.99;
     else idiso_1 = 1.;
 
     if(NtupleView->gen_match_2 == 5 && NtupleView->byTightIsolationMVArun2v1DBoldDMwLT_2) idiso_2 = 0.95;
+    //if(NtupleView->gen_match_2 == 5 && NtupleView->byMediumIsolationMVArun2v1DBoldDMwLT_2) idiso_2 = 0.97;
     else if(NtupleView->gen_match_2 == 5 && (NtupleView->byLooseIsolationMVArun2v1DBoldDMwLT_2 || NtupleView->byVLooseIsolationMVArun2v1DBoldDMwLT_2)) idiso_2 = 0.99;
     else idiso_2 = 1.;
   }
   else{
     if(NtupleView->gen_match_2 == 5 && NtupleView->byTightIsolationMVArun2v1DBoldDMwLT_2) idiso_2 = 0.95;
+    //if(NtupleView->gen_match_2 == 5 && NtupleView->byMediumIsolationMVArun2v1DBoldDMwLT_2) idiso_2 = 0.97;
     else if(NtupleView->gen_match_2 == 5 && (NtupleView->byLooseIsolationMVArun2v1DBoldDMwLT_2 || NtupleView->byVLooseIsolationMVArun2v1DBoldDMwLT_2) ) idiso_2 = 0.99;
     else idiso_2 = 1.;
   }
@@ -866,7 +872,7 @@ void CreateHistos::writeHistos( TString channel, vector<TString> cats, vector<TS
   if(doMC) D2+="-MCsum";
 
   for(auto var : vars){
-    outfile_name << "histos/"<<channel <<"_"<<UseIso  << "/htt_" << channel << ".inputs-mssm-13TeV-"<<var<<D2<<".root";
+    outfile_name << "histos/"<<channel <<"_"<<FFiso<< ""  << "/htt_" << channel << ".inputs-mssm-13TeV-"<<var<<D2<<".root";
     //outfile_name << "histos/htt_" << channel+"_"+UseIso << ".inputs-mssm-13TeV-"<<var<<D2<<".root";
     outfile = new TFile(outfile_name.str().c_str(), "RECREATE") ;
 
