@@ -10,14 +10,11 @@ FFCalculator::~FFCalculator(){
 
 void FFCalculator::initFakeFactors(){
   for(auto cat : cats){
-    if( std::find(Parameter.category.categoriesForFF.begin(), Parameter.category.categoriesForFF.end(), cat) == Parameter.category.categoriesForFF.end() ) continue;
+    if( std::find(Parameter.category.categoriesForQCDest.begin(), Parameter.category.categoriesForQCDest.end(), cat) == Parameter.category.categoriesForQCDest.end() ) continue;
     TString catSuffix = cat;
-    if(cat == s_wjets_0jet_cr) catSuffix = s_0jet;
-    if(cat == s_wjets_boosted_cr) catSuffix = s_boosted;
-    if(cat == s_wjets_vbf_cr) catSuffix = s_vbf;
-    if(cat == s_antiiso_0jet_cr) catSuffix = s_0jet;
-    if(cat == s_antiiso_boosted_cr) catSuffix = s_boosted;
-    if(cat == s_antiiso_vbf_cr) catSuffix = s_vbf;
+    if(cat == s_inclusive && channel != "tt") catSuffix = s_nobtag_tight;
+    if(cat == s_inclusive && channel == "tt") catSuffix = s_nobtag;
+
     FFfile[cat] = TFile::Open("HTTutilities/Jet2TauFakes/data/"+channel+"/"+catSuffix+"/"+FFversion);
     FFObj[cat] = (FakeFactor*)FFfile[cat]->Get("ff_comb");
   }
@@ -30,7 +27,7 @@ void FFCalculator::applyFF(float var, float weight, TString cat, TString strVar,
 
   TString sub = extend + "+" + strVar +"_" + cat + "+";
   float usedVar=var;
-  bool validCat =  std::find(Parameter.category.categoriesForFF.begin(), Parameter.category.categoriesForFF.end(), cat) != Parameter.category.categoriesForFF.end() ;
+  bool validCat =  std::find(Parameter.category.categoriesForQCDest.begin(), Parameter.category.categoriesForQCDest.end(), cat) != Parameter.category.categoriesForQCDest.end() ;
   if(extend=="2D") usedVar = this->get2DVar(sub)+0.1;
   /////////////////////////////////////////////////////////////////////////////////////////////////////////
   /////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -61,6 +58,7 @@ void FFCalculator::applyFF(float var, float weight, TString cat, TString strVar,
     }
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     else{
+
       if( this->Baseline("FF1",cat) &&  validCat  ){
         if( isData || NtupleView->gen_match_1 < 6 ){
           FFinputs.clear();
@@ -184,7 +182,7 @@ void FFCalculator::getFF1Inputs(vector<double>&inputs){
   inputs.push_back( NtupleView->decayMode_1 );
   inputs.push_back( this->getNjets() );
   inputs.push_back( NtupleView->m_vis );
-  inputs.push_back( 0 );
+  inputs.push_back( NtupleView->mt_tot );
 }
 void FFCalculator::getFF2Inputs(vector<double>&inputs){
   inputs.push_back( NtupleView->pt_2 );
@@ -192,7 +190,7 @@ void FFCalculator::getFF2Inputs(vector<double>&inputs){
   inputs.push_back( NtupleView->decayMode_2 );
   inputs.push_back( this->getNjets() );
   inputs.push_back( NtupleView->m_vis );
-  inputs.push_back( 0 );
+  inputs.push_back( NtupleView->mt_tot );
 }
 
 
@@ -215,7 +213,8 @@ void FFCalculator::doSystUncertaintyReplace( TString &replaceString ){
   if( replaceString.Contains("ff_qcd") ) replaceString.ReplaceAll("syst",channel+"_syst");
   if( channel == "tt"
       && ( replaceString.Contains("ff_w")
-           || replaceString.Contains("ff_tt") ) ) replaceString.ReplaceAll("syst",channel+"_syst");
+           || replaceString.Contains("ff_tt")
+           || replaceString.Contains("ff_dy") ) ) replaceString.ReplaceAll("syst",channel+"_syst");
   
 }
  

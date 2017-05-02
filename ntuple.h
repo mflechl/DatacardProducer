@@ -34,6 +34,7 @@ public :
    Float_t         trigweight_1;
    Float_t         trigweight_2;
    Float_t         idisoweight_1;
+   Float_t         trk_sf;
    Float_t         anti_idisoweight_1;
    Float_t         idisoweight_2;
    Float_t         effweight;
@@ -151,6 +152,9 @@ public :
    Int_t           byMediumIsolationMVArun2v1DBnewDMwLT_2;
    Int_t           byTightIsolationMVArun2v1DBnewDMwLT_2;
    Int_t           byVTightIsolationMVArun2v1DBnewDMwLT_2;
+   Int_t           NewMVAIDTight_2;
+   Int_t           NewMVAIDMedium_2;
+   Int_t           NewMVAIDLoose_2;
    Float_t         idMVANewDM_2;
    Float_t         chargedIsoPtSum_2;
    Float_t         neutralIsoPtSum_2;
@@ -169,6 +173,9 @@ public :
    Float_t         lep_etacentrality;
    Float_t         sphericity;
    Int_t           nadditionalMu;
+   Int_t           trg_singletau;
+   Int_t           trg_singleelectron;
+   Int_t           trg_doubletau;
    std::vector<double>  *addmuon_pt;
    std::vector<double>  *addmuon_eta;
    std::vector<double>  *addmuon_phi;
@@ -293,6 +300,9 @@ public :
    Float_t         bcsv_2;
 
    // List of branches
+   TBranch        *b_trg_singletau;
+   TBranch        *b_trg_singleelectron;
+   TBranch        *b_trg_doubletau;
    TBranch        *b_fileEntry;   //!
    TBranch        *b_run;   //!
    TBranch        *b_lumi;   //!
@@ -304,6 +314,7 @@ public :
    TBranch        *b_trigweight_1;   //!
    TBranch        *b_trigweight_2;   //!
    TBranch        *b_idisoweight_1;   //!
+   TBranch        *b_trk_sf;   //!
    TBranch        *b_anti_idisoweight_1;   //!
    TBranch        *b_idisoweight_2;   //!
    TBranch        *b_effweight;   //!
@@ -421,6 +432,9 @@ public :
    TBranch        *b_byMediumIsolationMVArun2v1DBnewDMwLT_2;   //!
    TBranch        *b_byTightIsolationMVArun2v1DBnewDMwLT_2;   //!
    TBranch        *b_byVTightIsolationMVArun2v1DBnewDMwLT_2;   //!
+   TBranch        *b_NewMVAIDTight_2;
+   TBranch        *b_NewMVAIDMedium_2;
+   TBranch        *b_NewMVAIDLoose_2;
    TBranch        *b_idMVANewDM_2;   //!
    TBranch        *b_chargedIsoPtSum_2;   //!
    TBranch        *b_neutralIsoPtSum_2;   //!
@@ -673,7 +687,9 @@ void ntuple::Init(TTree *tree)
    fChain = tree;
    fCurrent = -1;
    fChain->SetMakeClass(1);
-
+   fChain->SetBranchAddress("trg_singletau", &trg_singletau, &b_trg_singletau);
+   fChain->SetBranchAddress("trg_singleelectron", &trg_singleelectron, &b_trg_singleelectron);
+   fChain->SetBranchAddress("trg_doubletau", &trg_doubletau, &b_trg_doubletau);
    fChain->SetBranchAddress("fileEntry", &fileEntry, &b_fileEntry);
    fChain->SetBranchAddress("run", &run, &b_run);
    fChain->SetBranchAddress("lumi", &lumi, &b_lumi);
@@ -687,6 +703,7 @@ void ntuple::Init(TTree *tree)
    fChain->SetBranchAddress("idisoweight_1", &idisoweight_1, &b_idisoweight_1);
    fChain->SetBranchAddress("anti_idisoweight_1", &anti_idisoweight_1, &b_anti_idisoweight_1);
    fChain->SetBranchAddress("idisoweight_2", &idisoweight_2, &b_idisoweight_2);
+   fChain->SetBranchAddress("trk_sf", &trk_sf, &b_trk_sf);
    fChain->SetBranchAddress("effweight", &effweight, &b_effweight);
    fChain->SetBranchAddress("stitchedWeight", &stitchedWeight, &b_stitchedWeight);
    fChain->SetBranchAddress("topWeight", &topWeight, &b_topWeight);
@@ -802,6 +819,10 @@ void ntuple::Init(TTree *tree)
    fChain->SetBranchAddress("byMediumIsolationMVArun2v1DBnewDMwLT_2", &byMediumIsolationMVArun2v1DBnewDMwLT_2, &b_byMediumIsolationMVArun2v1DBnewDMwLT_2);
    fChain->SetBranchAddress("byTightIsolationMVArun2v1DBnewDMwLT_2", &byTightIsolationMVArun2v1DBnewDMwLT_2, &b_byTightIsolationMVArun2v1DBnewDMwLT_2);
    fChain->SetBranchAddress("byVTightIsolationMVArun2v1DBnewDMwLT_2", &byVTightIsolationMVArun2v1DBnewDMwLT_2, &b_byVTightIsolationMVArun2v1DBnewDMwLT_2);
+   fChain->SetBranchAddress("NewMVAIDTight_2", &NewMVAIDTight_2, &b_NewMVAIDTight_2);
+   fChain->SetBranchAddress("NewMVAIDMedium_2", &NewMVAIDMedium_2, &b_NewMVAIDMedium_2);
+   fChain->SetBranchAddress("NewMVAIDLoose_2", &NewMVAIDLoose_2, &b_NewMVAIDLoose_2);
+   
    fChain->SetBranchAddress("idMVANewDM_2", &idMVANewDM_2, &b_idMVANewDM_2);
    fChain->SetBranchAddress("chargedIsoPtSum_2", &chargedIsoPtSum_2, &b_chargedIsoPtSum_2);
    fChain->SetBranchAddress("neutralIsoPtSum_2", &neutralIsoPtSum_2, &b_neutralIsoPtSum_2);

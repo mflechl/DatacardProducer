@@ -28,11 +28,14 @@ class GlobalClass{
   int passMTCut();
   int passIso(TString type);
   int Vetos();
-  int CategorySelection(TString cat, TString iso = "");
+  int CategorySelection(TString cat, TString iso);
+  int LooseBtagCategory(TString cat, TString iso);
   int Btag(TString btag);
-  int TightMt(TString iso);
-  int LooseMt(TString iso);
-  int LooseIso(TString iso);
+  int TauIso(TString  iso);
+  int LooseBtag(TString btag);
+  int TightMt(TString iso,TString mt = "SR");
+  int LooseMt(TString iso,TString mt = "SR");
+  int LooseIso(TString iso,TString mt = "SR");
 
   double getWSFUncertainty( TString cat );
   double getQCDSFUncertainty( TString cat );
@@ -59,7 +62,8 @@ class GlobalClass{
   //vector< vector<TString> > files; 
   map<TString, pair<TString,TString> > files;
 
-  ntuple *NtupleView;
+  //ntuple *NtupleView;
+  std::unique_ptr<ntuple> NtupleView;
   Int_t isJEC=0; //0->no correction; 1->jecUp; -1->jecDown;
 };
 
