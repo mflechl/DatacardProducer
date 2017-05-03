@@ -361,19 +361,19 @@ float CreateHistos::recalcEffweight(){
   float idiso_2 = NtupleView->idisoweight_2;
 
   if(channel == "tt"){
-    if(NtupleView->gen_match_1 == 5 && NtupleView->byTightIsolationMVArun2v1DBoldDMwLT_1) idiso_1 = 0.95;
-    //if(NtupleView->gen_match_1 == 5 && NtupleView->byMediumIsolationMVArun2v1DBoldDMwLT_1) idiso_1 = 0.97;
+    //if(NtupleView->gen_match_1 == 5 && NtupleView->byTightIsolationMVArun2v1DBoldDMwLT_1) idiso_1 = 0.95;
+    if(NtupleView->gen_match_1 == 5 && NtupleView->byMediumIsolationMVArun2v1DBoldDMwLT_1) idiso_1 = 0.97;
     else if(NtupleView->gen_match_1 == 5 && (NtupleView->byLooseIsolationMVArun2v1DBoldDMwLT_1 || NtupleView->byVLooseIsolationMVArun2v1DBoldDMwLT_1) ) idiso_1 = 0.99;
     else idiso_1 = 1.;
 
-    if(NtupleView->gen_match_2 == 5 && NtupleView->byTightIsolationMVArun2v1DBoldDMwLT_2) idiso_2 = 0.95;
-    //if(NtupleView->gen_match_2 == 5 && NtupleView->byMediumIsolationMVArun2v1DBoldDMwLT_2) idiso_2 = 0.97;
+    //if(NtupleView->gen_match_2 == 5 && NtupleView->byTightIsolationMVArun2v1DBoldDMwLT_2) idiso_2 = 0.95;
+    if(NtupleView->gen_match_2 == 5 && NtupleView->byMediumIsolationMVArun2v1DBoldDMwLT_2) idiso_2 = 0.97;
     else if(NtupleView->gen_match_2 == 5 && (NtupleView->byLooseIsolationMVArun2v1DBoldDMwLT_2 || NtupleView->byVLooseIsolationMVArun2v1DBoldDMwLT_2)) idiso_2 = 0.99;
     else idiso_2 = 1.;
   }
   else{
-    if(NtupleView->gen_match_2 == 5 && NtupleView->byTightIsolationMVArun2v1DBoldDMwLT_2) idiso_2 = 0.95;
-    //if(NtupleView->gen_match_2 == 5 && NtupleView->byMediumIsolationMVArun2v1DBoldDMwLT_2) idiso_2 = 0.97;
+    //if(NtupleView->gen_match_2 == 5 && NtupleView->byTightIsolationMVArun2v1DBoldDMwLT_2) idiso_2 = 0.95;
+    if(NtupleView->gen_match_2 == 5 && NtupleView->byMediumIsolationMVArun2v1DBoldDMwLT_2) idiso_2 = 0.97;
     else if(NtupleView->gen_match_2 == 5 && (NtupleView->byLooseIsolationMVArun2v1DBoldDMwLT_2 || NtupleView->byVLooseIsolationMVArun2v1DBoldDMwLT_2) ) idiso_2 = 0.99;
     else idiso_2 = 1.;
   }

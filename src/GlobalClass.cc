@@ -83,10 +83,10 @@ int GlobalClass::Baseline(TString sign, TString cat){
 
       if( sign == "OS" || sign == "SS")  return 1;
 
-      if( sign == "FF"
-          && !NtupleView->byMediumIsolationMVArun2v1DBoldDMwLT_2
-          && NtupleView->byVLooseIsolationMVArun2v1DBoldDMwLT_2
-          ) return 1;
+      if( sign == "FF" && NtupleView->byVLooseIsolationMVArun2v1DBoldDMwLT_2){
+          if(FFiso == "medium" && !NtupleView->byMediumIsolationMVArun2v1DBoldDMwLT_2) return 1;
+          if(FFiso == "tight" && !NtupleView->byTightIsolationMVArun2v1DBoldDMwLT_2) return 1;
+      }
 
       if( sign == "FF1"
           && NtupleView->byTightIsolationMVArun2v1DBoldDMwLT_2
@@ -215,7 +215,10 @@ int GlobalClass::LooseBtagCategory(TString iso,TString cat){
 int GlobalClass::Btag(TString btag){
 
   if(btag == "btag" 
-    && NtupleView->nbtag > 0
+    && NtupleView->nbtag > 0  // if(Tiso == "tight"){
+  //   if(NtupleView->byTightIsolationMVArun2v1DBoldDMwLT_1 
+  //      && NtupleView->byTightIsolationMVArun2v1DBoldDMwLT_2 ) return 1;
+  // }
     && NtupleView->njets <= 1) return 1;
 
   if(btag == "nobtag" 
@@ -251,9 +254,9 @@ int GlobalClass::TauIso(TString Tiso){
   // }
   if(Tiso == "medium"){
     if( NtupleView->byTightIsolationMVArun2v1DBoldDMwLT_1
-        && !NtupleView->byTightIsolationMVArun2v1DBoldDMwLT_2
-        && NtupleView->byMediumIsolationMVArun2v1DBoldDMwLT_2 ) return 1;
-	}
+	&& !NtupleView->byTightIsolationMVArun2v1DBoldDMwLT_2
+	&& NtupleView->byMediumIsolationMVArun2v1DBoldDMwLT_2 ) return 1;
+  }
   // if(Tiso == "medium"){
   //   if( NtupleView->byMediumIsolationMVArun2v1DBoldDMwLT_1
   //       && !NtupleView->byMediumIsolationMVArun2v1DBoldDMwLT_2
@@ -262,8 +265,8 @@ int GlobalClass::TauIso(TString Tiso){
   if(Tiso == "loose"){
     if( NtupleView->byTightIsolationMVArun2v1DBoldDMwLT_1
         && !NtupleView->byTightIsolationMVArun2v1DBoldDMwLT_2
-        && NtupleView->byLooseIsolationMVArun2v1DBoldDMwLT_2 ) return 1;
-	}
+	      && NtupleView->byLooseIsolationMVArun2v1DBoldDMwLT_2 ) return 1;
+  }
   // if(Tiso == "loose"){
   //   if( NtupleView->byMediumIsolationMVArun2v1DBoldDMwLT_1
   //       && !NtupleView->byMediumIsolationMVArun2v1DBoldDMwLT_2
@@ -352,11 +355,7 @@ int GlobalClass::W_CR(TString sign, TString iso, TString cat, bool mtcut){
   if( this->passIso("base") 
       && this->Vetos() ){
 
-    //if(NtupleView->NewMVAIDMedium_2) return 1;
     if(iso == "medium" && NtupleView->byMediumIsolationMVArun2v1DBoldDMwLT_2) return 1;
-    //if(iso == "loose_new" && NtupleView->NewMVAIDLoose_2) return 1;
-    //if(iso == "loose" && NtupleView->NewMVAIDLoose_2) return 1;
-    //if(iso == "medium" && NtupleView->NewMVAIDMedium_2 ) return 1;
     if(iso == "tight" && NtupleView->byTightIsolationMVArun2v1DBoldDMwLT_2) return 1;
     if(iso == "loose" && !NtupleView->byTightIsolationMVArun2v1DBoldDMwLT_2){
       if(UseIso == "loose" && NtupleView->byLooseIsolationMVArun2v1DBoldDMwLT_2) return 1;
