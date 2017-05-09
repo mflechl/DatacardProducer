@@ -65,6 +65,8 @@ class GlobalClass{
   //ntuple *NtupleView;
   std::unique_ptr<ntuple> NtupleView;
   Int_t isJEC=0; //0->no correction; 1->jecUp; -1->jecDown;
+  TString testEnv = "";
+  TString folder;
 };
 
 

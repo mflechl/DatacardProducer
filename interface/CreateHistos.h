@@ -6,10 +6,11 @@
 class CreateHistos : public SelectionAnalyzer{
  public:
 
-  CreateHistos();
+  CreateHistos(TString testEnv_);
   ~CreateHistos();
 
   float getAntiLep_tauscaling();
+  float getTauES();
 
   int isZFile(TString fileName);
   int isEWKZFile(TString fileName);
@@ -30,7 +31,7 @@ class CreateHistos : public SelectionAnalyzer{
   float recalcEffweight();
 
   void loadFile(TString filename);
-  void run(TString isTest);
+  void run();
   void clearHistos();
   void writeHistos(TString channel, vector<TString> cats, vector<TString> vars);
   

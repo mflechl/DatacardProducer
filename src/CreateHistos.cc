@@ -1,5 +1,6 @@
 #include "interface/CreateHistos.h"
 #include "TLorentzVector.h"
+//#include <boost/filesystem.hpp>
 #include <iostream>
 #include <sstream>
 #include <TObject.h>
@@ -7,8 +8,27 @@
 
 using namespace std;
 
-CreateHistos::CreateHistos(){
+CreateHistos::CreateHistos(TString testEnv_){
+
+  testEnv = testEnv_;
+  if(testEnv == "test") cout << "testing availability of input files" << endl;
+  if(testEnv == "minimal") cout << "creating minimal datacard" << endl;
+
   TString tmp = "";
+  vector<TString> masspoints = Parameter.dataset.masspoints;
+  folder = channel +"_"+ FFiso;
+  if(testEnv == "minimal"){
+    stringstream dir;
+    auto t = std::time(nullptr);
+    auto tm = *std::localtime(&t);
+    //folder= std::put_time(&tm, "%Y-%m-%d_%H-%M-%S");
+    dir << "histos/"<<folder;
+    //boost::filesystem::create_directory(dir)
+    // mkdir(output.str().c_str(), 0777);
+
+    masspoints = Parameter.dataset.test_masspoints;
+  }
+
 
   files[s_Z].first = Parameter.dataset.Z;
   //files[s_EWKZ].first = Parameter.dataset.EWKZ;
@@ -27,7 +47,7 @@ CreateHistos::CreateHistos(){
   if(channel=="et")files[s_data].first = Parameter.dataset.data_et;
   if(channel=="tt")files[s_data].first = Parameter.dataset.data_tt;
 
-  for(auto mass : Parameter.dataset.masspoints){
+  for(auto mass : masspoints){
     tmp = Parameter.dataset.ggH;
     files[s_ggH+mass].first = tmp.ReplaceAll("XXX",mass);
     files[s_ggH+mass].second = mass;
@@ -37,7 +57,7 @@ CreateHistos::CreateHistos(){
     files[s_bbH+mass].second = mass;
   }
 
-  if(ptShift){
+  if( (ptShift || testEnv == "test" ) && testEnv != "minimal"){
     files[s_ZtauUp].first = Parameter.dataset.ZtauUp;
     files[s_ZtauDown].first = Parameter.dataset.ZtauDown;
     //files[s_EWKZtauUp].first = Parameter.dataset.EWKZtauUp;
@@ -59,7 +79,7 @@ CreateHistos::CreateHistos(){
     files[s_SMWplustauDown].first = Parameter.dataset.SMWplustauDown;
     files[s_SMZHtauDown].first = Parameter.dataset.SMZHtauDown;
 
-    for(auto mass : Parameter.dataset.masspoints){
+    for(auto mass : masspoints){
 
       tmp = Parameter.dataset.ggHtauUp;
       files[s_ggHtauUp+mass].first = tmp.ReplaceAll("XXX",mass);
@@ -78,7 +98,7 @@ CreateHistos::CreateHistos(){
       files[s_bbHtauDown+mass].second = mass;
     }
   }
-  if(jecShift){
+  if( (jecShift || testEnv == "test" ) && testEnv != "minimal" ){
     files[s_ZjecUp].first = Parameter.dataset.Z;
     files[s_ZjecDown].first = Parameter.dataset.Z;
     //files[s_EWKZjecUp].first = Parameter.dataset.EWKZ;
@@ -102,7 +122,7 @@ CreateHistos::CreateHistos(){
     files[s_SMWplusjecDown].first = Parameter.dataset.SMWplus;
     files[s_SMZHjecDown].first = Parameter.dataset.SMZH;
 
-    for(auto mass : Parameter.dataset.masspoints){
+    for(auto mass : masspoints){
       tmp = Parameter.dataset.ggH;
       files[s_ggHjecUp+mass].first = tmp.ReplaceAll("XXX",mass);
       files[s_ggHjecUp+mass].second = mass;
@@ -175,8 +195,7 @@ void CreateHistos::loadFile(TString filename){
  
 }
 
-void CreateHistos::run(TString isTest){
-
+void CreateHistos::run(){
 
   //clearHistos();
   float weight = 1;
@@ -237,7 +256,7 @@ void CreateHistos::run(TString isTest){
 
     this->loadFile(filename);
     Int_t nentries=0;
-    if(isTest=="test"){
+    if(testEnv == "test"){
       nentries = min( Int_t(NtupleView->fChain->GetEntries()), Int_t( 10000 ) );
     }else{
       nentries = Int_t(NtupleView->fChain->GetEntries());
@@ -259,14 +278,15 @@ void CreateHistos::run(TString isTest){
       NtupleView->GetEntry(jentry);
 
 
-      if( channel== "mt" && (NtupleView->Flag_badMuons || NtupleView->Flag_duplicateMuons ) ) continue;
-      if( channel=="et" && !NtupleView->trg_singleelectron ) continue;
-      if( channel=="tt" && !( NtupleView->trg_doubletau || NtupleView->trg_singletau ) ) continue;
+      if( channel== "mt" && (NtupleView->Flag_badMuons | NtupleView->Flag_duplicateMuons | !NtupleView->trg_singlemuon) ) continue;
+      if( channel== "et" && !NtupleView->trg_singleelectron ) continue;
+      if( channel== "tt" && !( NtupleView->trg_doubletau || NtupleView->trg_singletau ) ) continue;
 
 
       weight = NtupleView->stitchedWeight;
       weight *= NtupleView->puweight;
       weight *= this->recalcEffweight();
+      weight *= this->getTauES();
       weight *= NtupleView->genweight;
       weight *= NtupleView->antilep_tauscaling;
       weight *= NtupleView->trk_sf;
@@ -274,7 +294,7 @@ void CreateHistos::run(TString isTest){
 
       if(!doMC){
         if( isZFile(filetype) || isEWKZFile(filetype) ) weight *= NtupleView->ZWeight;
-        if( isTTFile(filetype) ) weight *= NtupleView->topWeight;
+        if( isTTFile(filetype) ) weight *= NtupleView->topWeight_run1;
       }
       else if(doMC) weight_data=weight;
 
@@ -409,6 +429,14 @@ float CreateHistos::getAntiLep_tauscaling(){
     }
     return 1.0;
 
+}
+
+float CreateHistos::getTauES(){
+  if( NtupleView->gen_match_2 == 1){
+    if(NtupleView->decayMode_2 == 0) return 1.024;
+    if(NtupleView->decayMode_2 == 1) return 1.076;
+  }
+  return 1.;
 }
 
 
@@ -874,7 +902,7 @@ void CreateHistos::writeHistos( TString channel, vector<TString> cats, vector<TS
   if(doMC) D2+="-MCsum";
 
   for(auto var : vars){
-    outfile_name << "histos/"<<channel <<"_"<<FFiso<< ""  << "/htt_" << channel << ".inputs-mssm-13TeV-"<<var<<D2<<".root";
+    outfile_name << "histos/"<<folder << "/htt_" << channel << ".inputs-mssm-13TeV-"<<var<<D2<<".root";
     //outfile_name << "histos/htt_" << channel+"_"+UseIso << ".inputs-mssm-13TeV-"<<var<<D2<<".root";
     outfile = new TFile(outfile_name.str().c_str(), "RECREATE") ;
 
@@ -917,7 +945,8 @@ void CreateHistos::writeHistos( TString channel, vector<TString> cats, vector<TS
                   || name.first.Contains(s_VVjecDown+"_"+s_jetFakes)
                   || name.first.Contains(s_EWKZ+"_"+s_jetFakes)
                   || name.first.Contains(s_EWKZjecUp+"_"+s_jetFakes)
-                  || name.first.Contains(s_EWKZjecDown+"_"+s_jetFakes)                  
+                  || name.first.Contains(s_EWKZjecDown+"_"+s_jetFakes)
+                  || name.first.Contains("_rest")               
                   )
               && !name.first.Contains(s_ggH)
               && !name.first.Contains(s_bbH)

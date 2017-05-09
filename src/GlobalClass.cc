@@ -281,19 +281,19 @@ int GlobalClass::TightMt(TString iso,TString mt){
     if( mt == "SR" && this->getMT() >  Parameter.analysisCut.mTLow) return 0;
     if( mt == "CR" && this->getMT() <  Parameter.analysisCut.mTHigh) return 0;
   }
+  if(iso == "FF") return 1;
+  if(iso == "OS" || iso == "SS"){
 
-    if(iso == "OS" || iso == "SS"){
+    if(FFiso == "loose_new" && NtupleView->NewMVAIDLoose_2 ) return 1;
+    if(FFiso == "medium_new" && NtupleView->NewMVAIDMedium_2 ) return 1;
+    if(FFiso == "tight_new" && NtupleView->NewMVAIDTight_2 ) return 1;
 
-      if(FFiso == "loose_new" && NtupleView->NewMVAIDLoose_2 ) return 1;
-      if(FFiso == "medium_new" && NtupleView->NewMVAIDMedium_2 ) return 1;
-      if(FFiso == "tight_new" && NtupleView->NewMVAIDTight_2 ) return 1;
-
-      if(FFiso == "loose" && NtupleView->byLooseIsolationMVArun2v1DBoldDMwLT_2 ) return 1;
-      if(FFiso == "medium" && NtupleView->byMediumIsolationMVArun2v1DBoldDMwLT_2 ) return 1;
-      if(FFiso == "tight" && NtupleView->byTightIsolationMVArun2v1DBoldDMwLT_2 ) return 1;
-      if(FFiso == "vtight" && NtupleView->byVTightIsolationMVArun2v1DBoldDMwLT_2 ) return 1;
-    }
-    if(iso == "FF") return 1;
+    if(FFiso == "loose" && NtupleView->byLooseIsolationMVArun2v1DBoldDMwLT_2 ) return 1;
+    if(FFiso == "medium" && NtupleView->byMediumIsolationMVArun2v1DBoldDMwLT_2 ) return 1;
+    if(FFiso == "tight" && NtupleView->byTightIsolationMVArun2v1DBoldDMwLT_2 ) return 1;
+    if(FFiso == "vtight" && NtupleView->byVTightIsolationMVArun2v1DBoldDMwLT_2 ) return 1;
+  }
+    
   
 
 
@@ -308,6 +308,7 @@ int GlobalClass::LooseMt(TString iso,TString mt){
     if( mt == "CR" && this->getMT() <  Parameter.analysisCut.mTHigh) return 0;
   }
 
+  if(iso == "FF") return 1;
   if(iso == "OS" || iso == "SS"){
 
       if(FFiso == "loose_new" && NtupleView->NewMVAIDLoose_2 ) return 1;
@@ -320,7 +321,7 @@ int GlobalClass::LooseMt(TString iso,TString mt){
       if(FFiso == "vtight" && NtupleView->byVTightIsolationMVArun2v1DBoldDMwLT_2) return 1;
   }
   
-  if(iso == "FF") return 1;
+  
   return 0;
   
 }

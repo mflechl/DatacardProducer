@@ -40,6 +40,7 @@ public :
    Float_t         effweight;
    Float_t         stitchedWeight;
    Float_t         topWeight;
+   Float_t         topWeight_run1;
    Float_t         ZWeight;
    Float_t         gen_Mll;
    Float_t         genpX;
@@ -176,9 +177,11 @@ public :
    Float_t         lep_etacentrality;
    Float_t         sphericity;
    Int_t           nadditionalMu;
+   Int_t           trg_singlemuon;
    Int_t           trg_singletau;
    Int_t           trg_singleelectron;
    Int_t           trg_doubletau;
+
    std::vector<double>  *addmuon_pt;
    std::vector<double>  *addmuon_eta;
    std::vector<double>  *addmuon_phi;
@@ -303,6 +306,7 @@ public :
    Float_t         bcsv_2;
 
    // List of branches
+   TBranch        *b_trg_singlemuon;
    TBranch        *b_trg_singletau;
    TBranch        *b_trg_singleelectron;
    TBranch        *b_trg_doubletau;
@@ -325,6 +329,7 @@ public :
    TBranch        *b_effweight;   //!
    TBranch        *b_stitchedWeight;   //!
    TBranch        *b_topWeight;   //!
+   TBranch        *b_topWeight_run1;   //!
    TBranch        *b_ZWeight;   //!
    TBranch        *b_gen_Mll;   //!
    TBranch        *b_genpX;   //!
@@ -692,6 +697,7 @@ void ntuple::Init(TTree *tree)
    fChain = tree;
    fCurrent = -1;
    fChain->SetMakeClass(1);
+   fChain->SetBranchAddress("trg_singlemuon", &trg_singlemuon, &b_trg_singlemuon);
    fChain->SetBranchAddress("trg_singletau", &trg_singletau, &b_trg_singletau);
    fChain->SetBranchAddress("trg_singleelectron", &trg_singleelectron, &b_trg_singleelectron);
    fChain->SetBranchAddress("trg_doubletau", &trg_doubletau, &b_trg_doubletau);
@@ -714,6 +720,7 @@ void ntuple::Init(TTree *tree)
    fChain->SetBranchAddress("effweight", &effweight, &b_effweight);
    fChain->SetBranchAddress("stitchedWeight", &stitchedWeight, &b_stitchedWeight);
    fChain->SetBranchAddress("topWeight", &topWeight, &b_topWeight);
+   fChain->SetBranchAddress("topWeight_run1", &topWeight_run1, &b_topWeight_run1);
    fChain->SetBranchAddress("ZWeight", &ZWeight, &b_ZWeight);
    fChain->SetBranchAddress("gen_Mll", &gen_Mll, &b_gen_Mll);
    fChain->SetBranchAddress("genpX", &genpX, &b_genpX);
