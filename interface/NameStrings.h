@@ -185,6 +185,8 @@ const TString s_FFrestjecDown =          s_FFrest+s_jecDown;
 const TString s_jetToTauFake =           "jetToTauFake";
 const TString s_jetToTauFakeUp =         s_jetToTauFake+s_up;
 const TString s_jetToTauFakeDown =       s_jetToTauFake+s_down;
+const TString s_1p0p0 =                  "1prong0pi0";
+const TString s_1p1p0 =                  "1prong1pi0";
 
 const TString s_CMStauScale =            "_CMS_scale_t_";
 const TString s_CMSjecScale =            "_CMS_scale_j_";
@@ -192,6 +194,7 @@ const TString s_CMSdyShape =             "_CMS_htt_dyShape_";
 const TString s_CMSttShape =             "_CMS_htt_ttbarShape_";
 const TString s_CMSZLShape =             "_CMS_htt_ZLShape_";
 const TString s_CMSjetToTauFake =        "_CMS_htt_jetToTauFake_";
+const TString s_CMSefake =               "_CMS_scale_t_efake_";
 const TString s_CMSscalegg =             "_CMS_scale_gg_";
 const TString s_CMSzmumu =               "_CMS_htt_zmumuShape_VBF_";
 const TString s_CMSmssmHigh =            "_CMS_eff_t_mssmHigh_";

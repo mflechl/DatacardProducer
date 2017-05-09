@@ -145,6 +145,18 @@ void SelectionAnalyzer::DYSelections(float var, float weight, TString cat, TStri
 	  this->GetHistbyName("ZJJ"+sub,strVar)->Fill(usedVar, weight);
 	} 
         if( this->LSelection() ){
+
+          if(NtupleView->decayMode_2 == 0){
+            this->GetHistbyName(s_ZL+s_CMSefake+s_1p0p0+"_"+s_13TeVUp+sub,strVar)->Fill(usedVar, weight *1.029 );
+            this->GetHistbyName(s_ZL+s_CMSefake+s_1p0p0+"_"+s_13TeVDown+sub,strVar)->Fill(usedVar, weight *1.019 );
+            //weight *= 1.024;
+          }
+          if(NtupleView->decayMode_2 == 1){
+            this->GetHistbyName(s_ZL+s_CMSefake+s_1p1p0+"_"+s_13TeVUp+sub,strVar)->Fill(usedVar, weight *1.086 );
+            this->GetHistbyName(s_ZL+s_CMSefake+s_1p1p0+"_"+s_13TeVDown+sub,strVar)->Fill(usedVar, weight *1.066 );
+            //weight *= 1.076;
+          }
+
           this->GetHistbyName(s_ZLL+sub,strVar)->Fill(usedVar, weight);
           this->GetHistbyName(s_ZL+sub,strVar)->Fill(usedVar, weight);
           this->GetHistbyName(s_ZL+s_CMSdyShape+s_13TeVUp+sub,strVar)->Fill(usedVar, weight * NtupleView->ZWeight );
@@ -330,6 +342,7 @@ void SelectionAnalyzer::TSelections(float var, float weight, TString cat, TStrin
         this->GetHistbyName(s_TT+s_CMSttShape+s_13TeVUp+sub,strVar)->Fill(usedVar, weight * NtupleView->topWeight);
         this->GetHistbyName(s_TT+s_CMSttShape+s_13TeVDown+sub,strVar)->Fill(usedVar, weight/NtupleView->topWeight);
         if( this->TSelection() || this->LSelection() ){ // for TT TSelection and L Selection are combined
+
           this->GetHistbyName(s_TTT+sub,strVar)->Fill(usedVar, weight);
           this->GetHistbyName(s_TTT+s_CMSttShape+s_13TeVUp+sub,strVar)->Fill(usedVar, weight*NtupleView->topWeight);
           this->GetHistbyName(s_TTT+s_CMSttShape+s_13TeVDown+sub,strVar)->Fill(usedVar, weight/NtupleView->topWeight);
@@ -341,6 +354,7 @@ void SelectionAnalyzer::TSelections(float var, float weight, TString cat, TStrin
           this->GetHistbyName(s_TTJ+s_CMSjetToTauFake+s_13TeVUp+sub,strVar)->Fill(usedVar, weight*this->getJetToTauFakeUp(NtupleView->pt_2) );
           this->GetHistbyName(s_TTJ+s_CMSjetToTauFake+s_13TeVDown+sub,strVar)->Fill(usedVar, weight*this->getJetToTauFakeDown(NtupleView->pt_2) );
         }
+
         if( this->TSelection() || this->LSelection() ){
           if(channel != "tt"){
 	    if( this->TSelection() ){

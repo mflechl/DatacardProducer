@@ -51,6 +51,9 @@ public :
    Float_t         vispX;
    Float_t         vispY;
    Float_t         vispZ;
+   Int_t           Flag_badMuons;
+   Int_t           Flag_duplicateMuons;
+
    Int_t           npv;
    Float_t         npu;
    Float_t         rho;
@@ -314,6 +317,8 @@ public :
    TBranch        *b_trigweight_1;   //!
    TBranch        *b_trigweight_2;   //!
    TBranch        *b_idisoweight_1;   //!
+   TBranch        *b_Flag_badMuons;
+   TBranch        *b_Flag_duplicateMuons;
    TBranch        *b_trk_sf;   //!
    TBranch        *b_anti_idisoweight_1;   //!
    TBranch        *b_idisoweight_2;   //!
@@ -701,6 +706,8 @@ void ntuple::Init(TTree *tree)
    fChain->SetBranchAddress("trigweight_1", &trigweight_1, &b_trigweight_1);
    fChain->SetBranchAddress("trigweight_2", &trigweight_2, &b_trigweight_2);
    fChain->SetBranchAddress("idisoweight_1", &idisoweight_1, &b_idisoweight_1);
+   fChain->SetBranchAddress("Flag_badMuons", &Flag_badMuons, &b_Flag_badMuons);
+   fChain->SetBranchAddress("Flag_duplicateMuons", &Flag_duplicateMuons, &b_Flag_duplicateMuons);
    fChain->SetBranchAddress("anti_idisoweight_1", &anti_idisoweight_1, &b_anti_idisoweight_1);
    fChain->SetBranchAddress("idisoweight_2", &idisoweight_2, &b_idisoweight_2);
    fChain->SetBranchAddress("trk_sf", &trk_sf, &b_trk_sf);
