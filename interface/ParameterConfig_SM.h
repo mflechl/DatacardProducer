@@ -11,6 +11,11 @@ const struct Parameter{
     TString Z="/data/higgs/data_2016/ntuples_"+version+"/"+channel+"/ntuples_"+doSvfit+"_merged/BASIS_ntuple_DYXJetsToLL_lowMass_merged_MCSummer16_"+channel+"_"+version+reduced+".root";
     TString ZtauUp="/data/higgs/data_2016/ntuples_"+version+"/"+channel+"/ntuples_"+doSvfit+"_merged/BASIS_ntuple_DYXJetsToLL_lowMass_merged_MCSummer16_"+channel+"_"+version+"_TauPtUp"+reduced+".root";
     TString ZtauDown="/data/higgs/data_2016/ntuples_"+version+"/"+channel+"/ntuples_"+doSvfit+"_merged/BASIS_ntuple_DYXJetsToLL_lowMass_merged_MCSummer16_"+channel+"_"+version+"_TauPtDown"+reduced+".root";
+    TString ZE0Up="/data/higgs/data_2016/ntuples_"+version+"/"+channel+"/ntuples_"+doSvfit+"_merged/BASIS_ntuple_DYXJetsToLL_lowMass_merged_MCSummer16_"+channel+"_"+version+"_E0Up"+reduced+".root";
+    TString ZE0Down="/data/higgs/data_2016/ntuples_"+version+"/"+channel+"/ntuples_"+doSvfit+"_merged/BASIS_ntuple_DYXJetsToLL_lowMass_merged_MCSummer16_"+channel+"_"+version+"_E0Down"+reduced+".root";
+    TString ZE1Up="/data/higgs/data_2016/ntuples_"+version+"/"+channel+"/ntuples_"+doSvfit+"_merged/BASIS_ntuple_DYXJetsToLL_lowMass_merged_MCSummer16_"+channel+"_"+version+"_E1Up"+reduced+".root";
+    TString ZE1Down="/data/higgs/data_2016/ntuples_"+version+"/"+channel+"/ntuples_"+doSvfit+"_merged/BASIS_ntuple_DYXJetsToLL_lowMass_merged_MCSummer16_"+channel+"_"+version+"_E1Down"+reduced+".root";
+
     TString EWKZ="/data/higgs/data_2016/ntuples_"+version+"/"+channel+"/ntuples_"+doSvfit+"_merged/BASIS_ntuple_EWK_merged_MCSummer16_"+channel+"_"+version+reduced+".root";
     TString EWKZtauUp="/data/higgs/data_2016/ntuples_"+version+"/"+channel+"/ntuples_"+doSvfit+"_merged/BASIS_ntuple_EWK_merged_MCSummer16_"+channel+"_"+version+"_TauPtUp"+reduced+".root";
     TString EWKZtauDown="/data/higgs/data_2016/ntuples_"+version+"/"+channel+"/ntuples_"+doSvfit+"_merged/BASIS_ntuple_EWK_merged_MCSummer16_"+channel+"_"+version+"_TauPtDown"+reduced+".root";
@@ -91,9 +96,9 @@ const struct Parameter{
       int nbins = 14;
       double nmin = 30;
       double nmax = 100;
-      int doVarBins = 0;
+      int doVarBins = 1;
       std::map<TString, vector<double> > varBins = {
-        {"default", {30,35,40,45,50,55,60,65,70,75,80,85,90,95,100} },
+        {"default", {30,35,40,45,50,55,60,65,70,75,80,85,90,95,100,120,140,160,180,200,250,300,350,400,500} },
         {"mt", {30,35,40,45,50,55,60,65,70,75,80,85,90,95,100} },
         {"et", {30,35,40,45,50,55,60,65,70,75,80,85,90,95,100} },
         {"tt", {40,45,50,55,60,65,70,75,80,85,90,95,100} } 

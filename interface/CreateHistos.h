@@ -10,7 +10,6 @@ class CreateHistos : public SelectionAnalyzer{
   ~CreateHistos();
 
   float getAntiLep_tauscaling();
-  float getTauES();
 
   int isZFile(TString fileName);
   int isEWKZFile(TString fileName);

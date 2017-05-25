@@ -42,6 +42,17 @@ public :
    Float_t         topWeight;
    Float_t         topWeight_run1;
    Float_t         ZWeight;
+   Float_t         zpt_weight_nom;
+   Float_t         zpt_weight_esup;
+   Float_t         zpt_weight_esdown;
+   Float_t         zpt_weight_ttup;
+   Float_t         zpt_weight_ttdown;
+   Float_t         zpt_weight_statpt0up;
+   Float_t         zpt_weight_statpt0down;
+   Float_t         zpt_weight_statpt40up;
+   Float_t         zpt_weight_statpt40down;
+   Float_t         zpt_weight_statpt80up;
+   Float_t         zpt_weight_statpt80down;
    Float_t         gen_Mll;
    Float_t         genpX;
    Float_t         genpY;
@@ -68,6 +79,10 @@ public :
    Float_t         genPt_2;
    Int_t           genJet_match_1;
    Int_t           genJet_match_2;
+   Float_t         matchedJetPt03_1;
+   Float_t         matchedJetPt03_2;
+   Float_t         matchedJetPt05_1;
+   Float_t         matchedJetPt05_2;
    Float_t         pt_1;
    Float_t         phi_1;
    Float_t         eta_1;
@@ -331,6 +346,17 @@ public :
    TBranch        *b_topWeight;   //!
    TBranch        *b_topWeight_run1;   //!
    TBranch        *b_ZWeight;   //!
+   TBranch        *b_zpt_weight_nom;   //!
+   TBranch        *b_zpt_weight_esup;   //!
+   TBranch        *b_zpt_weight_esdown;   //!
+   TBranch        *b_zpt_weight_ttup;   //!
+   TBranch        *b_zpt_weight_ttdown;   //!
+   TBranch        *b_zpt_weight_statpt0up;   //!
+   TBranch        *b_zpt_weight_statpt0down;   //!
+   TBranch        *b_zpt_weight_statpt40up;   //!
+   TBranch        *b_zpt_weight_statpt40down;   //!
+   TBranch        *b_zpt_weight_statpt80up;   //!
+   TBranch        *b_zpt_weight_statpt80down;   //!
    TBranch        *b_gen_Mll;   //!
    TBranch        *b_genpX;   //!
    TBranch        *b_genpY;   //!
@@ -345,6 +371,10 @@ public :
    TBranch        *b_npu;   //!
    TBranch        *b_rho;   //!
    TBranch        *b_NUP;   //!
+   TBranch        *b_matchedJetPt03_1;   //!
+   TBranch        *b_matchedJetPt03_2;   //!
+   TBranch        *b_matchedJetPt05_1;   //!
+   TBranch        *b_matchedJetPt05_2;   //!
    TBranch        *b_gen_match_1;   //!
    TBranch        *b_gen_match_2;   //!
    TBranch        *b_gen_match_jetId_1;   //!
@@ -722,6 +752,17 @@ void ntuple::Init(TTree *tree)
    fChain->SetBranchAddress("topWeight", &topWeight, &b_topWeight);
    fChain->SetBranchAddress("topWeight_run1", &topWeight_run1, &b_topWeight_run1);
    fChain->SetBranchAddress("ZWeight", &ZWeight, &b_ZWeight);
+   fChain->SetBranchAddress("zpt_weight_nom", &zpt_weight_nom, &b_zpt_weight_nom);
+   fChain->SetBranchAddress("zpt_weight_esup", &zpt_weight_esup, &b_zpt_weight_esup);
+   fChain->SetBranchAddress("zpt_weight_esdown", &zpt_weight_esdown, &b_zpt_weight_esdown);
+   fChain->SetBranchAddress("zpt_weight_ttup", &zpt_weight_ttup, &b_zpt_weight_ttup);
+   fChain->SetBranchAddress("zpt_weight_ttdown", &zpt_weight_ttdown, &b_zpt_weight_ttdown);
+   fChain->SetBranchAddress("zpt_weight_statpt0up", &zpt_weight_statpt0up, &b_zpt_weight_statpt0up);
+   fChain->SetBranchAddress("zpt_weight_statpt0down", &zpt_weight_statpt0down, &b_zpt_weight_statpt0down);
+   fChain->SetBranchAddress("zpt_weight_statpt40up", &zpt_weight_statpt40up, &b_zpt_weight_statpt40up);
+   fChain->SetBranchAddress("zpt_weight_statpt40down", &zpt_weight_statpt40down, &b_zpt_weight_statpt40down);
+   fChain->SetBranchAddress("zpt_weight_statpt80up", &zpt_weight_statpt80up, &b_zpt_weight_statpt80up);
+   fChain->SetBranchAddress("zpt_weight_statpt80down", &zpt_weight_statpt80down, &b_zpt_weight_statpt80down);
    fChain->SetBranchAddress("gen_Mll", &gen_Mll, &b_gen_Mll);
    fChain->SetBranchAddress("genpX", &genpX, &b_genpX);
    fChain->SetBranchAddress("genpY", &genpY, &b_genpY);
@@ -736,6 +777,10 @@ void ntuple::Init(TTree *tree)
    fChain->SetBranchAddress("npu", &npu, &b_npu);
    fChain->SetBranchAddress("rho", &rho, &b_rho);
    fChain->SetBranchAddress("NUP", &NUP, &b_NUP);
+   fChain->SetBranchAddress("matchedJetPt03_1", &matchedJetPt03_1, &b_matchedJetPt03_1);
+   fChain->SetBranchAddress("matchedJetPt05_1", &matchedJetPt05_1, &b_matchedJetPt05_1);
+   fChain->SetBranchAddress("matchedJetPt03_2", &matchedJetPt03_2, &b_matchedJetPt03_2);
+   fChain->SetBranchAddress("matchedJetPt05_2", &matchedJetPt05_2, &b_matchedJetPt05_2);
    fChain->SetBranchAddress("gen_match_1", &gen_match_1, &b_gen_match_1);
    fChain->SetBranchAddress("gen_match_2", &gen_match_2, &b_gen_match_2);
    fChain->SetBranchAddress("gen_match_jetId_1", &gen_match_jetId_1, &b_gen_match_jetId_1);

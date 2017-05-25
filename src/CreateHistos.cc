@@ -60,6 +60,12 @@ CreateHistos::CreateHistos(TString testEnv_){
   if( (ptShift || testEnv == "test" ) && testEnv != "minimal"){
     files[s_ZtauUp].first = Parameter.dataset.ZtauUp;
     files[s_ZtauDown].first = Parameter.dataset.ZtauDown;
+    if( channel=="et" ){
+      files[s_ZE0Up].first = Parameter.dataset.ZE0Up;
+      files[s_ZE0Down].first = Parameter.dataset.ZE0Down;
+      files[s_ZE1Up].first = Parameter.dataset.ZE1Up;
+      files[s_ZE1Down].first = Parameter.dataset.ZE1Down;
+    }
     //files[s_EWKZtauUp].first = Parameter.dataset.EWKZtauUp;
     //files[s_EWKZtauDown].first = Parameter.dataset.EWKZtauDown;
     files[s_TTtauUp].first = Parameter.dataset.TTtauUp;
@@ -98,7 +104,7 @@ CreateHistos::CreateHistos(TString testEnv_){
       files[s_bbHtauDown+mass].second = mass;
     }
   }
-  if( (jecShift || testEnv == "test" ) && testEnv != "minimal" ){
+  if( jecShift  && testEnv != "minimal" ){
     files[s_ZjecUp].first = Parameter.dataset.Z;
     files[s_ZjecDown].first = Parameter.dataset.Z;
     //files[s_EWKZjecUp].first = Parameter.dataset.EWKZ;
@@ -278,17 +284,18 @@ void CreateHistos::run(){
       NtupleView->GetEntry(jentry);
 
 
-      if( channel== "mt" && (NtupleView->Flag_badMuons | NtupleView->Flag_duplicateMuons | !NtupleView->trg_singlemuon) ) continue;
+      if( channel== "mt" && (NtupleView->Flag_badMuons || NtupleView->Flag_duplicateMuons || !NtupleView->trg_singlemuon) ) continue;
       if( channel== "et" && !NtupleView->trg_singleelectron ) continue;
-      if( channel== "tt" && !( NtupleView->trg_doubletau || NtupleView->trg_singletau ) ) continue;
+      //      if( channel== "tt" && !( NtupleView->trg_doubletau || NtupleView->trg_singletau ) ) continue;
+      if( channel== "tt" && !NtupleView->trg_doubletau ) continue;
 
 
       weight = NtupleView->stitchedWeight;
       weight *= NtupleView->puweight;
       weight *= this->recalcEffweight();
-      weight *= this->getTauES();
       weight *= NtupleView->genweight;
       weight *= NtupleView->antilep_tauscaling;
+      //weight *= this->getAntiLep_tauscaling();
       weight *= NtupleView->trk_sf;
       weight *= usedLuminosity;
 
@@ -427,16 +434,43 @@ float CreateHistos::getAntiLep_tauscaling(){
         else if (fabs(NtupleView->eta_2) > 1.558) return 1.994;   // +-2.6
       }
     }
+    if(channel == "tt"){
+      //run2 SF for VLoose for tau2
+      float scaleFactor_tautau = 1;
+      if( NtupleView->gen_match_2 == 1                                                                                                                                                        
+	  || NtupleView->gen_match_2 == 3 ){
+        if( fabs(NtupleView->eta_2 ) < 1.46) scaleFactor_tautau = 1.21;
+        else if( fabs(NtupleView->eta_2 ) > 1.558) scaleFactor_tautau =  1.38;
+      }  
+      //run2 SF with bad muon filter for cut-based Loose for tau2
+      if( NtupleView->gen_match_2 == 2                                                                                                                                                          
+	  || NtupleView->gen_match_2 == 4 ){
+        if( fabs(NtupleView->gen_match_2) < 0.4 ) scaleFactor_tautau =  1.22;
+	else if( fabs(NtupleView->gen_match_2) < 0.8 ) scaleFactor_tautau =  1.12;
+	else if( fabs(NtupleView->gen_match_2) < 1.2 ) scaleFactor_tautau =  1.26;
+	else if( fabs(NtupleView->gen_match_2) < 1.7 ) scaleFactor_tautau =  1.22;
+	else if( fabs(NtupleView->gen_match_2) < 2.3 ) scaleFactor_tautau =  2.39;
+      }
+
+      if( NtupleView->gen_match_1 == 1                                                                                                                                                        
+	  || NtupleView->gen_match_1 == 3 ){
+        if( fabs(NtupleView->eta_1 ) < 1.46) scaleFactor_tautau *= 1.21;
+        else if( fabs(NtupleView->eta_1 ) > 1.558) scaleFactor_tautau *=  1.38;
+      }  
+      //run2 SF with bad muon filter for cut-based Loose for tau2
+      if( NtupleView->gen_match_1 == 2                                                                                                                                                          
+	  || NtupleView->gen_match_1 == 4 ){
+        if( fabs(NtupleView->gen_match_1) < 0.4 ) scaleFactor_tautau *=  1.22;
+	else if( fabs(NtupleView->gen_match_1) < 0.8 ) scaleFactor_tautau *=  1.12;
+	else if( fabs(NtupleView->gen_match_1) < 1.2 ) scaleFactor_tautau *=  1.26;
+	else if( fabs(NtupleView->gen_match_1) < 1.7 ) scaleFactor_tautau *=  1.22;
+	else if( fabs(NtupleView->gen_match_1) < 2.3 ) scaleFactor_tautau *=  2.39;
+      }
+      return scaleFactor_tautau;
+
+    }
     return 1.0;
 
-}
-
-float CreateHistos::getTauES(){
-  if( NtupleView->gen_match_2 == 1){
-    if(NtupleView->decayMode_2 == 0) return 1.024;
-    if(NtupleView->decayMode_2 == 1) return 1.076;
-  }
-  return 1.;
 }
 
 
@@ -979,6 +1013,10 @@ int CreateHistos::isZFile(TString fileName){
   if(fileName == s_ZtauDown) return 1;
   if(fileName == s_ZjecUp) return 1;
   if(fileName == s_ZjecDown) return 1;
+  if(fileName == s_ZE0Up) return 1;
+  if(fileName == s_ZE0Down) return 1;
+  if(fileName == s_ZE1Up) return 1;
+  if(fileName == s_ZE1Down) return 1;
 
   return 0;
 }

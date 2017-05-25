@@ -215,11 +215,9 @@ int GlobalClass::LooseBtagCategory(TString iso,TString cat){
 int GlobalClass::Btag(TString btag){
 
   if(btag == "btag" 
-    && NtupleView->nbtag > 0  // if(Tiso == "tight"){
-  //   if(NtupleView->byTightIsolationMVArun2v1DBoldDMwLT_1 
-  //      && NtupleView->byTightIsolationMVArun2v1DBoldDMwLT_2 ) return 1;
-  // }
-    && NtupleView->njets <= 1) return 1;
+    && NtupleView->nbtag > 0  
+   // && NtupleView->njets <= 1
+    ) return 1;
 
   if(btag == "nobtag" 
      && NtupleView->nbtag ==0) return 1;
@@ -231,7 +229,7 @@ int GlobalClass::Btag(TString btag){
 int GlobalClass::LooseBtag(TString btag){
 
   if(btag == "btag"
-     && NtupleView->njets <= 1
+    // && NtupleView->njets <= 1
      && NtupleView->njetspt20 > 0) return 1;
 
   if(btag == "nobtag" 
@@ -460,7 +458,7 @@ TH1D* GlobalClass::JITHistoCreator(TString name, TString strVar){
     if(Parameter.variable.pt.doVarBins){
       usingVarBins = 1;
 
-      binning = channel;
+      //      binning = channel;
 
       histograms[name] = this->getBinnedHisto(name,Parameter.variable.pt.varBins.at(binning)) ;
     }

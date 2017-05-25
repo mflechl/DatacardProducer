@@ -26,6 +26,7 @@ class SelectionAnalyzer : public FFCalculator{
   int LSelection();
   int TSelection();
   int JSelection();
+  int ShapeSelector(int dm, TString from);
   int FFRest();
   double getJetToTauFakeUp( Float_t inputPt );
   double getJetToTauFakeDown( Float_t inputPt );
