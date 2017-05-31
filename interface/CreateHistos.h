@@ -17,6 +17,7 @@ class CreateHistos : public SelectionAnalyzer{
   int isTTFile(TString fileName);
   int isWFile(TString fileName);
   int isVVFile(TString fileName); 
+  int getFiletype(TString fileName);
 
   double getQCD_osss(TString cat);
   double getW_osss(TString strVar, TString cat);

@@ -171,7 +171,7 @@ int GlobalClass::CategorySelection(TString cat, TString iso){
     tmp.ReplaceAll("_looseTiso","");
   }
 
-  if(tmp == s_inclusive       )    return 0;    
+  if(tmp == s_inclusive       )    return 1;    
 
   
   if(tmp == s_nobtag          )    return this->Btag("nobtag") && this->TauIso(Tiso);
@@ -197,7 +197,7 @@ int GlobalClass::LooseBtagCategory(TString iso,TString cat){
 
   if( this->passIso("base") && this->Vetos() ){
 
-      if(tmp == s_inclusive) return 0;
+      if(tmp == s_inclusive && NtupleView->byTightIsolationMVArun2v1DBoldDMwLT_2) return 1;
 
       if(tmp == s_nobtag          )    return this->LooseBtag("nobtag");
       if(tmp == s_btag            )    return this->LooseBtag("btag");
@@ -348,8 +348,8 @@ int GlobalClass::W_CR(TString sign, TString iso, TString cat, bool mtcut){
   if(sign == "SS" && NtupleView->q_1 * NtupleView->q_2 < 0) return 0;
   if(mtcut && this->getMT() < Parameter.analysisCut.mTHigh ) return 0;
   if( cat.Contains("nobtag") && NtupleView->nbtag > 0 ) return 0;
-  if( cat.Contains("btag") && !cat.Contains("loosebtag") && !cat.Contains("nobtag") && !(NtupleView->njets <= 1 && NtupleView->nbtag > 0) ) return 0;
-  if( cat.Contains("loosebtag") && !(NtupleView->njets <= 1 && NtupleView->njetspt20 > 0) ) return 0;
+  if( cat.Contains("btag") && !cat.Contains("loosebtag") && !cat.Contains("nobtag") && !(NtupleView->nbtag > 0) ) return 0;
+  if( cat.Contains("loosebtag") && !(NtupleView->njetspt20 > 0) ) return 0;
 
   if( this->passIso("base") 
       && this->Vetos() ){
@@ -414,6 +414,18 @@ TH1D* GlobalClass::JITHistoCreator(TString name, TString strVar){
       nbins = Parameter.variable.m_vis.nbins;
       nmin  = Parameter.variable.m_vis.nmin;;
       nmax  = Parameter.variable.m_vis.nmax;
+    }
+  }
+
+  if(strVar == s_njet || strVar == s_nbtag ){
+    if(Parameter.variable.njet.doVarBins) {
+      usingVarBins = 1;
+      histograms[name] = this->getBinnedHisto(name,Parameter.variable.njet.varBins.at(binning)) ;
+    }
+    else{
+      nbins = Parameter.variable.njet.nbins;
+      nmin  = Parameter.variable.njet.nmin;;
+      nmax  = Parameter.variable.njet.nmax;
     }
   }
 

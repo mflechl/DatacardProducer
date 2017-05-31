@@ -18,14 +18,6 @@ CreateHistos::CreateHistos(TString testEnv_){
   vector<TString> masspoints = Parameter.dataset.masspoints;
   folder = channel +"_"+ FFiso;
   if(testEnv == "minimal"){
-    stringstream dir;
-    auto t = std::time(nullptr);
-    auto tm = *std::localtime(&t);
-    //folder= std::put_time(&tm, "%Y-%m-%d_%H-%M-%S");
-    dir << "histos/"<<folder;
-    //boost::filesystem::create_directory(dir)
-    // mkdir(output.str().c_str(), 0777);
-
     masspoints = Parameter.dataset.test_masspoints;
   }
 
@@ -58,50 +50,65 @@ CreateHistos::CreateHistos(TString testEnv_){
   }
 
   if( (ptShift || testEnv == "test" ) && testEnv != "minimal"){
-    files[s_ZtauUp].first = Parameter.dataset.ZtauUp;
-    files[s_ZtauDown].first = Parameter.dataset.ZtauDown;
+    vector<TString> shifts = Parameter.dataset.shifts;
+    if(channel == "tt") shifts = Parameter.dataset.full_shifts;
+    // files[s_ZtauUp].first = Parameter.dataset.ZtauUp;
+    // files[s_ZtauDown].first = Parameter.dataset.ZtauDown;
     if( channel=="et" ){
       files[s_ZE0Up].first = Parameter.dataset.ZE0Up;
       files[s_ZE0Down].first = Parameter.dataset.ZE0Down;
       files[s_ZE1Up].first = Parameter.dataset.ZE1Up;
       files[s_ZE1Down].first = Parameter.dataset.ZE1Down;
     }
-    //files[s_EWKZtauUp].first = Parameter.dataset.EWKZtauUp;
-    //files[s_EWKZtauDown].first = Parameter.dataset.EWKZtauDown;
-    files[s_TTtauUp].first = Parameter.dataset.TTtauUp;
-    files[s_TTtauDown].first = Parameter.dataset.TTtauDown;
-    files[s_VVtauUp].first = Parameter.dataset.VVtauUp;
-    files[s_VVtauDown].first = Parameter.dataset.VVtauDown;
+    // // files[s_EWKZtauUp].first = Parameter.dataset.EWKZtauUp;
+    // //  files[s_EWKZtauDown].first = Parameter.dataset.EWKZtauDown;
+    // files[s_TTtauUp].first = Parameter.dataset.TTtauUp;
+    // files[s_TTtauDown].first = Parameter.dataset.TTtauDown;
+    // files[s_VVtauUp].first = Parameter.dataset.VVtauUp;
+    // files[s_VVtauDown].first = Parameter.dataset.VVtauDown;
 
-    files[s_SMggHtauUp].first = Parameter.dataset.SMggHtauUp;
-    files[s_SMvbftauUp].first = Parameter.dataset.SMvbftauUp;
-    files[s_SMWminustauUp].first = Parameter.dataset.SMWminustauUp;
-    files[s_SMWplustauUp].first = Parameter.dataset.SMWplustauUp;
-    files[s_SMZHtauUp].first = Parameter.dataset.SMZHtauUp;
+    // files[s_SMggHtauUp].first = Parameter.dataset.SMggHtauUp;
+    // files[s_SMvbftauUp].first = Parameter.dataset.SMvbftauUp;
+    // files[s_SMWminustauUp].first = Parameter.dataset.SMWminustauUp;
+    // files[s_SMWplustauUp].first = Parameter.dataset.SMWplustauUp;
+    // files[s_SMZHtauUp].first = Parameter.dataset.SMZHtauUp;
 
-    files[s_SMggHtauDown].first = Parameter.dataset.SMggHtauDown;
-    files[s_SMvbftauDown].first = Parameter.dataset.SMvbftauDown;
-    files[s_SMWminustauDown].first = Parameter.dataset.SMWminustauDown;
-    files[s_SMWplustauDown].first = Parameter.dataset.SMWplustauDown;
-    files[s_SMZHtauDown].first = Parameter.dataset.SMZHtauDown;
+    // files[s_SMggHtauDown].first = Parameter.dataset.SMggHtauDown;
+    // files[s_SMvbftauDown].first = Parameter.dataset.SMvbftauDown;
+    // files[s_SMWminustauDown].first = Parameter.dataset.SMWminustauDown;
+    // files[s_SMWplustauDown].first = Parameter.dataset.SMWplustauDown;
+    // files[s_SMZHtauDown].first = Parameter.dataset.SMZHtauDown;
 
-    for(auto mass : masspoints){
+    for(auto shift : shifts ){
+      tmp = Parameter.dataset.ZtES;
+      files[s_Z+shift].first = tmp.ReplaceAll("TES",shift);
+      tmp=Parameter.dataset.TTtES;
+      files[s_TT+shift].first = tmp.ReplaceAll("TES",shift);
+      tmp=Parameter.dataset.VVtES;
+      files[s_VV+shift].first = tmp.ReplaceAll("TES",shift);
+      tmp=Parameter.dataset.SMggHtES;
+      files[s_SMggH+shift].first = tmp.ReplaceAll("TES",shift);
+      tmp=Parameter.dataset.SMvbftES;
+      files[s_SMvbf+shift].first = tmp.ReplaceAll("TES",shift);
+      tmp=Parameter.dataset.SMWminustES;
+      files[s_SMWminus+shift].first = tmp.ReplaceAll("TES",shift);
+      tmp=Parameter.dataset.SMWplustES;
+      files[s_SMWplus+shift].first = tmp.ReplaceAll("TES",shift);
+      tmp=Parameter.dataset.SMZHtES;
+      files[s_SMZH+shift].first = tmp.ReplaceAll("TES",shift);
 
-      tmp = Parameter.dataset.ggHtauUp;
-      files[s_ggHtauUp+mass].first = tmp.ReplaceAll("XXX",mass);
-      files[s_ggHtauUp+mass].second = mass;
+      for(auto mass : masspoints){
 
-      tmp = Parameter.dataset.ggHtauDown;
-      files[s_ggHtauDown+mass].first = tmp.ReplaceAll("XXX",mass);
-      files[s_ggHtauDown+mass].second = mass;
+          tmp = Parameter.dataset.ggHtES;
+          tmp = tmp.ReplaceAll("XXX",mass);
+          files[s_ggH+shift+mass].first = tmp.ReplaceAll("TES",shift);
+          files[s_ggH+shift+mass].second = mass;
 
-      tmp = Parameter.dataset.bbHtauUp;
-      files[s_bbHtauUp+mass].first = tmp.ReplaceAll("XXX",mass);
-      files[s_bbHtauUp+mass].second = mass;
-
-      tmp = Parameter.dataset.bbHtauDown;
-      files[s_bbHtauDown+mass].first = tmp.ReplaceAll("XXX",mass);
-      files[s_bbHtauDown+mass].second = mass;
+          tmp = Parameter.dataset.bbHtES;
+          tmp = tmp.ReplaceAll("XXX",mass);
+          files[s_bbH+shift+mass].first = tmp.ReplaceAll("TES",shift);
+          files[s_bbH+shift+mass].second = mass;   
+      }
     }
   }
   if( jecShift  && testEnv != "minimal" ){
@@ -216,7 +223,6 @@ void CreateHistos::run(){
   cout << endl;
   cout << "----Settings:-----" << endl;
   cout << "Channel: " << channel << endl;
-  cout << "UseIso: " << UseIso << endl;
   cout << "FFiso: " << FFiso << endl;
   cout << "isSync: " << isSync << endl;
   cout << "useMVAMET: " << useMVAMET << endl;
@@ -246,15 +252,20 @@ void CreateHistos::run(){
   }
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
   TString filetype = "";
+  int fileindex = 0;
   TString filename = "";
   TString mass = "";
+  cout.precision(3);
 
   for (auto const& file : files){
 
     filetype = file.first;
+    
     filename = file.second.first;
     mass = file.second.second;
     filetype.ReplaceAll( mass, "" );
+    fileindex = this->getFiletype(filetype);
+
   
     if(filetype.Contains(s_jecUp)) this->isJEC=1;
     else if(filetype.Contains(s_jecDown)) this->isJEC=-1;
@@ -276,7 +287,7 @@ void CreateHistos::run(){
         if(nentries > 0){
           perc =  ( (float)jentry / (float)nentries ) * 100;
         }
-        cout.precision(3);
+        
         cout<< "                                                             \r"<< flush;
         cout<< jentry << "/" << nentries <<"\t\t" << perc << "%\r"<< flush;
       }
@@ -294,21 +305,17 @@ void CreateHistos::run(){
       weight *= NtupleView->puweight;
       weight *= this->recalcEffweight();
       weight *= NtupleView->genweight;
-      weight *= NtupleView->antilep_tauscaling;
-      //weight *= this->getAntiLep_tauscaling();
+      if(channel != "tt") weight *= NtupleView->antilep_tauscaling;
+      else weight *= this->getAntiLep_tauscaling();
       weight *= NtupleView->trk_sf;
       weight *= usedLuminosity;
 
       if(!doMC){
-        if( isZFile(filetype) || isEWKZFile(filetype) ) weight *= NtupleView->ZWeight;
-        if( isTTFile(filetype) ) weight *= NtupleView->topWeight_run1;
+        if( fileindex == 1 || fileindex == 6 ) weight *= NtupleView->ZWeight;
+        if( fileindex == 3 ) weight *= NtupleView->topWeight_run1;
       }
       else if(doMC) weight_data=weight;
-
       for(auto cat : cats){
-
-
-        //if( !doMC && isZFile(filetype) ) weight *= this->getZmumuWeight( cat );
 
         for(auto strVar : vars){
 
@@ -320,6 +327,8 @@ void CreateHistos::run(){
           else if(strVar == s_mt2)                            var = this->getMT2();
           else if(strVar == s_jpt1)                           var = NtupleView->jpt_1;
           else if(strVar == s_jpt2)                           var = NtupleView->jpt_2;
+          else if(strVar == s_njet)                           var = NtupleView->njets;
+          else if(strVar == s_nbtag)                           var = NtupleView->nbtag;          
           
           else if(strVar == s_pt1)                            var = NtupleView->pt_1;
           else if(strVar == s_pt2)                            var = NtupleView->pt_2;
@@ -348,27 +357,19 @@ void CreateHistos::run(){
 
           else continue;
 
-            if( isZFile(filetype) )                     this->DYSelections(var, weight, cat, strVar, filetype);
-            
-            else if( isEWKZFile(filetype) )             this->EWKZSelections(var, weight, cat, strVar, filetype);
-          
-            else if( isTTFile(filetype) )               this->TSelections(var, weight, cat, strVar, filetype);
-            
-            else if( isVVFile(filetype) )               this->VVSelections(var, weight, cat, strVar, filetype);
-
-            else if( isWFile(filetype) )                this->WSelections(var, weight, cat, strVar, filetype);
-
-            else if( filetype == s_data )               this->dataSelections(var, weight_data, cat, strVar, filetype);
-
-            else if( isSignalFile(filetype) )           this->signalSelections(var, weight, cat, strVar, filetype, mass);
-
+          if( fileindex == 1 )                this->DYSelections(var, weight, cat, strVar, filetype);
+          else if( fileindex == 2 )           this->signalSelections(var, weight, cat, strVar, filetype, mass);
+          else if( fileindex == 3 )           this->TSelections(var, weight, cat, strVar, filetype);
+          else if( fileindex == 4 )           this->WSelections(var, weight, cat, strVar, filetype);             
+          else if( fileindex == 5 )           this->VVSelections(var, weight, cat, strVar, filetype);                 
+          else if( fileindex == 6 )           this->EWKZSelections(var, weight, cat, strVar, filetype);       
+          else if( filetype == s_data )       this->dataSelections(var, weight_data, cat, strVar, filetype);
 
         }
-        
       }
     }
   }
-
+  cout.precision(10);
   for(auto cat : cats){
     for(auto strVar : vars){
       this->EstimateW(strVar, cat);
@@ -438,33 +439,37 @@ float CreateHistos::getAntiLep_tauscaling(){
       //run2 SF for VLoose for tau2
       float scaleFactor_tautau = 1;
       if( NtupleView->gen_match_2 == 1                                                                                                                                                        
-	  || NtupleView->gen_match_2 == 3 ){
+	        || NtupleView->gen_match_2 == 3 ){
+
         if( fabs(NtupleView->eta_2 ) < 1.46) scaleFactor_tautau = 1.21;
         else if( fabs(NtupleView->eta_2 ) > 1.558) scaleFactor_tautau =  1.38;
       }  
       //run2 SF with bad muon filter for cut-based Loose for tau2
       if( NtupleView->gen_match_2 == 2                                                                                                                                                          
-	  || NtupleView->gen_match_2 == 4 ){
+	        || NtupleView->gen_match_2 == 4 ){
+
         if( fabs(NtupleView->gen_match_2) < 0.4 ) scaleFactor_tautau =  1.22;
-	else if( fabs(NtupleView->gen_match_2) < 0.8 ) scaleFactor_tautau =  1.12;
-	else if( fabs(NtupleView->gen_match_2) < 1.2 ) scaleFactor_tautau =  1.26;
-	else if( fabs(NtupleView->gen_match_2) < 1.7 ) scaleFactor_tautau =  1.22;
-	else if( fabs(NtupleView->gen_match_2) < 2.3 ) scaleFactor_tautau =  2.39;
+      	else if( fabs(NtupleView->gen_match_2) < 0.8 ) scaleFactor_tautau =  1.12;
+      	else if( fabs(NtupleView->gen_match_2) < 1.2 ) scaleFactor_tautau =  1.26;
+      	else if( fabs(NtupleView->gen_match_2) < 1.7 ) scaleFactor_tautau =  1.22;
+      	else if( fabs(NtupleView->gen_match_2) < 2.3 ) scaleFactor_tautau =  2.39;
       }
 
       if( NtupleView->gen_match_1 == 1                                                                                                                                                        
-	  || NtupleView->gen_match_1 == 3 ){
+	        || NtupleView->gen_match_1 == 3 ){
+
         if( fabs(NtupleView->eta_1 ) < 1.46) scaleFactor_tautau *= 1.21;
         else if( fabs(NtupleView->eta_1 ) > 1.558) scaleFactor_tautau *=  1.38;
       }  
       //run2 SF with bad muon filter for cut-based Loose for tau2
       if( NtupleView->gen_match_1 == 2                                                                                                                                                          
-	  || NtupleView->gen_match_1 == 4 ){
+	        || NtupleView->gen_match_1 == 4 ){
+
         if( fabs(NtupleView->gen_match_1) < 0.4 ) scaleFactor_tautau *=  1.22;
-	else if( fabs(NtupleView->gen_match_1) < 0.8 ) scaleFactor_tautau *=  1.12;
-	else if( fabs(NtupleView->gen_match_1) < 1.2 ) scaleFactor_tautau *=  1.26;
-	else if( fabs(NtupleView->gen_match_1) < 1.7 ) scaleFactor_tautau *=  1.22;
-	else if( fabs(NtupleView->gen_match_1) < 2.3 ) scaleFactor_tautau *=  2.39;
+      	else if( fabs(NtupleView->gen_match_1) < 0.8 ) scaleFactor_tautau *=  1.12;
+      	else if( fabs(NtupleView->gen_match_1) < 1.2 ) scaleFactor_tautau *=  1.26;
+      	else if( fabs(NtupleView->gen_match_1) < 1.7 ) scaleFactor_tautau *=  1.22;
+      	else if( fabs(NtupleView->gen_match_1) < 2.3 ) scaleFactor_tautau *=  2.39;
       }
       return scaleFactor_tautau;
 
@@ -741,8 +746,8 @@ double CreateHistos::getQCD_osss(TString cat){
       if(cat.Contains("inclusive") ) return 1.19;
     }
     else{
-      if(cat.Contains("btag") && !cat.Contains("nobtag") ) return 1.08;
-      if(cat.Contains("nobtag") ) return 1.12;
+      if(cat.Contains("btag") && !cat.Contains("nobtag") ) return 1.01;
+      if(cat.Contains("nobtag") ) return 1.14;
       if(cat.Contains("inclusive") ) return 1.10;      
     }
   }
@@ -753,8 +758,8 @@ double CreateHistos::getQCD_osss(TString cat){
       if(cat.Contains("inclusive") ) return 0.99;
     }
     else{
-      if(cat.Contains("btag") && !cat.Contains("nobtag") ) return 1.21;
-      if(cat.Contains("nobtag") ) return 1.02;
+      if(cat.Contains("btag") && !cat.Contains("nobtag") ) return 1.16;
+      if(cat.Contains("nobtag") ) return 1.11;
       if(cat.Contains("inclusive") ) return 1.04;      
     }
   }
@@ -797,8 +802,6 @@ void CreateHistos::EstimateW(TString strVar, TString cat){
     BConv_CR = this->getW_BtagConv(strVar, cat, "_wjets_cr");
     bt = "_loosebtag";
   }
-  cout<< cat<< "  " << R_W<< "  " << R_QCD<<  "  "<< HLExt<< "  "<< BConv_CR<< "  "<< BConv_SR << endl ;
-
   TString sub = "+" + strVar +"_" + cat;
 
   this->GetHistbyName("data_os_obs"+sub+"_wjets_cr+",strVar)->Add( this->GetHistbyName(s_data + sub + bt +"_wjets_cr+",strVar)   );
@@ -816,17 +819,30 @@ void CreateHistos::EstimateW(TString strVar, TString cat){
   double wjets_ss_cr_norm  = this->GetHistbyName("data_os_obs"+sub+"_wjets_cr+",strVar)->Integral() - this->GetHistbyName("backgrounds_os"+sub+"_wjets_cr+",strVar)->Integral();
          wjets_ss_cr_norm -= (this->GetHistbyName("data_ss_obs"+sub+"_wjets_ss_cr+",strVar)->Integral() - this->GetHistbyName("backgrounds_ss"+sub+"_wjets_ss_cr+",strVar)->Integral() ) * R_QCD;
          wjets_ss_cr_norm *= ( 1 /  ( R_W - R_QCD ) );
-  cout << "numbers" << endl;
-  cout << this->GetHistbyName("data_os_obs"+sub+"_wjets_cr+",strVar)->Integral()  << endl;
-  cout << this->GetHistbyName("backgrounds_os"+sub+"_wjets_cr+",strVar)->Integral() << endl;
-  cout << this->GetHistbyName("data_ss_obs"+sub+"_wjets_ss_cr+",strVar)->Integral() << endl;
-  cout << this->GetHistbyName("backgrounds_ss"+sub+"_wjets_ss_cr+",strVar)->Integral() << endl;
-  cout << "------" << endl;
+
 
   this->GetHistbyName(s_W+sub+"_wjets_ss_cr+",strVar)->Add( this->GetHistbyName(s_W+"_MC"+sub+"_wjets_ss_cr+",strVar) );
   this->GetHistbyName(s_W+sub+"_wjets_cr+",strVar)->Add( this->GetHistbyName(s_W +"_MC"+sub+"_wjets_cr+",strVar) );
   this->GetHistbyName(s_W +sub +"_qcd_cr+",strVar)->Add( this->GetHistbyName(s_W+ "_MC" +sub +"_qcd_cr+",strVar) );
   this->GetHistbyName(s_W +sub +"+",strVar)->Add( this->GetHistbyName(s_W+ "_MC" +sub +"+",strVar) ); 
+  if(channel != "tt"){
+    cout << "W numbers " << cat << endl;
+    cout << "R_W           "   << R_W << endl;
+    cout << "R_QCD         " << R_QCD << endl;
+    cout << "HLExt         " << HLExt << endl;
+    cout << "BConv_SR      "<< BConv_SR << endl;
+    cout << "BConv_CR      "<< BConv_CR << endl;
+    cout << "W_SS_CR_norm  "<< wjets_ss_cr_norm << endl;
+    cout << "WSS/W         "<< wjets_ss_cr_norm / this->GetHistbyName(s_W +sub +"+",strVar)->Integral() << endl;
+    cout << "WSS/W_QCD     "<< wjets_ss_cr_norm / this->GetHistbyName(s_W +sub +"_qcd_cr+",strVar)->Integral() << endl;
+    cout << "WSS/WCR       "<< wjets_ss_cr_norm / this->GetHistbyName(s_W+sub+"_wjets_cr+",strVar)->Integral() << endl;
+    cout << "WSS/WSS       "<< wjets_ss_cr_norm / this->GetHistbyName(s_W+sub+"_wjets_ss_cr+",strVar)->Integral() << endl;
+    cout << "data OS       "<< this->GetHistbyName("data_os_obs"+sub+"_wjets_cr+",strVar)->Integral()  << endl;
+    cout << "BG OS         "<< this->GetHistbyName("backgrounds_os"+sub+"_wjets_cr+",strVar)->Integral() << endl;
+    cout << "data SS       "<< this->GetHistbyName("data_ss_obs"+sub+"_wjets_ss_cr+",strVar)->Integral() << endl;
+    cout << "BG SS         "<< this->GetHistbyName("backgrounds_ss"+sub+"_wjets_ss_cr+",strVar)->Integral() << endl;
+    cout << "------" << endl;
+  }
 
   TString w_FakeShape_up="W_CMS_htt_wFakeShape_13TeVUp";
   TString w_FakeShape_down="W_CMS_htt_wFakeShape_13TeVDown";
@@ -837,7 +853,7 @@ void CreateHistos::EstimateW(TString strVar, TString cat){
   if(channel != "tt"){
     this->GetHistbyName(s_W +sub +"+",strVar)->Scale( (wjets_ss_cr_norm * HLExt * R_W* BConv_SR ) / this->GetHistbyName(s_W +sub +"+",strVar)->Integral() );
     this->GetHistbyName(s_W +sub +"_qcd_cr+",strVar)->Scale( (wjets_ss_cr_norm * HLExt* BConv_SR) / this->GetHistbyName(s_W +sub +"_qcd_cr+",strVar)->Integral() );
-    this->GetHistbyName(s_W+sub+"_wjets_cr+",strVar)->Scale( (R_W * wjets_ss_cr_norm* BConv_CR) / this->GetHistbyName(s_W+sub+"_wjets_cr+",strVar)->Integral() );
+    this->GetHistbyName(s_W+sub+"_wjets_cr+",strVar)->Scale( (wjets_ss_cr_norm *R_W * BConv_CR) / this->GetHistbyName(s_W+sub+"_wjets_cr+",strVar)->Integral() );
     this->GetHistbyName(s_W+sub+"_wjets_ss_cr+",strVar)->Scale( (wjets_ss_cr_norm * BConv_CR) / this->GetHistbyName(s_W+sub+"_wjets_ss_cr+",strVar)->Integral() );
 
     this->GetHistbyName(w_FakeShape_up +sub +"+",strVar)->Scale( (wjets_ss_cr_norm * HLExt * R_W* BConv_SR ) / this->GetHistbyName(w_FakeShape_up +sub +"+",strVar)->Integral() );
@@ -857,7 +873,6 @@ void CreateHistos::EstimateQCD(TString strVar, TString cat){
 
     this->GetHistbyName("QCD" + sub +"_qcd_cr+" ,strVar)->Add( this->GetHistbyName(s_data+sub  + "_qcd_cr+",strVar));
     this->GetHistbyName("QCD" + sub +"_qcd_cr+" ,strVar)->Add( this->GetHistbyName(s_Z+sub  + "_qcd_cr+",strVar), -1);
-    this->GetHistbyName("QCD" + sub +"_qcd_cr+" ,strVar)->Add( this->GetHistbyName(s_EWKZ+sub  + "_qcd_cr+",strVar), -1);
     this->GetHistbyName("QCD" + sub +"_qcd_cr+" ,strVar)->Add( this->GetHistbyName(s_VV+sub  + "_qcd_cr+",strVar), -1);
     this->GetHistbyName("QCD" + sub +"_qcd_cr+" ,strVar)->Add( this->GetHistbyName(s_TT+sub  + "_qcd_cr+",strVar), -1);
     CR_QCD_norm   = this->GetHistbyName("QCD" + sub +"_qcd_cr+" ,strVar)->Integral();
@@ -869,11 +884,8 @@ void CreateHistos::EstimateQCD(TString strVar, TString cat){
     this->GetHistbyName("QCD"+ sub + "+" ,strVar)->Add( this->GetHistbyName("QCD" + sub +"_qcd_cr+" ,strVar) );
     this->GetHistbyName("QCD"+ sub + "+" ,strVar)->Scale( this->getQCD_osss(cat) );
 
-
-
     this->GetHistbyName("QCD" + sub +"_wjets_ss_cr+",strVar)->Add( this->GetHistbyName(s_data + sub +"_wjets_ss_cr+",strVar)   );
     this->GetHistbyName("QCD" + sub +"_wjets_ss_cr+",strVar)->Add( this->GetHistbyName(s_Z + sub +"_wjets_ss_cr+",strVar), -1 );
-    this->GetHistbyName("QCD" + sub +"_wjets_ss_cr+",strVar)->Add( this->GetHistbyName(s_EWKZ + sub +"_wjets_ss_cr+",strVar), -1 );
     this->GetHistbyName("QCD" + sub +"_wjets_ss_cr+",strVar)->Add( this->GetHistbyName(s_VV + sub +"_wjets_ss_cr+",strVar), -1 );
     this->GetHistbyName("QCD" + sub +"_wjets_ss_cr+",strVar)->Add( this->GetHistbyName(s_TT + sub +"_wjets_ss_cr+",strVar), -1 );
     CR_QCD_norm   = this->GetHistbyName("QCD" + sub +"_wjets_ss_cr+" ,strVar)->Integral();
@@ -888,21 +900,21 @@ void CreateHistos::EstimateQCD(TString strVar, TString cat){
   else {
     this->GetHistbyName("QCD" + sub +"+" ,strVar)->Add( this->GetHistbyName(s_data+sub  + "_looseTiso+",strVar));
     this->GetHistbyName("QCD" + sub +"+" ,strVar)->Add( this->GetHistbyName(s_Z+sub  + "_looseTiso+",strVar), -1);
-    this->GetHistbyName("QCD" + sub +"+" ,strVar)->Add( this->GetHistbyName(s_EWKZ+sub  + "_looseTiso+",strVar), -1);
+    //this->GetHistbyName("QCD" + sub +"+" ,strVar)->Add( this->GetHistbyName(s_EWKZ+sub  + "_looseTiso+",strVar), -1);
     this->GetHistbyName("QCD" + sub +"+" ,strVar)->Add( this->GetHistbyName(s_VV+sub  + "_looseTiso+",strVar), -1);
     this->GetHistbyName("QCD" + sub +"+" ,strVar)->Add( this->GetHistbyName(s_TT+sub  + "_looseTiso+",strVar), -1);
     this->GetHistbyName("QCD" + sub +"+" ,strVar)->Add( this->GetHistbyName(s_W+ "_MC" +sub   + "_looseTiso+",strVar), -1);
 
     double SS_loose = this->GetHistbyName(s_data+sub  + "_looseTiso_qcd_cr+",strVar)->Integral();
     SS_loose -= this->GetHistbyName(s_Z+sub  + "_looseTiso_qcd_cr+",strVar)->Integral();
-    SS_loose -= this->GetHistbyName(s_EWKZ+sub  + "_looseTiso_qcd_cr+",strVar)->Integral();
+    //SS_loose -= this->GetHistbyName(s_EWKZ+sub  + "_looseTiso_qcd_cr+",strVar)->Integral();
     SS_loose -= this->GetHistbyName(s_VV+sub  + "_looseTiso_qcd_cr+",strVar)->Integral();
     SS_loose -= this->GetHistbyName(s_TT+sub  + "_looseTiso_qcd_cr+",strVar)->Integral();
     SS_loose -= this->GetHistbyName(s_W+ "_MC" +sub   + "_looseTiso_qcd_cr+",strVar)->Integral();
 
     double SS = this->GetHistbyName(s_data+sub  + "_qcd_cr+",strVar)->Integral();
     SS -= this->GetHistbyName(s_Z+sub  + "_qcd_cr+",strVar)->Integral();
-    SS -= this->GetHistbyName(s_EWKZ+sub  + "_qcd_cr+",strVar)->Integral();
+    //SS -= this->GetHistbyName(s_EWKZ+sub  + "_qcd_cr+",strVar)->Integral();
     SS -= this->GetHistbyName(s_VV+sub  + "_qcd_cr+",strVar)->Integral();
     SS -= this->GetHistbyName(s_TT+sub  + "_qcd_cr+",strVar)->Integral();
     SS -= this->GetHistbyName(s_W+ "_MC" +sub   + "_qcd_cr+",strVar)->Integral();
@@ -1007,10 +1019,33 @@ void CreateHistos::writeHistos( TString channel, vector<TString> cats, vector<TS
     
 }
 
+int CreateHistos::getFiletype(TString fileName){
+
+  vector<int> index;
+
+  index.push_back( this->isZFile(fileName) );
+  index.push_back( this->isSignalFile(fileName) );
+  index.push_back( this->isTTFile(fileName) );
+  index.push_back( this->isWFile(fileName) );
+  index.push_back( this->isVVFile(fileName) );
+  index.push_back( this->isEWKZFile(fileName) );
+
+  for(auto ind : index){
+    if(ind != 0) return ind;
+  }
+  return 0;
+}
+
 int CreateHistos::isZFile(TString fileName){
   if(fileName == s_Z) return 1;
   if(fileName == s_ZtauUp) return 1;
   if(fileName == s_ZtauDown) return 1;
+  if(fileName == s_Z+"T0Up") return 1;
+  if(fileName == s_Z+"T0Down") return 1;
+  if(fileName == s_Z+"T1Up") return 1;
+  if(fileName == s_Z+"T1Down") return 1;
+  if(fileName == s_Z+"T10Up") return 1;
+  if(fileName == s_Z+"T10Down") return 1;
   if(fileName == s_ZjecUp) return 1;
   if(fileName == s_ZjecDown) return 1;
   if(fileName == s_ZE0Up) return 1;
@@ -1021,84 +1056,145 @@ int CreateHistos::isZFile(TString fileName){
   return 0;
 }
 
-int CreateHistos::isEWKZFile(TString fileName){
-  if(fileName == s_EWKZ) return 1;
-  if(fileName == s_EWKZtauUp) return 1;
-  if(fileName == s_EWKZtauDown) return 1;
-  if(fileName == s_EWKZjecUp) return 1;
-  if(fileName == s_EWKZjecDown) return 1;
 
-  return 0;
-}
 
 int CreateHistos::isSignalFile(TString fileName){
 
-    if(fileName == s_ggH) return 1;
-    if(fileName == s_ggHtauUp) return 1;
-    if(fileName == s_ggHtauDown) return 1;
-    if(fileName == s_ggHjecUp) return 1;
-    if(fileName == s_ggHjecDown) return 1;
-    if(fileName == s_bbH) return 1;
-    if(fileName == s_bbHtauUp) return 1;
-    if(fileName == s_bbHtauDown) return 1;
-    if(fileName == s_bbHjecUp) return 1;
-    if(fileName == s_bbHjecDown) return 1;
+    if(fileName == s_ggH) return 2;
+    if(fileName == s_ggHtauUp) return 2;
+    if(fileName == s_ggHtauDown) return 2;
+    if(fileName == s_ggH+"T0Up") return 2;
+    if(fileName == s_ggH+"T0Down") return 2;
+    if(fileName == s_ggH+"T1Up") return 2;
+    if(fileName == s_ggH+"T1Down") return 2;
+    if(fileName == s_ggH+"T10Up") return 2;
+    if(fileName == s_ggH+"T10Down") return 2;
+    if(fileName == s_ggHjecUp) return 2;
+    if(fileName == s_ggHjecDown) return 2;
+    if(fileName == s_bbH) return 2;
+    if(fileName == s_bbHtauUp) return 2;
+    if(fileName == s_bbHtauDown) return 2;
+    if(fileName == s_bbH+"T0Up") return 2;
+    if(fileName == s_bbH+"T0Down") return 2;
+    if(fileName == s_bbH+"T1Up") return 2;
+    if(fileName == s_bbH+"T1Down") return 2;
+    if(fileName == s_bbH+"T10Up") return 2;
+    if(fileName == s_bbH+"T10Down") return 2;
+    if(fileName == s_bbHjecUp) return 2;
+    if(fileName == s_bbHjecDown) return 2;
 
-    if(fileName == s_SMggH ) return 1;
-    if(fileName == s_SMvbf ) return 1;
-    if(fileName == s_SMWminus ) return 1;
-    if(fileName == s_SMWplus ) return 1;
-    if(fileName == s_SMZH ) return 1;
+    if(fileName == s_SMggH ) return 2;
+    if(fileName == s_SMvbf ) return 2;
+    if(fileName == s_SMWminus ) return 2;
+    if(fileName == s_SMWplus ) return 2;
+    if(fileName == s_SMZH ) return 2;
 
-    if(fileName == s_SMggHtauUp ) return 1;
-    if(fileName == s_SMvbftauUp ) return 1;
-    if(fileName == s_SMWminustauUp ) return 1;
-    if(fileName == s_SMWplustauUp ) return 1;
-    if(fileName == s_SMZHtauUp ) return 1;
-    if(fileName == s_SMggHtauDown ) return 1;
-    if(fileName == s_SMvbftauDown ) return 1;
-    if(fileName == s_SMWminustauDown ) return 1;
-    if(fileName == s_SMWplustauDown ) return 1;
-    if(fileName == s_SMZHtauDown ) return 1;
+    if(fileName == s_SMggHtauUp ) return 2;
+    if(fileName == s_SMvbftauUp ) return 2;
+    if(fileName == s_SMWminustauUp ) return 2;
+    if(fileName == s_SMWplustauUp ) return 2;
+    if(fileName == s_SMZHtauUp ) return 2;
+    if(fileName == s_SMggHtauDown ) return 2;
+    if(fileName == s_SMvbftauDown ) return 2;
+    if(fileName == s_SMWminustauDown ) return 2;
+    if(fileName == s_SMWplustauDown ) return 2;
+    if(fileName == s_SMZHtauDown ) return 2;
 
-    if(fileName == s_SMggHjecUp ) return 1;
-    if(fileName == s_SMvbfjecUp ) return 1;
-    if(fileName == s_SMWminusjecUp ) return 1;
-    if(fileName == s_SMWplusjecUp ) return 1;
-    if(fileName == s_SMZHjecUp ) return 1;
-    if(fileName == s_SMggHjecDown ) return 1;
-    if(fileName == s_SMvbfjecDown ) return 1;
-    if(fileName == s_SMWminusjecDown ) return 1;
-    if(fileName == s_SMWplusjecDown ) return 1;
-    if(fileName == s_SMZHjecDown ) return 1;
+    if(fileName == s_SMggH+"T0Up") return 2;
+    if(fileName == s_SMggH+"T0Down") return 2;
+    if(fileName == s_SMggH+"T1Up") return 2;
+    if(fileName == s_SMggH+"T1Down") return 2;
+    if(fileName == s_SMggH+"T10Up") return 2;
+    if(fileName == s_SMggH+"T10Down") return 2;
+
+    if(fileName == s_SMvbf+"T0Up") return 2;
+    if(fileName == s_SMvbf+"T0Down") return 2;
+    if(fileName == s_SMvbf+"T1Up") return 2;
+    if(fileName == s_SMvbf+"T1Down") return 2;
+    if(fileName == s_SMvbf+"T10Up") return 2;
+    if(fileName == s_SMvbf+"T10Down") return 2;
+
+    if(fileName == s_SMWminus+"T0Up") return 2;
+    if(fileName == s_SMWminus+"T0Down") return 2;
+    if(fileName == s_SMWminus+"T1Up") return 2;
+    if(fileName == s_SMWminus+"T1Down") return 2;
+    if(fileName == s_SMWminus+"T10Up") return 2;
+    if(fileName == s_SMWminus+"T10Down") return 2;
+
+    if(fileName == s_SMWplus+"T0Up") return 2;
+    if(fileName == s_SMWplus+"T0Down") return 2;
+    if(fileName == s_SMWplus+"T1Up") return 2;
+    if(fileName == s_SMWplus+"T1Down") return 2;
+    if(fileName == s_SMWplus+"T10Up") return 2;
+    if(fileName == s_SMWplus+"T10Down") return 2;
+
+    if(fileName == s_SMZH+"T0Up") return 2;
+    if(fileName == s_SMZH+"T0Down") return 2;
+    if(fileName == s_SMZH+"T1Up") return 2;
+    if(fileName == s_SMZH+"T1Down") return 2;
+    if(fileName == s_SMZH+"T10Up") return 2;
+    if(fileName == s_SMZH+"T10Down") return 2;
+
+    if(fileName == s_SMggHjecUp ) return 2;
+    if(fileName == s_SMvbfjecUp ) return 2;
+    if(fileName == s_SMWminusjecUp ) return 2;
+    if(fileName == s_SMWplusjecUp ) return 2;
+    if(fileName == s_SMZHjecUp ) return 2;
+    if(fileName == s_SMggHjecDown ) return 2;
+    if(fileName == s_SMvbfjecDown ) return 2;
+    if(fileName == s_SMWminusjecDown ) return 2;
+    if(fileName == s_SMWplusjecDown ) return 2;
+    if(fileName == s_SMZHjecDown ) return 2;
 
   return 0;
 }
 
 int CreateHistos::isTTFile(TString fileName){
-  if(fileName == s_TT) return 1;
-  if(fileName == s_TTtauUp) return 1;
-  if(fileName == s_TTtauDown) return 1;
-  if(fileName == s_TTjecUp) return 1;
-  if(fileName == s_TTjecDown) return 1;
+  if(fileName == s_TT) return 3;
+  if(fileName == s_TTtauUp) return 3;
+  if(fileName == s_TTtauDown) return 3;
+  if(fileName == s_TT+"T0Up") return 3;
+  if(fileName == s_TT+"T0Down") return 3;
+  if(fileName == s_TT+"T1Up") return 3;
+  if(fileName == s_TT+"T1Down") return 3;
+  if(fileName == s_TT+"T10Up") return 3;
+  if(fileName == s_TT+"T10Down") return 3;
+  if(fileName == s_TTjecUp) return 3;
+  if(fileName == s_TTjecDown) return 3;
 
   return 0;  
 }
 
 int CreateHistos::isWFile(TString fileName){
-  if(fileName == s_W) return 1;
-  if(fileName == s_WjecUp) return 1;
-  if(fileName == s_WjecDown) return 1;
+  if(fileName == s_W) return 4;
+  if(fileName == s_WjecUp) return 4;
+  if(fileName == s_WjecDown) return 4;
 
   return 0;
 }
 
 int CreateHistos::isVVFile(TString fileName){
-  if(fileName == s_VV) return 1;
-  if(fileName == s_VVtauUp) return 1;
-  if(fileName == s_VVtauDown) return 1;
-  if(fileName == s_VVjecUp) return 1;
-  if(fileName == s_VVjecDown) return 1;
+  if(fileName == s_VV) return 5;
+  if(fileName == s_VVtauUp) return 5;
+  if(fileName == s_VVtauDown) return 5;
+  if(fileName == s_VV+"T0Up") return 5;
+  if(fileName == s_VV+"T0Down") return 5;
+  if(fileName == s_VV+"T1Up") return 5;
+  if(fileName == s_VV+"T1Down") return 5;
+  if(fileName == s_VV+"T10Up") return 5;
+  if(fileName == s_VV+"T10Down") return 5;
+  if(fileName == s_VVjecUp) return 5;
+  if(fileName == s_VVjecDown) return 5;
+
+  return 0;
+}
+
+int CreateHistos::isEWKZFile(TString fileName){
+  if(fileName == s_EWKZ) return 6;
+  if(fileName == s_EWKZtauUp) return 6;
+  if(fileName == s_EWKZtauDown) return 6;
+  if(fileName == s_EWKZjecUp) return 6;
+  if(fileName == s_EWKZjecDown) return 6;
 
   return 0;
 }
