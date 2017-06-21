@@ -417,7 +417,7 @@ TH1D* GlobalClass::JITHistoCreator(TString name, TString strVar){
     }
   }
 
-  if(strVar == s_njet || strVar == s_nbtag ){
+  if(strVar == s_njet ){
     if(Parameter.variable.njet.doVarBins) {
       usingVarBins = 1;
       histograms[name] = this->getBinnedHisto(name,Parameter.variable.njet.varBins.at(binning)) ;
@@ -426,6 +426,18 @@ TH1D* GlobalClass::JITHistoCreator(TString name, TString strVar){
       nbins = Parameter.variable.njet.nbins;
       nmin  = Parameter.variable.njet.nmin;;
       nmax  = Parameter.variable.njet.nmax;
+    }
+  }
+
+  if(strVar == s_nbtag ){
+    if(Parameter.variable.nbtag.doVarBins) {
+      usingVarBins = 1;
+      histograms[name] = this->getBinnedHisto(name,Parameter.variable.nbtag.varBins.at(binning)) ;
+    }
+    else{
+      nbins = Parameter.variable.nbtag.nbins;
+      nmin  = Parameter.variable.nbtag.nmin;;
+      nmax  = Parameter.variable.nbtag.nmax;
     }
   }
 

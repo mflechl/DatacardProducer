@@ -13,14 +13,15 @@ CreateHistos::CreateHistos(TString testEnv_){
   testEnv = testEnv_;
   if(testEnv == "test") cout << "testing availability of input files" << endl;
   if(testEnv == "minimal") cout << "creating minimal datacard" << endl;
+  if(testEnv == "nlo") cout << "creating nlo datacard" << endl;
 
   TString tmp = "";
   vector<TString> masspoints = Parameter.dataset.masspoints;
-  folder = channel +"_"+ FFiso;
+  //folder = channel +"_"+ FFiso;
+  folder = channel;
   if(testEnv == "minimal"){
     masspoints = Parameter.dataset.test_masspoints;
   }
-
 
   files[s_Z].first = Parameter.dataset.Z;
   //files[s_EWKZ].first = Parameter.dataset.EWKZ;
@@ -44,14 +45,15 @@ CreateHistos::CreateHistos(TString testEnv_){
     files[s_ggH+mass].first = tmp.ReplaceAll("XXX",mass);
     files[s_ggH+mass].second = mass;
 
-    tmp = Parameter.dataset.bbH;
+    if(testEnv == "nlo") tmp = Parameter.dataset.bbHNLO;
+    else tmp = Parameter.dataset.bbH;
     files[s_bbH+mass].first = tmp.ReplaceAll("XXX",mass);
     files[s_bbH+mass].second = mass;
   }
 
   if( (ptShift || testEnv == "test" ) && testEnv != "minimal"){
     vector<TString> shifts = Parameter.dataset.shifts;
-    if(channel == "tt") shifts = Parameter.dataset.full_shifts;
+    if(channel != "et") shifts = Parameter.dataset.full_shifts;
     // files[s_ZtauUp].first = Parameter.dataset.ZtauUp;
     // files[s_ZtauDown].first = Parameter.dataset.ZtauDown;
     if( channel=="et" ){
@@ -60,24 +62,7 @@ CreateHistos::CreateHistos(TString testEnv_){
       files[s_ZE1Up].first = Parameter.dataset.ZE1Up;
       files[s_ZE1Down].first = Parameter.dataset.ZE1Down;
     }
-    // // files[s_EWKZtauUp].first = Parameter.dataset.EWKZtauUp;
-    // //  files[s_EWKZtauDown].first = Parameter.dataset.EWKZtauDown;
-    // files[s_TTtauUp].first = Parameter.dataset.TTtauUp;
-    // files[s_TTtauDown].first = Parameter.dataset.TTtauDown;
-    // files[s_VVtauUp].first = Parameter.dataset.VVtauUp;
-    // files[s_VVtauDown].first = Parameter.dataset.VVtauDown;
 
-    // files[s_SMggHtauUp].first = Parameter.dataset.SMggHtauUp;
-    // files[s_SMvbftauUp].first = Parameter.dataset.SMvbftauUp;
-    // files[s_SMWminustauUp].first = Parameter.dataset.SMWminustauUp;
-    // files[s_SMWplustauUp].first = Parameter.dataset.SMWplustauUp;
-    // files[s_SMZHtauUp].first = Parameter.dataset.SMZHtauUp;
-
-    // files[s_SMggHtauDown].first = Parameter.dataset.SMggHtauDown;
-    // files[s_SMvbftauDown].first = Parameter.dataset.SMvbftauDown;
-    // files[s_SMWminustauDown].first = Parameter.dataset.SMWminustauDown;
-    // files[s_SMWplustauDown].first = Parameter.dataset.SMWplustauDown;
-    // files[s_SMZHtauDown].first = Parameter.dataset.SMZHtauDown;
 
     for(auto shift : shifts ){
       tmp = Parameter.dataset.ZtES;
@@ -104,7 +89,8 @@ CreateHistos::CreateHistos(TString testEnv_){
           files[s_ggH+shift+mass].first = tmp.ReplaceAll("TES",shift);
           files[s_ggH+shift+mass].second = mass;
 
-          tmp = Parameter.dataset.bbHtES;
+          if(testEnv == "nlo") tmp = Parameter.dataset.bbHtESNLO;
+          else tmp = Parameter.dataset.bbHtES;
           tmp = tmp.ReplaceAll("XXX",mass);
           files[s_bbH+shift+mass].first = tmp.ReplaceAll("TES",shift);
           files[s_bbH+shift+mass].second = mass;   
@@ -204,7 +190,7 @@ void CreateHistos::loadFile(TString filename){
   
   //NtupleView = new ntuple(tchain);
   NtupleView = std::unique_ptr<ntuple>(new ntuple(tchain ) );
-  cout<<"File: "<<filename<<" loaded"<<endl;
+  
  
 }
 
@@ -245,7 +231,7 @@ void CreateHistos::run(){
           initTSelections(cat,strVar);
           initVVSelections(cat,strVar);
           initEWKZSelections(cat,strVar);
-          initSignalSelections(cat,strVar);
+          //initSignalSelections(cat,strVar);
 
       }
     }
@@ -278,6 +264,13 @@ void CreateHistos::run(){
     }else{
       nentries = Int_t(NtupleView->fChain->GetEntries());
     }
+    if(nentries == 0){
+      cout<<"File: "<<filename<<" not available"<<endl;
+      continue;
+    }
+    else{
+      cout<<"File: "<<filename<<" loaded"<<endl;
+    }
     cout<<"The input chain contains: "<<nentries<<" events."<<endl;
     float perc;
 
@@ -296,7 +289,7 @@ void CreateHistos::run(){
 
 
       if( channel== "mt" && (NtupleView->Flag_badMuons || NtupleView->Flag_duplicateMuons || !NtupleView->trg_singlemuon) ) continue;
-      if( channel== "et" && !NtupleView->trg_singleelectron ) continue;
+      if( channel== "et" && ( !NtupleView->trg_singleelectron ) )continue;
       //      if( channel== "tt" && !( NtupleView->trg_doubletau || NtupleView->trg_singletau ) ) continue;
       if( channel== "tt" && !NtupleView->trg_doubletau ) continue;
 
@@ -773,11 +766,11 @@ double CreateHistos::getW_osss(TString strVar, TString cat){
   
   return this->GetHistbyName("OS_incl_"+s_W+sub,strVar)->Integral() / this->GetHistbyName("SS_incl_"+s_W+sub,strVar)->Integral();
 }
-double CreateHistos::getW_mtHL(TString strVar, TString cat){
+double CreateHistos::getW_mtHL(TString strVar, TString cat, TString sign){
   TString sub = "+" + strVar +"_" + cat;
   if(cat.Contains("btag") && !cat.Contains("nobtag") ) sub = "+" + strVar +"_" + cat+"_loosebtag";
-
-  return this->GetHistbyName(s_W+ "_MC"+ sub + "+",strVar)->Integral() / this->GetHistbyName(s_W+ "_MC"+ sub+"_wjets_cr+",strVar)->Integral();
+  if(sign == "OS")  return this->GetHistbyName(s_W+ "_MC"+ sub + "+",strVar)->Integral() / this->GetHistbyName(s_W+ "_MC"+ sub+"_wjets_cr+",strVar)->Integral();
+  if(sign == "SS")  return this->GetHistbyName(s_W+ "_MC"+ sub + "_qcd_cr+",strVar)->Integral() / this->GetHistbyName(s_W+ "_MC"+ sub+"_wjets_ss_cr+",strVar)->Integral();
 }
 double CreateHistos::getW_BtagConv(TString strVar, TString cat, TString cr){
   TString sub = "+" + strVar +"_" + cat ;
@@ -790,7 +783,8 @@ void CreateHistos::EstimateW(TString strVar, TString cat){
 
   double R_W = this->getW_osss(strVar, cat);
   double R_QCD = this->getQCD_osss(cat);
-  double HLExt = this->getW_mtHL(strVar, cat);
+  double HLExt_OS = this->getW_mtHL(strVar, cat,"OS");
+  double HLExt_SS = this->getW_mtHL(strVar, cat,"SS");
   double BConv_SR = 1.;
   double BConv_CR = 1.;
 
@@ -829,7 +823,8 @@ void CreateHistos::EstimateW(TString strVar, TString cat){
     cout << "W numbers " << cat << endl;
     cout << "R_W           "   << R_W << endl;
     cout << "R_QCD         " << R_QCD << endl;
-    cout << "HLExt         " << HLExt << endl;
+    cout << "HLExt_OS      " << HLExt_OS << endl;
+    cout << "HLExt_SS      " << HLExt_SS << endl;
     cout << "BConv_SR      "<< BConv_SR << endl;
     cout << "BConv_CR      "<< BConv_CR << endl;
     cout << "W_SS_CR_norm  "<< wjets_ss_cr_norm << endl;
@@ -851,13 +846,13 @@ void CreateHistos::EstimateW(TString strVar, TString cat){
   this->GetHistbyName(w_FakeShape_down +sub+"+",strVar)->Add( this->GetHistbyName(s_W+ "_MC_fakeShapeDown_" +sub +"+",strVar) );
 
   if(channel != "tt"){
-    this->GetHistbyName(s_W +sub +"+",strVar)->Scale( (wjets_ss_cr_norm * HLExt * R_W* BConv_SR ) / this->GetHistbyName(s_W +sub +"+",strVar)->Integral() );
-    this->GetHistbyName(s_W +sub +"_qcd_cr+",strVar)->Scale( (wjets_ss_cr_norm * HLExt* BConv_SR) / this->GetHistbyName(s_W +sub +"_qcd_cr+",strVar)->Integral() );
+    this->GetHistbyName(s_W +sub +"+",strVar)->Scale( (wjets_ss_cr_norm * HLExt_OS * R_W* BConv_SR ) / this->GetHistbyName(s_W +sub +"+",strVar)->Integral() );
+    this->GetHistbyName(s_W +sub +"_qcd_cr+",strVar)->Scale( (wjets_ss_cr_norm * HLExt_SS* BConv_SR) / this->GetHistbyName(s_W +sub +"_qcd_cr+",strVar)->Integral() );
     this->GetHistbyName(s_W+sub+"_wjets_cr+",strVar)->Scale( (wjets_ss_cr_norm *R_W * BConv_CR) / this->GetHistbyName(s_W+sub+"_wjets_cr+",strVar)->Integral() );
     this->GetHistbyName(s_W+sub+"_wjets_ss_cr+",strVar)->Scale( (wjets_ss_cr_norm * BConv_CR) / this->GetHistbyName(s_W+sub+"_wjets_ss_cr+",strVar)->Integral() );
 
-    this->GetHistbyName(w_FakeShape_up +sub +"+",strVar)->Scale( (wjets_ss_cr_norm * HLExt * R_W* BConv_SR ) / this->GetHistbyName(w_FakeShape_up +sub +"+",strVar)->Integral() );
-    this->GetHistbyName(w_FakeShape_down +sub +"+",strVar)->Scale( (wjets_ss_cr_norm * HLExt * R_W* BConv_SR ) / this->GetHistbyName(w_FakeShape_down +sub +"+",strVar)->Integral() );
+    this->GetHistbyName(w_FakeShape_up +sub +"+",strVar)->Scale( (wjets_ss_cr_norm * HLExt_OS * R_W* BConv_SR ) / this->GetHistbyName(w_FakeShape_up +sub +"+",strVar)->Integral() );
+    this->GetHistbyName(w_FakeShape_down +sub +"+",strVar)->Scale( (wjets_ss_cr_norm * HLExt_OS * R_W* BConv_SR ) / this->GetHistbyName(w_FakeShape_down +sub +"+",strVar)->Integral() );
   }
 }
 

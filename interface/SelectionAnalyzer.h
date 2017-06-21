@@ -30,6 +30,7 @@ class SelectionAnalyzer : public FFCalculator{
   int FFRest();
   double getJetToTauFakeUp( Float_t inputPt );
   double getJetToTauFakeDown( Float_t inputPt );
+  double getMSSMHighUncert(Float_t pt1, Float_t pt2,  TString shift);
 
 };
 

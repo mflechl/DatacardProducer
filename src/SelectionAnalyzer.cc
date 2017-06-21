@@ -34,8 +34,8 @@ void SelectionAnalyzer::initDYSelections(TString cat, TString strVar, TString ex
   this->GetHistbyName(s_ZTT+sub,strVar);
   this->GetHistbyName(s_ZTT+s_CMSdyShape+s_13TeVUp+sub,strVar);
   this->GetHistbyName(s_ZTT+s_CMSdyShape+s_13TeVDown+sub,strVar);
-  this->GetHistbyName(s_ZTT+s_CMStauScale+channel+"_"+s_13TeVUp+sub,strVar);
-  this->GetHistbyName(s_ZTT+s_CMStauScale+channel+"_"+s_13TeVDown+sub,strVar);
+  //this->GetHistbyName(s_ZTT+s_CMStauScale+channel+"_"+s_13TeVUp+sub,strVar);
+  //this->GetHistbyName(s_ZTT+s_CMStauScale+channel+"_"+s_13TeVDown+sub,strVar);
   this->GetHistbyName(s_ZTT+s_CMSzmumu+s_13TeVUp+sub,strVar);
   this->GetHistbyName(s_ZTT+s_CMSzmumu+s_13TeVDown+sub,strVar);
   this->GetHistbyName(s_ZTT+s_CMSmssmHigh+channel+"_"+s_13TeVUp+sub,strVar);
@@ -74,8 +74,8 @@ void SelectionAnalyzer::initTSelections(TString cat, TString strVar, TString ext
   this->GetHistbyName(s_TTT+sub,strVar);
   this->GetHistbyName(s_TTT+s_CMSttShape+s_13TeVUp+sub,strVar);
   this->GetHistbyName(s_TTT+s_CMSttShape+s_13TeVDown+sub,strVar);
-  this->GetHistbyName(s_TTT+s_CMStauScale+channel+"_"+s_13TeVUp+sub,strVar);
-  this->GetHistbyName(s_TTT+s_CMStauScale+channel+"_"+s_13TeVDown+sub,strVar);
+  //this->GetHistbyName(s_TTT+s_CMStauScale+channel+"_"+s_13TeVUp+sub,strVar);
+  //this->GetHistbyName(s_TTT+s_CMStauScale+channel+"_"+s_13TeVDown+sub,strVar);
   this->GetHistbyName(s_TTT+s_CMSmssmHigh+channel+"_"+s_13TeVUp+sub,strVar);
   this->GetHistbyName(s_TTT+s_CMSmssmHigh+channel+"_"+s_13TeVDown+sub,strVar);
   this->GetHistbyName(s_TTTjecUp+sub,strVar);
@@ -97,8 +97,8 @@ void SelectionAnalyzer::initVVSelections(TString cat, TString strVar, TString ex
   this->GetHistbyName(s_VVJjecUp+sub,strVar);
   this->GetHistbyName(s_VVJjecDown+sub,strVar);    
   this->GetHistbyName(s_VVT+sub,strVar);
-  this->GetHistbyName(s_VVT+s_CMStauScale+channel+"_"+s_13TeVUp+sub,strVar);
-  this->GetHistbyName(s_VVT+s_CMStauScale+channel+"_"+s_13TeVDown+sub,strVar);
+  //this->GetHistbyName(s_VVT+s_CMStauScale+channel+"_"+s_13TeVUp+sub,strVar);
+  //this->GetHistbyName(s_VVT+s_CMStauScale+channel+"_"+s_13TeVDown+sub,strVar);
   this->GetHistbyName(s_VVT+s_CMSmssmHigh+channel+"_"+s_13TeVUp+sub,strVar);
   this->GetHistbyName(s_VVT+s_CMSmssmHigh+channel+"_"+s_13TeVDown+sub,strVar);
   this->GetHistbyName(s_VVTjecUp+sub,strVar);
@@ -154,22 +154,6 @@ void SelectionAnalyzer::DYSelections(float var, float weight, TString cat, TStri
         float ttdown = NtupleView->zpt_weight_ttdown == 0 ? 1 : NtupleView->zpt_weight_ttdown;
 
         if( this->LSelection() ){
-          /*if( NtupleView->gen_match_2 == 1 ){
-            if(NtupleView->decayMode_2 != 0){
-              this->GetHistbyName(s_ZL+s_CMSefake+s_1p0p0+"_"+s_13TeVUp+sub,strVar)->Fill(usedVar, weight );
-              this->GetHistbyName(s_ZL+s_CMSefake+s_1p0p0+"_"+s_13TeVDown+sub,strVar)->Fill(usedVar, weight );
-            }
-            if(NtupleView->decayMode_2 != 1){
-              this->GetHistbyName(s_ZL+s_CMSefake+s_1p1p0+"_"+s_13TeVUp+sub,strVar)->Fill(usedVar, weight );
-              this->GetHistbyName(s_ZL+s_CMSefake+s_1p1p0+"_"+s_13TeVDown+sub,strVar)->Fill(usedVar, weight );
-            }  
-          }
-          else{
-              this->GetHistbyName(s_ZL+s_CMSefake+s_1p0p0+"_"+s_13TeVUp+sub,strVar)->Fill(usedVar, weight );
-              this->GetHistbyName(s_ZL+s_CMSefake+s_1p0p0+"_"+s_13TeVDown+sub,strVar)->Fill(usedVar, weight );
-              this->GetHistbyName(s_ZL+s_CMSefake+s_1p1p0+"_"+s_13TeVUp+sub,strVar)->Fill(usedVar, weight );
-              this->GetHistbyName(s_ZL+s_CMSefake+s_1p1p0+"_"+s_13TeVDown+sub,strVar)->Fill(usedVar, weight );            
-	      }*/
 
           this->GetHistbyName(s_ZLL+sub,strVar)->Fill(usedVar, weight);
           this->GetHistbyName(s_ZL+sub,strVar)->Fill(usedVar, weight);
@@ -209,8 +193,8 @@ void SelectionAnalyzer::DYSelections(float var, float weight, TString cat, TStri
 
           this->GetHistbyName(s_ZTT+s_CMSzmumu+s_13TeVUp+sub,strVar)->Fill(usedVar, weight * this->applyZmumuUncertainty( cat ) );
           this->GetHistbyName(s_ZTT+s_CMSzmumu+s_13TeVDown+sub,strVar)->Fill(usedVar, weight / this->applyZmumuUncertainty( cat ) );
-          if(channel != "tt"){
 
+          if(channel == "et"){
             if( this->ShapeSelector(0,"nom") ){
               this->GetHistbyName(s_ZTT+s_CMStauScale+s_1p0p0+"_"+s_13TeVUp+sub,strVar)->Fill(usedVar, weight);
               this->GetHistbyName(s_ZTT+s_CMStauScale+s_1p0p0+"_"+s_13TeVDown+sub,strVar)->Fill(usedVar, weight);
@@ -223,13 +207,14 @@ void SelectionAnalyzer::DYSelections(float var, float weight, TString cat, TStri
               this->GetHistbyName(s_ZTT+s_CMStauScale+s_3p0p0+"_"+s_13TeVUp+sub,strVar)->Fill(usedVar, weight);
               this->GetHistbyName(s_ZTT+s_CMStauScale+s_3p0p0+"_"+s_13TeVDown+sub,strVar)->Fill(usedVar, weight);
             }
-
-            this->GetHistbyName(s_ZTT+s_CMSmssmHigh+channel+"_"+s_13TeVUp+sub,strVar)->Fill(usedVar, weight *(1 + (0.2 * NtupleView->genPt_2)/1000 ) );
-            this->GetHistbyName(s_ZTT+s_CMSmssmHigh+channel+"_"+s_13TeVDown+sub,strVar)->Fill(usedVar, weight*(1 - (0.2 * NtupleView->genPt_2)/1000 ) );
+          }
+          if(channel != "tt"){
+            this->GetHistbyName(s_ZTT+s_CMSmssmHigh+channel+"_"+s_13TeVUp+sub,strVar)->Fill(usedVar, weight * this->getMSSMHighUncert(NtupleView->genPt_2, 0, "up") );
+            this->GetHistbyName(s_ZTT+s_CMSmssmHigh+channel+"_"+s_13TeVDown+sub,strVar)->Fill(usedVar, weight* this->getMSSMHighUncert(NtupleView->genPt_2, 0, "down") );
           }
           else{
-            this->GetHistbyName(s_ZTT+s_CMSmssmHigh+channel+"_"+s_13TeVUp+sub,strVar)->Fill(usedVar, weight *(1 + 0.2*NtupleView->genPt_1/1000 )*(1 + 0.2*NtupleView->genPt_2/1000 ) ); 
-            this->GetHistbyName(s_ZTT+s_CMSmssmHigh+channel+"_"+s_13TeVDown+sub,strVar)->Fill(usedVar, weight *(1 - 0.2*NtupleView->genPt_1/1000 )*(1 - 0.2*NtupleView->genPt_2/1000 ) );
+            this->GetHistbyName(s_ZTT+s_CMSmssmHigh+channel+"_"+s_13TeVUp+sub,strVar)->Fill(usedVar, weight * this->getMSSMHighUncert(NtupleView->genPt_1,NtupleView->genPt_2, "up") ); 
+            this->GetHistbyName(s_ZTT+s_CMSmssmHigh+channel+"_"+s_13TeVDown+sub,strVar)->Fill(usedVar, weight * this->getMSSMHighUncert(NtupleView->genPt_1,NtupleView->genPt_2, "down") );
           }
 
         }
@@ -266,22 +251,6 @@ void SelectionAnalyzer::DYSelections(float var, float weight, TString cat, TStri
 
       
     }
-    /*else if(fname == s_ZEUp && NtupleView->gen_match_2 == 1 && this->Baseline(sign,cat) ) {
-        if(NtupleView->decayMode_2 == 0){
-          this->GetHistbyName(s_ZL+s_CMSefake+s_1p0p0+"_"+s_13TeVUp+sub,strVar)->Fill(usedVar, weight );
-        }
-        if(NtupleView->decayMode_2 == 1){
-          this->GetHistbyName(s_ZL+s_CMSefake+s_1p1p0+"_"+s_13TeVUp+sub,strVar)->Fill(usedVar, weight );
-        }
-    }
-    else if(fname == s_ZEDown && NtupleView->gen_match_2 == 1 && this->Baseline(sign,cat) ){
-        if(NtupleView->decayMode_2 == 0){
-          this->GetHistbyName(s_ZL+s_CMSefake+s_1p0p0+"_"+s_13TeVDown+sub,strVar)->Fill(usedVar, weight );
-        }
-        if(NtupleView->decayMode_2 == 1){
-          this->GetHistbyName(s_ZL+s_CMSefake+s_1p1p0+"_"+s_13TeVDown+sub,strVar)->Fill(usedVar, weight );
-        }
-	}*/
     else if(fname == s_ZE0Up && this->Baseline(sign,cat) && this->LSelection() ) {
       this->GetHistbyName(s_ZL+s_CMSefake+s_1p0p0+"_"+s_13TeVUp+sub,strVar)->Fill(usedVar, weight );
     }
@@ -294,43 +263,29 @@ void SelectionAnalyzer::DYSelections(float var, float weight, TString cat, TStri
     else if(fname == s_ZE1Down && this->Baseline(sign,cat) && this->LSelection() ) {
       this->GetHistbyName(s_ZL+s_CMSefake+s_1p1p0+"_"+s_13TeVDown+sub,strVar)->Fill(usedVar, weight );
     }
-
-    else if(fname == s_Z+"T0Up"){
-      if( this->Baseline(sign,cat) && this->TSelection() ){
+    else if(fname == s_Z+"T0Up" && this->Baseline(sign,cat) && this->TSelection() ){
         this->GetHistbyName(fname.ReplaceAll("T0Up","TT")+s_CMStauScale+s_1p0p0+"_"+s_13TeVUp+sub,strVar)->Fill(usedVar, weight);
         return;
-      }
     }
-    else if(fname == s_Z+"T1Up"){
-      if( this->Baseline(sign,cat) && this->TSelection() ){
+    else if(fname == s_Z+"T1Up" && this->Baseline(sign,cat) && this->TSelection()){
         this->GetHistbyName(fname.ReplaceAll("T1Up","TT")+s_CMStauScale+s_1p1p0+"_"+s_13TeVUp+sub,strVar)->Fill(usedVar, weight);
         return;
-      }
     }
-    else if(fname == s_Z+"T10Up"){
-      if( this->Baseline(sign,cat) && this->TSelection() ){
+    else if(fname == s_Z+"T10Up" && this->Baseline(sign,cat) && this->TSelection()){
         this->GetHistbyName(fname.ReplaceAll("T10Up","TT")+s_CMStauScale+s_3p0p0+"_"+s_13TeVUp+sub,strVar)->Fill(usedVar, weight);
         return;
-      }
     }
-
-    else if(fname == s_Z+"T0Down"){
-      if( this->Baseline(sign,cat) && this->TSelection() ){
+    else if(fname == s_Z+"T0Down" && this->Baseline(sign,cat) && this->TSelection()){
         this->GetHistbyName(fname.ReplaceAll("T0Down","TT")+s_CMStauScale+s_1p0p0+"_"+s_13TeVDown+sub,strVar)->Fill(usedVar, weight);
         return;
-      }
     }
-    else if(fname == s_Z+"T1Down"){
-      if( this->Baseline(sign,cat) && this->TSelection() ){
+    else if(fname == s_Z+"T1Down" && this->Baseline(sign,cat) && this->TSelection()){
         this->GetHistbyName(fname.ReplaceAll("T1Down","TT")+s_CMStauScale+s_1p1p0+"_"+s_13TeVDown+sub,strVar)->Fill(usedVar, weight);
         return;
-      }
     }
-    else if(fname == s_Z+"T10Down"){
-      if( this->Baseline(sign,cat) && this->TSelection() ){
+    else if(fname == s_Z+"T10Down" && this->Baseline(sign,cat) && this->TSelection()){
         this->GetHistbyName(fname.ReplaceAll("T10Down","TT")+s_CMStauScale+s_3p0p0+"_"+s_13TeVDown+sub,strVar)->Fill(usedVar, weight);
         return;
-      }    
     }
 
     else if(fname == s_ZtauUp){
@@ -503,7 +458,7 @@ void SelectionAnalyzer::TSelections(float var, float weight, TString cat, TStrin
 
         if( this->TSelection() || this->LSelection() ){
 
-          if(channel != "tt"){
+          if(channel == "et"){
             if(this->ShapeSelector(0,  "nom")){
               this->GetHistbyName(s_TTT+s_CMStauScale+s_1p0p0+"_"+s_13TeVUp+sub,strVar)->Fill(usedVar, weight);
               this->GetHistbyName(s_TTT+s_CMStauScale+s_1p0p0+"_"+s_13TeVDown+sub,strVar)->Fill(usedVar, weight);
@@ -515,11 +470,13 @@ void SelectionAnalyzer::TSelections(float var, float weight, TString cat, TStrin
             if(this->ShapeSelector(10,  "nom")){
               this->GetHistbyName(s_TTT+s_CMStauScale+s_3p0p0+"_"+s_13TeVUp+sub,strVar)->Fill(usedVar, weight);
               this->GetHistbyName(s_TTT+s_CMStauScale+s_3p0p0+"_"+s_13TeVDown+sub,strVar)->Fill(usedVar, weight);
-            }
+            }            
+          }
+          if(channel != "tt"){
 
       	    if( this->TSelection() ){
-      	      this->GetHistbyName(s_TTT+s_CMSmssmHigh+channel+"_"+s_13TeVUp+sub,strVar)->Fill(usedVar, weight *(1 + (0.2 * NtupleView->genPt_2)/1000 ) );
-      	      this->GetHistbyName(s_TTT+s_CMSmssmHigh+channel+"_"+s_13TeVDown+sub,strVar)->Fill(usedVar, weight*(1 - (0.2 * NtupleView->genPt_2)/1000 ) );
+      	      this->GetHistbyName(s_TTT+s_CMSmssmHigh+channel+"_"+s_13TeVUp+sub,strVar)->Fill(usedVar, weight *this->getMSSMHighUncert(NtupleView->genPt_2, 0., "up") );
+      	      this->GetHistbyName(s_TTT+s_CMSmssmHigh+channel+"_"+s_13TeVDown+sub,strVar)->Fill(usedVar, weight*this->getMSSMHighUncert(NtupleView->genPt_2, 0., "down") );
       	    }
       	    else{
       	      this->GetHistbyName(s_TTT+s_CMSmssmHigh+channel+"_"+s_13TeVUp+sub,strVar)->Fill(usedVar, weight );
@@ -528,16 +485,16 @@ void SelectionAnalyzer::TSelections(float var, float weight, TString cat, TStrin
           }
           else{
       	    if(this->TSelection() ){
-      	      this->GetHistbyName(s_TTT+s_CMSmssmHigh+channel+"_"+s_13TeVUp+sub,strVar)->Fill(usedVar, weight *(1 + 0.2*NtupleView->genPt_1/1000 )*(1 + 0.2*NtupleView->genPt_2/1000 ) );
-      	      this->GetHistbyName(s_TTT+s_CMSmssmHigh+channel+"_"+s_13TeVDown+sub,strVar)->Fill(usedVar, weight *(1 - 0.2*NtupleView->genPt_1/1000 )*(1 - 0.2*NtupleView->genPt_2/1000 ) );
+      	      this->GetHistbyName(s_TTT+s_CMSmssmHigh+channel+"_"+s_13TeVUp+sub,strVar)->Fill(usedVar, weight *this->getMSSMHighUncert(NtupleView->genPt_1, NtupleView->genPt_2, "up") );
+      	      this->GetHistbyName(s_TTT+s_CMSmssmHigh+channel+"_"+s_13TeVDown+sub,strVar)->Fill(usedVar, weight *this->getMSSMHighUncert(NtupleView->genPt_1, NtupleView->genPt_2, "down") );
       	    }
 	          else if( NtupleView->gen_match_1 == 5 ){
-              this->GetHistbyName(s_TTT+s_CMSmssmHigh+channel+"_"+s_13TeVUp+sub,strVar)->Fill(usedVar, weight *(1 + (0.2 * NtupleView->genPt_1)/1000 ) );
-              this->GetHistbyName(s_TTT+s_CMSmssmHigh+channel+"_"+s_13TeVDown+sub,strVar)->Fill(usedVar, weight*(1 - (0.2 * NtupleView->genPt_1)/1000 ) );
+              this->GetHistbyName(s_TTT+s_CMSmssmHigh+channel+"_"+s_13TeVUp+sub,strVar)->Fill(usedVar, weight *this->getMSSMHighUncert(NtupleView->genPt_1, 0., "up") );
+              this->GetHistbyName(s_TTT+s_CMSmssmHigh+channel+"_"+s_13TeVDown+sub,strVar)->Fill(usedVar, weight*this->getMSSMHighUncert(NtupleView->genPt_1, 0., "down") );
             }
             else if( NtupleView->gen_match_2 == 5 ){
-              this->GetHistbyName(s_TTT+s_CMSmssmHigh+channel+"_"+s_13TeVUp+sub,strVar)->Fill(usedVar, weight *(1 + (0.2 * NtupleView->genPt_2)/1000 ) );
-              this->GetHistbyName(s_TTT+s_CMSmssmHigh+channel+"_"+s_13TeVDown+sub,strVar)->Fill(usedVar, weight*(1 - (0.2 * NtupleView->genPt_2)/1000 ) );
+              this->GetHistbyName(s_TTT+s_CMSmssmHigh+channel+"_"+s_13TeVUp+sub,strVar)->Fill(usedVar, weight *this->getMSSMHighUncert(NtupleView->genPt_2, 0., "up") );
+              this->GetHistbyName(s_TTT+s_CMSmssmHigh+channel+"_"+s_13TeVDown+sub,strVar)->Fill(usedVar, weight*this->getMSSMHighUncert(NtupleView->genPt_2, 0., "down") );
 	           }
       	    else{
       	      this->GetHistbyName(s_TTT+s_CMSmssmHigh+channel+"_"+s_13TeVUp+sub,strVar)->Fill(usedVar, weight );
@@ -555,42 +512,30 @@ void SelectionAnalyzer::TSelections(float var, float weight, TString cat, TStrin
       
     }
 
-    else if(fname == s_TT+"T0Up"){
-      if( this->Baseline(sign,cat) && ( this->TSelection() || this->LSelection() ) ){
+    else if(fname == s_TT+"T0Up" && this->Baseline(sign,cat) && ( this->TSelection() || this->LSelection() ) ){
         this->GetHistbyName(fname.ReplaceAll("T0Up","T")+s_CMStauScale+s_1p0p0+"_"+s_13TeVUp+sub,strVar)->Fill(usedVar, weight);
         return;
-      }
     }
-    else if(fname == s_TT+"T1Up"){
-      if( this->Baseline(sign,cat) && ( this->TSelection() || this->LSelection() ) ){
+    else if(fname == s_TT+"T1Up" && this->Baseline(sign,cat) && ( this->TSelection() || this->LSelection() ) ){
         this->GetHistbyName(fname.ReplaceAll("T1Up","T")+s_CMStauScale+s_1p1p0+"_"+s_13TeVUp+sub,strVar)->Fill(usedVar, weight);
         return;
-      }
     }
-    else if(fname == s_TT+"T10Up"){
-      if( this->Baseline(sign,cat) && ( this->TSelection() || this->LSelection() ) ){
+    else if(fname == s_TT+"T10Up" && this->Baseline(sign,cat) && ( this->TSelection() || this->LSelection() ) ){
         this->GetHistbyName(fname.ReplaceAll("T10Up","T")+s_CMStauScale+s_3p0p0+"_"+s_13TeVUp+sub,strVar)->Fill(usedVar, weight);
         return;
-      }
     }
 
-    else if(fname == s_TT+"T0Down"){
-      if( this->Baseline(sign,cat) && ( this->TSelection() || this->LSelection() ) ){
+    else if(fname == s_TT+"T0Down" && this->Baseline(sign,cat) && ( this->TSelection() || this->LSelection() ) ){
         this->GetHistbyName(fname.ReplaceAll("T0Down","T")+s_CMStauScale+s_1p0p0+"_"+s_13TeVDown+sub,strVar)->Fill(usedVar, weight);
         return;
-      }
     }
-    else if(fname == s_TT+"T1Down"){
-      if( this->Baseline(sign,cat) && ( this->TSelection() || this->LSelection() ) ){
+    else if(fname == s_TT+"T1Down" && this->Baseline(sign,cat) && ( this->TSelection() || this->LSelection() ) ){
         this->GetHistbyName(fname.ReplaceAll("T1Down","T")+s_CMStauScale+s_1p1p0+"_"+s_13TeVDown+sub,strVar)->Fill(usedVar, weight);
         return;
-      }
     }
-    else if(fname == s_TT+"T10Down"){
-      if( this->Baseline(sign,cat) && ( this->TSelection() || this->LSelection() ) ){
+    else if(fname == s_TT+"T10Down" && this->Baseline(sign,cat) && ( this->TSelection() || this->LSelection() ) ){
         this->GetHistbyName(fname.ReplaceAll("T10Down","T")+s_CMStauScale+s_3p0p0+"_"+s_13TeVDown+sub,strVar)->Fill(usedVar, weight);
         return;
-      }    
     }
 
     else if(fname == s_TTtauUp){
@@ -756,10 +701,7 @@ void SelectionAnalyzer::VVSelections(float var, float weight, TString cat, TStri
         }
         if( this->TSelection() || this->LSelection() ){
 
-
-
-          if(channel != "tt"){
-
+          if(channel == "et"){
             if( this->ShapeSelector(0, "nom") ){
               this->GetHistbyName(s_VVT+s_CMStauScale+s_1p0p0+"_"+s_13TeVUp+sub,strVar)->Fill(usedVar, weight);
               this->GetHistbyName(s_VVT+s_CMStauScale+s_1p0p0+"_"+s_13TeVDown+sub,strVar)->Fill(usedVar, weight);
@@ -771,11 +713,12 @@ void SelectionAnalyzer::VVSelections(float var, float weight, TString cat, TStri
             if( this->ShapeSelector(10, "nom")){
               this->GetHistbyName(s_VVT+s_CMStauScale+s_3p0p0+"_"+s_13TeVUp+sub,strVar)->Fill(usedVar, weight);
               this->GetHistbyName(s_VVT+s_CMStauScale+s_3p0p0+"_"+s_13TeVDown+sub,strVar)->Fill(usedVar, weight);
-            }
-
+            }           
+          }
+          if(channel != "tt"){
       	    if( this->TSelection() ){
-      	      this->GetHistbyName(s_VVT+s_CMSmssmHigh+channel+"_"+s_13TeVUp+sub,strVar)->Fill(usedVar, weight *(1 + (0.2 * NtupleView->genPt_2)/1000 ) );
-      	      this->GetHistbyName(s_VVT+s_CMSmssmHigh+channel+"_"+s_13TeVDown+sub,strVar)->Fill(usedVar, weight*(1 - (0.2 * NtupleView->genPt_2)/1000 ) );
+      	      this->GetHistbyName(s_VVT+s_CMSmssmHigh+channel+"_"+s_13TeVUp+sub,strVar)->Fill(usedVar, weight *this->getMSSMHighUncert(NtupleView->genPt_2, 0., "up") );
+      	      this->GetHistbyName(s_VVT+s_CMSmssmHigh+channel+"_"+s_13TeVDown+sub,strVar)->Fill(usedVar, weight*this->getMSSMHighUncert(NtupleView->genPt_2, 0., "down") );
       	    }
       	    else{
       	      this->GetHistbyName(s_VVT+s_CMSmssmHigh+channel+"_"+s_13TeVUp+sub,strVar)->Fill(usedVar, weight );
@@ -784,16 +727,16 @@ void SelectionAnalyzer::VVSelections(float var, float weight, TString cat, TStri
           }
           else{
       	    if( this->TSelection() ){
-      	      this->GetHistbyName(s_VVT+s_CMSmssmHigh+channel+"_"+s_13TeVUp+sub,strVar)->Fill(usedVar, weight *(1 + 0.2*NtupleView->genPt_1/1000 )*(1 + 0.2*NtupleView->genPt_2/1000 ) ); 
-      	      this->GetHistbyName(s_VVT+s_CMSmssmHigh+channel+"_"+s_13TeVDown+sub,strVar)->Fill(usedVar, weight *(1 - 0.2*NtupleView->genPt_1/1000 )*(1 - 0.2*NtupleView->genPt_2/1000 ) );
+      	      this->GetHistbyName(s_VVT+s_CMSmssmHigh+channel+"_"+s_13TeVUp+sub,strVar)->Fill(usedVar, weight *this->getMSSMHighUncert(NtupleView->genPt_1,NtupleView->genPt_2, "up") ); 
+      	      this->GetHistbyName(s_VVT+s_CMSmssmHigh+channel+"_"+s_13TeVDown+sub,strVar)->Fill(usedVar, weight *this->getMSSMHighUncert(NtupleView->genPt_1,NtupleView->genPt_2, "down") );
       	    }
             else if( NtupleView->gen_match_1 == 5 ){
-              this->GetHistbyName(s_VVT+s_CMSmssmHigh+channel+"_"+s_13TeVUp+sub,strVar)->Fill(usedVar, weight *(1 + (0.2 * NtupleView->genPt_1)/1000 ) );
-              this->GetHistbyName(s_VVT+s_CMSmssmHigh+channel+"_"+s_13TeVDown+sub,strVar)->Fill(usedVar, weight*(1 - (0.2 * NtupleView->genPt_1)/1000 ) );
+              this->GetHistbyName(s_VVT+s_CMSmssmHigh+channel+"_"+s_13TeVUp+sub,strVar)->Fill(usedVar, weight *this->getMSSMHighUncert(NtupleView->genPt_1, 0., "up") );
+              this->GetHistbyName(s_VVT+s_CMSmssmHigh+channel+"_"+s_13TeVDown+sub,strVar)->Fill(usedVar, weight*this->getMSSMHighUncert(NtupleView->genPt_1, 0., "down") );
             }
             else if( NtupleView->gen_match_2 == 5 ){
-              this->GetHistbyName(s_VVT+s_CMSmssmHigh+channel+"_"+s_13TeVUp+sub,strVar)->Fill(usedVar, weight *(1 + (0.2 * NtupleView->genPt_2)/1000 ) );
-              this->GetHistbyName(s_VVT+s_CMSmssmHigh+channel+"_"+s_13TeVDown+sub,strVar)->Fill(usedVar, weight*(1 - (0.2 * NtupleView->genPt_2)/1000 ) );
+              this->GetHistbyName(s_VVT+s_CMSmssmHigh+channel+"_"+s_13TeVUp+sub,strVar)->Fill(usedVar, weight *this->getMSSMHighUncert(NtupleView->genPt_2, 0., "up") );
+              this->GetHistbyName(s_VVT+s_CMSmssmHigh+channel+"_"+s_13TeVDown+sub,strVar)->Fill(usedVar, weight*this->getMSSMHighUncert(NtupleView->genPt_2, 0., "down") );
 	          }
       	    else{
       	      this->GetHistbyName(s_VVT+s_CMSmssmHigh+channel+"_"+s_13TeVUp+sub,strVar)->Fill(usedVar, weight );
@@ -809,42 +752,24 @@ void SelectionAnalyzer::VVSelections(float var, float weight, TString cat, TStri
       if(calcFF) this->applyFF(usedVar,weight,cat,strVar,fname,0,extend);
       
     }
-    else if(fname == s_VV+"T0Up"){
-      if( this->Baseline(sign,cat) && ( this->TSelection() || this->LSelection() ) ){
+    else if(fname == s_VV+"T0Up" && this->Baseline(sign,cat) && ( this->TSelection() || this->LSelection() ) ){
         this->GetHistbyName(fname.ReplaceAll("T0Up","T")+s_CMStauScale+s_1p0p0+"_"+s_13TeVUp+sub,strVar)->Fill(usedVar, weight);
-        return;
-      }
     }
-    else if(fname == s_VV+"T1Up"){
-      if( this->Baseline(sign,cat) && ( this->TSelection() || this->LSelection() ) ){
+    else if(fname == s_VV+"T1Up" && this->Baseline(sign,cat) && ( this->TSelection() || this->LSelection() ) ){
         this->GetHistbyName(fname.ReplaceAll("T1Up","T")+s_CMStauScale+s_1p1p0+"_"+s_13TeVUp+sub,strVar)->Fill(usedVar, weight);
-        return;
-      }
     }
-    else if(fname == s_VV+"T10Up"){
-      if( this->Baseline(sign,cat) && ( this->TSelection() || this->LSelection() ) ){
+    else if(fname == s_VV+"T10Up" && this->Baseline(sign,cat) && ( this->TSelection() || this->LSelection() ) ){
         this->GetHistbyName(fname.ReplaceAll("T10Up","T")+s_CMStauScale+s_3p0p0+"_"+s_13TeVUp+sub,strVar)->Fill(usedVar, weight);
-        return;
-      }
     }
 
-    else if(fname == s_VV+"T0Down"){
-      if( this->Baseline(sign,cat) && ( this->TSelection() || this->LSelection() ) ){
+    else if(fname == s_VV+"T0Down" && this->Baseline(sign,cat) && ( this->TSelection() || this->LSelection() ) ){
         this->GetHistbyName(fname.ReplaceAll("T0Down","T")+s_CMStauScale+s_1p0p0+"_"+s_13TeVDown+sub,strVar)->Fill(usedVar, weight);
-        return;
-      }
     }
-    else if(fname == s_VV+"T1Down"){
-      if( this->Baseline(sign,cat) && ( this->TSelection() || this->LSelection() ) ){
+    else if(fname == s_VV+"T1Down" && this->Baseline(sign,cat) && ( this->TSelection() || this->LSelection() ) ){
         this->GetHistbyName(fname.ReplaceAll("T1Down","T")+s_CMStauScale+s_1p1p0+"_"+s_13TeVDown+sub,strVar)->Fill(usedVar, weight);
-        return;
-      }
     }
-    else if(fname == s_VV+"T10Down"){
-      if( this->Baseline(sign,cat) && ( this->TSelection() || this->LSelection() ) ){
-        this->GetHistbyName(fname.ReplaceAll("T10Down","T")+s_CMStauScale+s_3p0p0+"_"+s_13TeVDown+sub,strVar)->Fill(usedVar, weight);
-        return;
-      }    
+    else if(fname == s_VV+"T10Down" && this->Baseline(sign,cat) && ( this->TSelection() || this->LSelection() ) ){
+        this->GetHistbyName(fname.ReplaceAll("T10Down","T")+s_CMStauScale+s_3p0p0+"_"+s_13TeVDown+sub,strVar)->Fill(usedVar, weight);    
     }
     else if(fname == s_VVtauUp){
       if( this->Baseline(sign,cat) ){
@@ -943,20 +868,22 @@ void SelectionAnalyzer::signalSelections(float var, float weight, TString cat, T
 
       if(channel != "tt"){
         if(this->TSelection()){
-          if(this->ShapeSelector(0,  "nom")){
-            this->GetHistbyName(fname+mass+s_CMStauScale+s_1p0p0+"_"+s_13TeVUp+sub,strVar)->Fill(usedVar, weight);
-            this->GetHistbyName(fname+mass+s_CMStauScale+s_1p0p0+"_"+s_13TeVDown+sub,strVar)->Fill(usedVar, weight);
+          if(channel == "et"){
+            if(this->ShapeSelector(0,  "nom")){
+              this->GetHistbyName(fname+mass+s_CMStauScale+s_1p0p0+"_"+s_13TeVUp+sub,strVar)->Fill(usedVar, weight);
+              this->GetHistbyName(fname+mass+s_CMStauScale+s_1p0p0+"_"+s_13TeVDown+sub,strVar)->Fill(usedVar, weight);
+            }
+            if(this->ShapeSelector(1,  "nom")){
+              this->GetHistbyName(fname+mass+s_CMStauScale+s_1p1p0+"_"+s_13TeVUp+sub,strVar)->Fill(usedVar, weight);
+              this->GetHistbyName(fname+mass+s_CMStauScale+s_1p1p0+"_"+s_13TeVDown+sub,strVar)->Fill(usedVar, weight);
+            }
+            if(this->ShapeSelector(10,  "nom")){
+              this->GetHistbyName(fname+mass+s_CMStauScale+s_3p0p0+"_"+s_13TeVUp+sub,strVar)->Fill(usedVar, weight);
+              this->GetHistbyName(fname+mass+s_CMStauScale+s_3p0p0+"_"+s_13TeVDown+sub,strVar)->Fill(usedVar, weight);
+            }
           }
-          if(this->ShapeSelector(1,  "nom")){
-            this->GetHistbyName(fname+mass+s_CMStauScale+s_1p1p0+"_"+s_13TeVUp+sub,strVar)->Fill(usedVar, weight);
-            this->GetHistbyName(fname+mass+s_CMStauScale+s_1p1p0+"_"+s_13TeVDown+sub,strVar)->Fill(usedVar, weight);
-          }
-          if(this->ShapeSelector(10,  "nom")){
-            this->GetHistbyName(fname+mass+s_CMStauScale+s_3p0p0+"_"+s_13TeVUp+sub,strVar)->Fill(usedVar, weight);
-            this->GetHistbyName(fname+mass+s_CMStauScale+s_3p0p0+"_"+s_13TeVDown+sub,strVar)->Fill(usedVar, weight);
-          }
-          this->GetHistbyName(fname+mass+s_CMSmssmHigh+channel+"_"+s_13TeVUp+sub,strVar)->Fill(usedVar, weight *(1 + (0.2 * NtupleView->genPt_2)/1000 ) );
-          this->GetHistbyName(fname+mass+s_CMSmssmHigh+channel+"_"+s_13TeVDown+sub,strVar)->Fill(usedVar, weight*(1 - (0.2 * NtupleView->genPt_2)/1000 ) );
+          this->GetHistbyName(fname+mass+s_CMSmssmHigh+channel+"_"+s_13TeVUp+sub,strVar)->Fill(usedVar, weight *this->getMSSMHighUncert(NtupleView->genPt_2, 0., "up") );
+          this->GetHistbyName(fname+mass+s_CMSmssmHigh+channel+"_"+s_13TeVDown+sub,strVar)->Fill(usedVar, weight*this->getMSSMHighUncert(NtupleView->genPt_2, 0., "down") );
         }
         else{
           this->GetHistbyName(fname+mass+s_CMSmssmHigh+channel+"_"+s_13TeVUp+sub,strVar)->Fill(usedVar, weight );
@@ -965,16 +892,16 @@ void SelectionAnalyzer::signalSelections(float var, float weight, TString cat, T
       }
       if(channel == "tt"){
         if( this->TSelection() ){
-          this->GetHistbyName(fname+mass+s_CMSmssmHigh+channel+"_"+s_13TeVUp+sub,strVar)->Fill(usedVar, weight *(1 + 0.2*NtupleView->genPt_1/1000 )*(1 + 0.2*NtupleView->genPt_2/1000 ) );
-          this->GetHistbyName(fname+mass+s_CMSmssmHigh+channel+"_"+s_13TeVDown+sub,strVar)->Fill(usedVar, weight *(1 - 0.2*NtupleView->genPt_1/1000 )*(1 - 0.2*NtupleView->genPt_2/1000 ) );
+          this->GetHistbyName(fname+mass+s_CMSmssmHigh+channel+"_"+s_13TeVUp+sub,strVar)->Fill(usedVar, weight *this->getMSSMHighUncert(NtupleView->genPt_1, NtupleView->genPt_2, "up") );
+          this->GetHistbyName(fname+mass+s_CMSmssmHigh+channel+"_"+s_13TeVDown+sub,strVar)->Fill(usedVar, weight *this->getMSSMHighUncert(NtupleView->genPt_1, NtupleView->genPt_2, "down") );
         }
         else if( NtupleView->gen_match_1 == 5 ){
-          this->GetHistbyName(fname+mass+s_CMSmssmHigh+channel+"_"+s_13TeVUp+sub,strVar)->Fill(usedVar, weight *(1 + (0.2 * NtupleView->genPt_1)/1000 ) );
-          this->GetHistbyName(fname+mass+s_CMSmssmHigh+channel+"_"+s_13TeVDown+sub,strVar)->Fill(usedVar, weight*(1 - (0.2 * NtupleView->genPt_1)/1000 ) );
+          this->GetHistbyName(fname+mass+s_CMSmssmHigh+channel+"_"+s_13TeVUp+sub,strVar)->Fill(usedVar, weight *this->getMSSMHighUncert(NtupleView->genPt_1, 0., "up") );
+          this->GetHistbyName(fname+mass+s_CMSmssmHigh+channel+"_"+s_13TeVDown+sub,strVar)->Fill(usedVar, weight*this->getMSSMHighUncert(NtupleView->genPt_1, 0., "down") );
         }
         else if( NtupleView->gen_match_2 == 5 ){
-          this->GetHistbyName(fname+mass+s_CMSmssmHigh+channel+"_"+s_13TeVUp+sub,strVar)->Fill(usedVar, weight *(1 + (0.2 * NtupleView->genPt_2)/1000 ) );
-          this->GetHistbyName(fname+mass+s_CMSmssmHigh+channel+"_"+s_13TeVDown+sub,strVar)->Fill(usedVar, weight*(1 - (0.2 * NtupleView->genPt_2)/1000 ) );
+          this->GetHistbyName(fname+mass+s_CMSmssmHigh+channel+"_"+s_13TeVUp+sub,strVar)->Fill(usedVar, weight * this->getMSSMHighUncert(NtupleView->genPt_2, 0., "up") );
+          this->GetHistbyName(fname+mass+s_CMSmssmHigh+channel+"_"+s_13TeVDown+sub,strVar)->Fill(usedVar, weight* this->getMSSMHighUncert(NtupleView->genPt_2, 0., "down") );
         }
         else{
           this->GetHistbyName(fname+mass+s_CMSmssmHigh+channel+"_"+s_13TeVUp+sub,strVar)->Fill(usedVar, weight );
@@ -1003,42 +930,23 @@ void SelectionAnalyzer::signalSelections(float var, float weight, TString cat, T
     return;
   }
 
-  else if( fname .Contains("T0Up") ){
-    if( this->Baseline(sign,cat)  ){
+  else if( fname .Contains("T0Up") && this->Baseline(sign,cat) ){
       this->GetHistbyName(fname.ReplaceAll("T0Up","")+mass+s_CMStauScale+s_1p0p0+"_"+s_13TeVUp+sub,strVar)->Fill(usedVar, weight);
-      return;
-    }
   }
-  else if(fname.Contains("T1Up")){
-    if( this->Baseline(sign,cat)  ){
+  else if(fname.Contains("T1Up") && this->Baseline(sign,cat) ){
       this->GetHistbyName(fname.ReplaceAll("T1Up","")+mass+s_CMStauScale+s_1p1p0+"_"+s_13TeVUp+sub,strVar)->Fill(usedVar, weight);
-      return;
-    }
   }
-  else if(fname.Contains("T10Up")){
-    if( this->Baseline(sign,cat)  ){
+  else if(fname.Contains("T10Up") && this->Baseline(sign,cat) ){
       this->GetHistbyName(fname.ReplaceAll("T10Up","")+mass+s_CMStauScale+s_3p0p0+"_"+s_13TeVUp+sub,strVar)->Fill(usedVar, weight);
-      return;
-    }
   }
-
-  else if(fname.Contains("T0Down")){
-    if( this->Baseline(sign,cat)  ){
+  else if(fname.Contains("T0Down") && this->Baseline(sign,cat) ){
       this->GetHistbyName(fname.ReplaceAll("T0Down","")+mass+s_CMStauScale+s_1p0p0+"_"+s_13TeVDown+sub,strVar)->Fill(usedVar, weight);
-      return;
-    }
   }
-  else if(fname.Contains("T1Down")){
-    if( this->Baseline(sign,cat)  ){
+  else if(fname.Contains("T1Down") && this->Baseline(sign,cat) ){
       this->GetHistbyName(fname.ReplaceAll("T1Down","")+mass+s_CMStauScale+s_1p1p0+"_"+s_13TeVDown+sub,strVar)->Fill(usedVar, weight);
-      return;
-    }
   }
-  else if(fname.Contains("T10Down")){
-    if( this->Baseline(sign,cat)  ){
-      this->GetHistbyName(fname.ReplaceAll("T10Down","")+mass+s_CMStauScale+s_3p0p0+"_"+s_13TeVDown+sub,strVar)->Fill(usedVar, weight);
-      return;
-    }    
+  else if(fname.Contains("T10Down") && this->Baseline(sign,cat) ){
+      this->GetHistbyName(fname.ReplaceAll("T10Down","")+mass+s_CMStauScale+s_3p0p0+"_"+s_13TeVDown+sub,strVar)->Fill(usedVar, weight);    
   }
   else if( fname.Contains(s_tauUp) ){
 
@@ -1159,6 +1067,12 @@ double SelectionAnalyzer::getJetToTauFakeDown( Float_t inputPt ){
   if(inputPt<200) return 1+(0.2*inputPt/100);
   else return 1.4;
   
+}
+
+double SelectionAnalyzer::getMSSMHighUncert(Float_t pt1, Float_t pt2,  TString shift){
+  if(shift == "up") return (1 + 0.2*pt1/1000 )*(1 + 0.2*pt2/1000 );
+  if(shift == "down") return (1 - 0.2*pt1/1000 )*(1 - 0.2*pt2/1000 );
+  return 1;
 }
 
 

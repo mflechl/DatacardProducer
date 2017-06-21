@@ -21,7 +21,7 @@ class CreateHistos : public SelectionAnalyzer{
 
   double getQCD_osss(TString cat);
   double getW_osss(TString strVar, TString cat);
-  double getW_mtHL(TString strVar, TString cat);
+  double getW_mtHL(TString strVar, TString cat, TString sign);
   double getW_BtagConv(TString strVar, TString cat, TString cr = "");
   void Estimate_W_QCD(TString strVar, TString cat, TString extend="");
   void EstimateW(TString strVar, TString cat);

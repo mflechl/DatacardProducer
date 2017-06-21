@@ -6,6 +6,7 @@ import sys
 parser = argparse.ArgumentParser()
 parser.add_argument('-t', dest='test', help='run test', action='store_true')
 parser.add_argument('-m', dest='minimal', help='run minimal test', action='store_true')
+parser.add_argument('-n', dest='nlo', help='run NLO signal', action='store_true')
 args = parser.parse_args()
 
 print 'Compiling...'
@@ -21,5 +22,7 @@ if args.test:
 	cmd += " test"
 if args.minimal:
 	cmd += " minimal"
+if args.nlo:
+	cmd += " nlo"
 p = sp.Popen(shlex.split(cmd),stdout = sys.__stdout__, stderr = sys.__stderr__, shell=False)
 p.communicate()
