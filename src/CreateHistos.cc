@@ -17,14 +17,12 @@ CreateHistos::CreateHistos(TString testEnv_){
 
   TString tmp = "";
   vector<TString> masspoints = Parameter.dataset.masspoints;
-  //folder = channel +"_"+ FFiso;
   folder = channel;
   if(testEnv == "minimal"){
     masspoints = Parameter.dataset.test_masspoints;
   }
 
   files[s_Z].first = Parameter.dataset.Z;
-  //files[s_EWKZ].first = Parameter.dataset.EWKZ;
   files[s_W].first = Parameter.dataset.W;
   files[s_TT].first = Parameter.dataset.TT;
   files[s_VV].first = Parameter.dataset.VV;
@@ -54,8 +52,6 @@ CreateHistos::CreateHistos(TString testEnv_){
   if( (ptShift || testEnv == "test" ) && testEnv != "minimal"){
     vector<TString> shifts = Parameter.dataset.shifts;
     if(channel != "et") shifts = Parameter.dataset.full_shifts;
-    // files[s_ZtauUp].first = Parameter.dataset.ZtauUp;
-    // files[s_ZtauDown].first = Parameter.dataset.ZtauDown;
     if( channel=="et" ){
       files[s_ZE0Up].first = Parameter.dataset.ZE0Up;
       files[s_ZE0Down].first = Parameter.dataset.ZE0Down;
@@ -100,8 +96,6 @@ CreateHistos::CreateHistos(TString testEnv_){
   if( jecShift  && testEnv != "minimal" ){
     files[s_ZjecUp].first = Parameter.dataset.Z;
     files[s_ZjecDown].first = Parameter.dataset.Z;
-    //files[s_EWKZjecUp].first = Parameter.dataset.EWKZ;
-    //files[s_EWKZjecDown].first = Parameter.dataset.EWKZ;
     files[s_WjecUp].first = Parameter.dataset.W;
     files[s_WjecDown].first = Parameter.dataset.W;
     files[s_TTjecUp].first = Parameter.dataset.TT;
@@ -185,13 +179,9 @@ CreateHistos::~CreateHistos(){
 void CreateHistos::loadFile(TString filename){
 
   TChain *tchain = new TChain("TauCheck");
-  //std::unique_ptr<TChain> tchain( new TChain("TauCheck") );
   tchain->Add(filename);
-  
-  //NtupleView = new ntuple(tchain);
   NtupleView = std::unique_ptr<ntuple>(new ntuple(tchain ) );
   
- 
 }
 
 void CreateHistos::run(){
@@ -200,7 +190,6 @@ void CreateHistos::run(){
   float weight = 1;
   float weight_data = 1;
   float var = -999;
-  
   initFakeFactors();
 
   
@@ -210,7 +199,6 @@ void CreateHistos::run(){
   cout << "----Settings:-----" << endl;
   cout << "Channel: " << channel << endl;
   cout << "FFiso: " << FFiso << endl;
-  cout << "isSync: " << isSync << endl;
   cout << "useMVAMET: " << useMVAMET << endl;
   cout << "calcFF: " << calcFF << endl;
   cout << "FF version: " << FFversion << endl;
@@ -250,7 +238,16 @@ void CreateHistos::run(){
     filename = file.second.first;
     mass = file.second.second;
     filetype.ReplaceAll( mass, "" );
+    ////////////////////////////////
+    // Fileindex      Filetype
+    // 1              DY
+    // 2              Signal
+    // 3              TT
+    // 4              W
+    // 5              Diboson
+    // 6              EWK
     fileindex = this->getFiletype(filetype);
+
 
   
     if(filetype.Contains(s_jecUp)) this->isJEC=1;
@@ -290,7 +287,6 @@ void CreateHistos::run(){
 
       if( channel== "mt" && (NtupleView->Flag_badMuons || NtupleView->Flag_duplicateMuons || !NtupleView->trg_singlemuon) ) continue;
       if( channel== "et" && ( !NtupleView->trg_singleelectron ) )continue;
-      //      if( channel== "tt" && !( NtupleView->trg_doubletau || NtupleView->trg_singletau ) ) continue;
       if( channel== "tt" && !NtupleView->trg_doubletau ) continue;
 
 
@@ -298,18 +294,18 @@ void CreateHistos::run(){
       weight *= NtupleView->puweight;
       weight *= this->recalcEffweight();
       weight *= NtupleView->genweight;
-      if(channel != "tt") weight *= NtupleView->antilep_tauscaling;
-      else weight *= this->getAntiLep_tauscaling();
       weight *= NtupleView->trk_sf;
       weight *= usedLuminosity;
+      if(channel != "tt") weight *= NtupleView->antilep_tauscaling;
+      else weight *= this->getAntiLep_tauscaling();
 
       if(!doMC){
         if( fileindex == 1 || fileindex == 6 ) weight *= NtupleView->ZWeight;
         if( fileindex == 3 ) weight *= NtupleView->topWeight_run1;
       }
       else if(doMC) weight_data=weight;
-      for(auto cat : cats){
 
+      for(auto cat : cats){
         for(auto strVar : vars){
 
           var = -999;
@@ -321,7 +317,7 @@ void CreateHistos::run(){
           else if(strVar == s_jpt1)                           var = NtupleView->jpt_1;
           else if(strVar == s_jpt2)                           var = NtupleView->jpt_2;
           else if(strVar == s_njet)                           var = NtupleView->njets;
-          else if(strVar == s_nbtag)                           var = NtupleView->nbtag;          
+          else if(strVar == s_nbtag)                          var = NtupleView->nbtag;          
           
           else if(strVar == s_pt1)                            var = NtupleView->pt_1;
           else if(strVar == s_pt2)                            var = NtupleView->pt_2;
@@ -384,19 +380,16 @@ float CreateHistos::recalcEffweight(){
   float idiso_2 = NtupleView->idisoweight_2;
 
   if(channel == "tt"){
-    //if(NtupleView->gen_match_1 == 5 && NtupleView->byTightIsolationMVArun2v1DBoldDMwLT_1) idiso_1 = 0.95;
     if(NtupleView->gen_match_1 == 5 && NtupleView->byMediumIsolationMVArun2v1DBoldDMwLT_1) idiso_1 = 0.97;
     else if(NtupleView->gen_match_1 == 5 && (NtupleView->byLooseIsolationMVArun2v1DBoldDMwLT_1 || NtupleView->byVLooseIsolationMVArun2v1DBoldDMwLT_1) ) idiso_1 = 0.99;
     else idiso_1 = 1.;
 
-    //if(NtupleView->gen_match_2 == 5 && NtupleView->byTightIsolationMVArun2v1DBoldDMwLT_2) idiso_2 = 0.95;
     if(NtupleView->gen_match_2 == 5 && NtupleView->byMediumIsolationMVArun2v1DBoldDMwLT_2) idiso_2 = 0.97;
     else if(NtupleView->gen_match_2 == 5 && (NtupleView->byLooseIsolationMVArun2v1DBoldDMwLT_2 || NtupleView->byVLooseIsolationMVArun2v1DBoldDMwLT_2)) idiso_2 = 0.99;
     else idiso_2 = 1.;
   }
   else{
     if(NtupleView->gen_match_2 == 5 && NtupleView->byTightIsolationMVArun2v1DBoldDMwLT_2) idiso_2 = 0.95;
-    //if(NtupleView->gen_match_2 == 5 && NtupleView->byMediumIsolationMVArun2v1DBoldDMwLT_2) idiso_2 = 0.97;
     else if(NtupleView->gen_match_2 == 5 && (NtupleView->byLooseIsolationMVArun2v1DBoldDMwLT_2 || NtupleView->byVLooseIsolationMVArun2v1DBoldDMwLT_2) ) idiso_2 = 0.99;
     else idiso_2 = 1.;
   }

@@ -911,7 +911,7 @@ void SelectionAnalyzer::signalSelections(float var, float weight, TString cat, T
     }
   
 
-    if(calcFF && !isSync) this->applyFF(usedVar,weight,cat,strVar,fname+mass,0,"");
+    if(calcFF) this->applyFF(usedVar,weight,cat,strVar,fname+mass,0,"");
 
     if(fname == s_ggH){
       if( this->Baseline(sign,cat) )                 this->GetHistbyName(fname+mass+s_CMSscalegg+s_13TeVUp+sub,strVar)->Fill(usedVar, weight*this->getRenormScale(cat) );

@@ -21,7 +21,6 @@ const vector<TString> variables={s_mttot};
 ///////////////////////////////////////////////////////////////////////////
 //const int applyMTCut=0;//MTcut in inclusive selection, default==1 for mt&et, default==0 for tt
 const int resetZero=0;
-const int isSync=1;
 const int ptShift=1;
 const int jecShift=0;
 const int doInitialize=1;
