@@ -261,7 +261,7 @@ void CreateHistos::run(){
 
       if( channel== "mt" && (NtupleView->Flag_badMuons || NtupleView->Flag_duplicateMuons || !NtupleView->trg_singlemuon) ) continue;
       if( channel== "et" && ( !NtupleView->trg_singleelectron ) )continue;
-      if( channel== "tt" && !(  NtupleView->trg_doubletau )continue;
+      if( channel== "tt" && !NtupleView->trg_doubletau )continue;
 
 
       weight = NtupleView->stitchedWeight;
