@@ -5,9 +5,10 @@ using namespace std;
 //const TString channel="et";const TString FFiso = "tight";const vector<TString> categories={s_nobtag_tight,s_btag_tight,s_nobtag_loosemt,s_btag_loosemt};const int applyMTCut=1;
 //const TString channel="et";const TString FFiso = "tight";const int applyMTCut=0;
 
-const TString channel="mt";const TString FFiso = "tight";const vector<TString> categories={s_nobtag_tight,s_btag_tight,s_nobtag_loosemt,s_btag_loosemt};const int applyMTCut=1;
-//const TString channel="tt";const TString FFiso = "medium";const vector<TString> categories={s_btag,s_nobtag};const int applyMTCut=0;
+//const TString channel="mt";const TString FFiso = "tight";const vector<TString> categories={s_nobtag_tight,s_btag_tight,s_nobtag_loosemt,s_btag_loosemt};const int applyMTCut=1;
+const TString channel="tt";const TString FFiso = "medium";const vector<TString> categories={s_btag,s_nobtag};const int applyMTCut=0;
 const TString version="v16";
+const TString production = "MCSummer16";
 const int doMC=0;
 const double usedLuminosity=35.9; 
 const TString doSvfit="woSVFIT";

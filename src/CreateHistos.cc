@@ -1,8 +1,9 @@
 #include "interface/CreateHistos.h"
 #include "TLorentzVector.h"
-//#include <boost/filesystem.hpp>
 #include <iostream>
 #include <sstream>
+#include <unistd.h>
+#include <boost/algorithm/string.hpp>
 #include <TObject.h>
 #include <algorithm>
 
@@ -11,126 +12,82 @@ using namespace std;
 CreateHistos::CreateHistos(TString testEnv_){
 
   testEnv = testEnv_;
-  if(testEnv == "test") cout << "testing availability of input files" << endl;
-  if(testEnv == "minimal") cout << "creating minimal datacard" << endl;
-  if(testEnv == "nlo") cout << "creating nlo datacard" << endl;
-
-  TString tmp = "";
-  vector<TString> masspoints = Parameter.dataset.masspoints;
   folder = channel;
+  if(testEnv == "test")    cout << "testing availability of input files" << endl;
+  if(testEnv == "minimal") cout << "creating minimal datacard" << endl;
+  if(testEnv == "nlo"){
+    folder = channel + "_nlo";
+    cout << "creating nlo datacard" << endl;
+  }
+
+  vector<TString> masspoints = Parameter.dataset.masspoints;
+  
   if(testEnv == "minimal"){
     masspoints = Parameter.dataset.test_masspoints;
   }
 
-  files[s_Z].first = Parameter.dataset.Z;
-  files[s_W].first = Parameter.dataset.W;
-  files[s_TT].first = Parameter.dataset.TT;
-  files[s_VV].first = Parameter.dataset.VV;
-
-  files[s_SMggH].first = Parameter.dataset.SMggH;
-  files[s_SMvbf].first = Parameter.dataset.SMvbf;
-  files[s_SMWminus].first = Parameter.dataset.SMWminus;
-  files[s_SMWplus].first = Parameter.dataset.SMWplus;
-  files[s_SMZH].first = Parameter.dataset.SMZH;
-
-  if(channel=="mt" && !doMC )files[s_data].first = Parameter.dataset.data_mt;
-  else if(channel=="mt" && doMC)files[s_data].first = Parameter.dataset.MCsum_mt;
-  if(channel=="et")files[s_data].first = Parameter.dataset.data_et;
-  if(channel=="tt")files[s_data].first = Parameter.dataset.data_tt;
-
-  for(auto mass : masspoints){
-    tmp = Parameter.dataset.ggH;
-    files[s_ggH+mass].first = tmp.ReplaceAll("XXX",mass);
-    files[s_ggH+mass].second = mass;
-
-    if(testEnv == "nlo") tmp = Parameter.dataset.bbHNLO;
-    else tmp = Parameter.dataset.bbH;
-    files[s_bbH+mass].first = tmp.ReplaceAll("XXX",mass);
-    files[s_bbH+mass].second = mass;
-  }
-
-  if( (ptShift || testEnv == "test" ) && testEnv != "minimal"){
-    vector<TString> shifts = Parameter.dataset.shifts;
-    if(channel != "et") shifts = Parameter.dataset.full_shifts;
-    if( channel=="et" ){
-      files[s_ZE0Up].first = Parameter.dataset.ZE0Up;
-      files[s_ZE0Down].first = Parameter.dataset.ZE0Down;
-      files[s_ZE1Up].first = Parameter.dataset.ZE1Up;
-      files[s_ZE1Down].first = Parameter.dataset.ZE1Down;
+  vector<TString> shifts = {""};
+  if( (ptShift || testEnv == "test" ) && testEnv != "minimal"){    
+    if(channel != "et"){
+      shifts.insert( shifts.end(), Parameter.dataset.tES_shifts.begin(), Parameter.dataset.tES_shifts.end() );
     }
-
-
-    for(auto shift : shifts ){
-      tmp = Parameter.dataset.ZtES;
-      files[s_Z+shift].first = tmp.ReplaceAll("TES",shift);
-      tmp=Parameter.dataset.TTtES;
-      files[s_TT+shift].first = tmp.ReplaceAll("TES",shift);
-      tmp=Parameter.dataset.VVtES;
-      files[s_VV+shift].first = tmp.ReplaceAll("TES",shift);
-      tmp=Parameter.dataset.SMggHtES;
-      files[s_SMggH+shift].first = tmp.ReplaceAll("TES",shift);
-      tmp=Parameter.dataset.SMvbftES;
-      files[s_SMvbf+shift].first = tmp.ReplaceAll("TES",shift);
-      tmp=Parameter.dataset.SMWminustES;
-      files[s_SMWminus+shift].first = tmp.ReplaceAll("TES",shift);
-      tmp=Parameter.dataset.SMWplustES;
-      files[s_SMWplus+shift].first = tmp.ReplaceAll("TES",shift);
-      tmp=Parameter.dataset.SMZHtES;
-      files[s_SMZH+shift].first = tmp.ReplaceAll("TES",shift);
-
-      for(auto mass : masspoints){
-
-          tmp = Parameter.dataset.ggHtES;
-          tmp = tmp.ReplaceAll("XXX",mass);
-          files[s_ggH+shift+mass].first = tmp.ReplaceAll("TES",shift);
-          files[s_ggH+shift+mass].second = mass;
-
-          if(testEnv == "nlo") tmp = Parameter.dataset.bbHtESNLO;
-          else tmp = Parameter.dataset.bbHtES;
-          tmp = tmp.ReplaceAll("XXX",mass);
-          files[s_bbH+shift+mass].first = tmp.ReplaceAll("TES",shift);
-          files[s_bbH+shift+mass].second = mass;   
-      }
+    else if( channel=="et" ){
+      shifts.insert( shifts.end(), Parameter.dataset.min_shifts.begin(), Parameter.dataset.min_shifts.end() );
+      shifts.insert( shifts.end(), Parameter.dataset.eES_shifts.begin(), Parameter.dataset.eES_shifts.end() );
     }
   }
-  if( jecShift  && testEnv != "minimal" ){
-    files[s_ZjecUp].first = Parameter.dataset.Z;
-    files[s_ZjecDown].first = Parameter.dataset.Z;
-    files[s_WjecUp].first = Parameter.dataset.W;
-    files[s_WjecDown].first = Parameter.dataset.W;
-    files[s_TTjecUp].first = Parameter.dataset.TT;
-    files[s_TTjecDown].first = Parameter.dataset.TT;
-    files[s_VVjecUp].first = Parameter.dataset.VV;
-    files[s_VVjecDown].first = Parameter.dataset.VV;
 
-    files[s_SMggHjecUp].first = Parameter.dataset.SMggH;
-    files[s_SMvbfjecUp].first = Parameter.dataset.SMvbf;
-    files[s_SMWminusjecUp].first = Parameter.dataset.SMWminus;
-    files[s_SMWplusjecUp].first = Parameter.dataset.SMWplus;
-    files[s_SMZHjecUp].first = Parameter.dataset.SMZH;
+  if(channel=="mt") files[s_data].first = this->getFilestring( Parameter.dataset.data_mt );
+  if(channel=="et") files[s_data].first = this->getFilestring( Parameter.dataset.data_et );
+  if(channel=="tt") files[s_data].first = this->getFilestring( Parameter.dataset.data_tt );
 
-    files[s_SMggHjecDown].first = Parameter.dataset.SMggH;
-    files[s_SMvbfjecDown].first = Parameter.dataset.SMvbf;
-    files[s_SMWminusjecDown].first = Parameter.dataset.SMWminus;
-    files[s_SMWplusjecDown].first = Parameter.dataset.SMWplus;
-    files[s_SMZHjecDown].first = Parameter.dataset.SMZH;
+  files[s_W].first = this->getFilestring( Parameter.dataset.W );
+
+  for(auto shift : shifts ){
+
+    files[s_Z+shift].first = this->getFilestring( Parameter.dataset.Z, shift );
+    files[s_TT+shift].first = this->getFilestring( Parameter.dataset.TT, shift );
+    files[s_VV+shift].first = this->getFilestring( Parameter.dataset.VV, shift );
+    files[s_SMggH+shift].first = this->getFilestring( Parameter.dataset.SMggH, shift );
+    files[s_SMvbf+shift].first = this->getFilestring( Parameter.dataset.SMvbf, shift );
+    files[s_SMWminus+shift].first = this->getFilestring( Parameter.dataset.SMWminus, shift );
+    files[s_SMWplus+shift].first = this->getFilestring( Parameter.dataset.SMWplus, shift );
+    files[s_SMZH+shift].first = this->getFilestring( Parameter.dataset.SMZH, shift );
 
     for(auto mass : masspoints){
-      tmp = Parameter.dataset.ggH;
-      files[s_ggHjecUp+mass].first = tmp.ReplaceAll("XXX",mass);
-      files[s_ggHjecUp+mass].second = mass;
 
-      tmp = Parameter.dataset.ggH;
-      files[s_ggHjecDown+mass].first = tmp.ReplaceAll("XXX",mass);
-      files[s_ggHjecDown+mass].second = mass;
+        files[s_ggH+shift+mass].first = this->getFilestring( Parameter.dataset.ggH, shift, mass );
+        files[s_ggH+shift+mass].second = mass;
 
-      tmp = Parameter.dataset.bbH;
-      files[s_bbHjecUp+mass].first = tmp.ReplaceAll("XXX",mass);
-      files[s_bbHjecUp+mass].second = mass;
+        if(testEnv == "nlo") files[s_bbH+shift+mass].first = this->getFilestring( Parameter.dataset.bbHNLO, shift, mass );
+        else files[s_bbH+shift+mass].first = this->getFilestring( Parameter.dataset.bbH, shift, mass );
+        files[s_bbH+shift+mass].second = mass;   
+    }
+  }
+  
 
-      tmp = Parameter.dataset.bbH;
-      files[s_bbHjecDown+mass].first = tmp.ReplaceAll("XXX",mass);
-      files[s_bbHjecDown+mass].second = mass;
+  if( jecShift  && testEnv != "minimal" ){
+    for(auto jshift : {s_jecUp, s_jecDown} ){
+      files[s_Z+jshift].first = this->getFilestring( Parameter.dataset.Z);
+      files[s_W+jshift].first = this->getFilestring( Parameter.dataset.W);
+      files[s_TT+jshift].first = this->getFilestring( Parameter.dataset.TT);
+      files[s_VV+jshift].first = this->getFilestring( Parameter.dataset.VV);
+      files[s_SMggH+jshift].first = this->getFilestring( Parameter.dataset.SMggH);
+      files[s_SMvbf+jshift].first = this->getFilestring( Parameter.dataset.SMvbf);
+      files[s_SMWminus+jshift].first = this->getFilestring( Parameter.dataset.SMWminus);
+      files[s_SMWplus+jshift].first = this->getFilestring( Parameter.dataset.SMWplus);
+      files[s_SMZH+jshift].first = this->getFilestring( Parameter.dataset.SMZH);
+
+
+      for(auto mass : masspoints){
+        files[s_ggH+jshift+mass].first = this->getFilestring(Parameter.dataset.ggH,"",mass);
+        files[s_ggH+jshift+mass].second = this->getFilestring( mass);
+
+
+        files[s_bbH+jshift+mass].first = this->getFilestring( Parameter.dataset.bbH,"",mass);
+        files[s_bbH+jshift+mass].second = this->getFilestring( mass);
+
+      }
     }
   }
 
@@ -152,8 +109,6 @@ CreateHistos::CreateHistos(TString testEnv_){
       cats.push_back(cat+"_looseTiso_qcd_cr");
     }
   };
-  
-  
 }
 
 CreateHistos::~CreateHistos(){
@@ -176,6 +131,17 @@ CreateHistos::~CreateHistos(){
     }
 }
 
+TString CreateHistos::getFilestring(TString input, TString ES, TString mass){
+
+  TString newstring = input;
+  newstring.ReplaceAll("XXX",mass);
+  if(ES == "") newstring.ReplaceAll("_TES",ES);
+  else newstring.ReplaceAll("TES",ES);
+
+  return newstring;
+
+}
+
 void CreateHistos::loadFile(TString filename){
 
   TChain *tchain = new TChain("TauCheck");
@@ -190,20 +156,24 @@ void CreateHistos::run(){
   float weight = 1;
   float weight_data = 1;
   float var = -999;
+  TString black = "\033[1;30m";
+  TString red = "\033[1;31m";
+  TString green = "\033[1;32m";
+  TString endc = "\033[0m";
   initFakeFactors();
 
   
   for(auto strVar : vars) cout << "Variable " << strVar << endl;
-  for(auto cat : cats) cout << "Category " << cat << endl;
+  for(auto cat : categories) cout << "Category " << cat << endl;
   cout << endl;
   cout << "----Settings:-----" << endl;
-  cout << "Channel: " << channel << endl;
-  cout << "FFiso: " << FFiso << endl;
-  cout << "useMVAMET: " << useMVAMET << endl;
-  cout << "calcFF: " << calcFF << endl;
-  cout << "FF version: " << FFversion << endl;
+  cout << left << setw(12) << setfill(' ')  << "Channel: "    << channel << endl;
+  cout << left << setw(12) << setfill(' ')  << "FF version: " << FFversion <<  endl;
+  cout << left << setw(12) << setfill(' ')  << "useMVAMET: "  << useMVAMET <<  endl;
+  cout << left << setw(12) << setfill(' ')  << "calcFF: "     << calcFF <<  endl;
+  cout << left << setw(12) << setfill(' ')  << "Pt Shift: "   << ptShift <<  endl;
+  cout << left << setw(12) << setfill(' ')  << "JEC Shift: "  << jecShift <<  endl;
   cout << doSvfit << endl;
-  cout << "Reduced string: " << reduced << endl;
   cout << endl;
   if(channel == "tt" && applyMTCut ) cout << "##### WARNING ######    mt cut applied in tt channel!!" << endl;
   else if(channel != "tt" && !applyMTCut) cout << "##### WARNING ######  NO  mt cut applied in mt or et channel!!" << endl;
@@ -227,17 +197,24 @@ void CreateHistos::run(){
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
   TString filetype = "";
   int fileindex = 0;
+  float perc;
   TString filename = "";
   TString mass = "";
   cout.precision(3);
 
   for (auto const& file : files){
 
-    filetype = file.first;
-    
+    filetype = file.first; 
     filename = file.second.first;
     mass = file.second.second;
     filetype.ReplaceAll( mass, "" );
+
+
+    if( access(filename.Data(),F_OK ) != 0 ){
+      cout << red +" Warning "+endc+"File does not exist ->  " << filename.ReplaceAll(Parameter.dataset.inputfolder,"") << endl;
+      continue;
+    }
+
     ////////////////////////////////
     // Fileindex      Filetype
     // 1              DY
@@ -247,9 +224,9 @@ void CreateHistos::run(){
     // 5              Diboson
     // 6              EWK
     fileindex = this->getFiletype(filetype);
+    if(jecShift){
 
-
-  
+    }
     if(filetype.Contains(s_jecUp)) this->isJEC=1;
     else if(filetype.Contains(s_jecDown)) this->isJEC=-1;
     else this->isJEC=0;
@@ -261,15 +238,13 @@ void CreateHistos::run(){
     }else{
       nentries = Int_t(NtupleView->fChain->GetEntries());
     }
-    if(nentries == 0){
-      cout<<"File: "<<filename<<" not available"<<endl;
-      continue;
-    }
-    else{
-      cout<<"File: "<<filename<<" loaded"<<endl;
-    }
-    cout<<"The input chain contains: "<<nentries<<" events."<<endl;
-    float perc;
+
+    if(nentries > 0) cout<< "Contains "+green;
+    else cout<< "Contains " + red;
+    cout<< left << setw(8) << setfill(' ')  << nentries;
+    cout<<endc+" events. File: "+black<< filename.ReplaceAll(Parameter.dataset.inputfolder,"") <<endc+" loaded."<<endl;
+
+    
 
     for (Int_t jentry=0; jentry<nentries;jentry++){       
 
@@ -277,7 +252,6 @@ void CreateHistos::run(){
         if(nentries > 0){
           perc =  ( (float)jentry / (float)nentries ) * 100;
         }
-        
         cout<< "                                                             \r"<< flush;
         cout<< jentry << "/" << nentries <<"\t\t" << perc << "%\r"<< flush;
       }
@@ -287,7 +261,7 @@ void CreateHistos::run(){
 
       if( channel== "mt" && (NtupleView->Flag_badMuons || NtupleView->Flag_duplicateMuons || !NtupleView->trg_singlemuon) ) continue;
       if( channel== "et" && ( !NtupleView->trg_singleelectron ) )continue;
-      if( channel== "tt" && !NtupleView->trg_doubletau ) continue;
+      if( channel== "tt" && !(  NtupleView->trg_doubletau )continue;
 
 
       weight = NtupleView->stitchedWeight;
@@ -296,6 +270,7 @@ void CreateHistos::run(){
       weight *= NtupleView->genweight;
       weight *= NtupleView->trk_sf;
       weight *= usedLuminosity;
+
       if(channel != "tt") weight *= NtupleView->antilep_tauscaling;
       else weight *= this->getAntiLep_tauscaling();
 
@@ -306,6 +281,7 @@ void CreateHistos::run(){
       else if(doMC) weight_data=weight;
 
       for(auto cat : cats){
+
         for(auto strVar : vars){
 
           var = -999;

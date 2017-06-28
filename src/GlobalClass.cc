@@ -88,16 +88,6 @@ int GlobalClass::Baseline(TString sign, TString cat){
           if(FFiso == "tight" && !NtupleView->byTightIsolationMVArun2v1DBoldDMwLT_2) return 1;
       }
 
-      // if( sign == "FF1"
-      //     && NtupleView->byTightIsolationMVArun2v1DBoldDMwLT_2
-      //     && !NtupleView->byTightIsolationMVArun2v1DBoldDMwLT_1
-      //     && NtupleView->byVLooseIsolationMVArun2v1DBoldDMwLT_1
-      //     ) return 1;
-      // if( sign == "FF2"
-      //     && NtupleView->byTightIsolationMVArun2v1DBoldDMwLT_1
-      //     && !NtupleView->byTightIsolationMVArun2v1DBoldDMwLT_2
-      //     && NtupleView->byVLooseIsolationMVArun2v1DBoldDMwLT_2
-      //     ) return 1;
       if( sign == "FF1"
           && NtupleView->byMediumIsolationMVArun2v1DBoldDMwLT_2
           && !NtupleView->byMediumIsolationMVArun2v1DBoldDMwLT_1
@@ -126,7 +116,6 @@ int GlobalClass::passIso(TString type){
   if(type == "base"){
     if(channel == "et" && NtupleView->iso_1 < Parameter.analysisCut.elIso_base) return 1;
     if(channel == "mt" && NtupleView->iso_1 < Parameter.analysisCut.muIso_base) return 1;
-    //if(channel == "tt" && NtupleView->byTightIsolationMVArun2v1DBoldDMwLT_1 && NtupleView->byTightIsolationMVArun2v1DBoldDMwLT_2 ) return 1;
   }
   else if(type == "relaxed"){
     if(channel == "et" && NtupleView->iso_1 < Parameter.analysisCut.elIso_relaxed) return 1;
@@ -241,30 +230,15 @@ int GlobalClass::LooseBtag(TString btag){
 
 int GlobalClass::TauIso(TString Tiso){
 
-
-  // if(Tiso == "tight"){
-  //   if(NtupleView->byTightIsolationMVArun2v1DBoldDMwLT_1 
-  //      && NtupleView->byTightIsolationMVArun2v1DBoldDMwLT_2 ) return 1;
-  // }
   if(Tiso == "tight"){
     if(NtupleView->byMediumIsolationMVArun2v1DBoldDMwLT_1 
        && NtupleView->byMediumIsolationMVArun2v1DBoldDMwLT_2 ) return 1;
   }
- //  if(Tiso == "medium"){
- //    if( NtupleView->byTightIsolationMVArun2v1DBoldDMwLT_1
-	// && !NtupleView->byTightIsolationMVArun2v1DBoldDMwLT_2
-	// && NtupleView->byMediumIsolationMVArun2v1DBoldDMwLT_2 ) return 1;
- //  }
   if(Tiso == "medium"){
     if( NtupleView->byMediumIsolationMVArun2v1DBoldDMwLT_1
         && !NtupleView->byMediumIsolationMVArun2v1DBoldDMwLT_2
         && NtupleView->byLooseIsolationMVArun2v1DBoldDMwLT_2 ) return 1;
   }
-  // if(Tiso == "loose"){
-  //   if( NtupleView->byTightIsolationMVArun2v1DBoldDMwLT_1
-  //       && !NtupleView->byTightIsolationMVArun2v1DBoldDMwLT_2
-	 //      && NtupleView->byLooseIsolationMVArun2v1DBoldDMwLT_2 ) return 1;
-  // }
   if(Tiso == "loose"){
     if( NtupleView->byMediumIsolationMVArun2v1DBoldDMwLT_1
         && !NtupleView->byMediumIsolationMVArun2v1DBoldDMwLT_2
