@@ -5,7 +5,7 @@
 #include "TChain.h"
 #include "TFile.h"
 #include "TH1D.h"
-#include "ParameterConfig_SM.h"
+#include "ParameterConfig.h"
 
 
 class GlobalClass{
