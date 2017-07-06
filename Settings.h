@@ -18,7 +18,7 @@ const TString UseIso = "tight";
 //const vector<TString> categories={s_inclusive};
 //const vector<TString> variables={s_mttot,s_pt1,s_pt2,s_eta1,s_eta2,s_njet,s_nbtag,s_mvis,s_met}; //s_mvis,s_met,s_pt1,s_pt2
 //const vector<TString> variables={s_pt1,s_pt2,s_eta1,s_eta2,s_njet,s_nbtag};
-const vector<TString> variables={s_mttot,s_pt1,s_pt2};
+const vector<TString> variables={s_mttot};
 ///////////////////////////////////////////////////////////////////////////
 //const int applyMTCut=0;//MTcut in inclusive selection, default==1 for mt&et, default==0 for tt
 const int resetZero=0;

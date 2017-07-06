@@ -146,7 +146,7 @@ void CreateHistos::loadFile(TString filename){
 
   TChain *tchain = new TChain("TauCheck");
   tchain->Add(filename);
-  NtupleView = std::unique_ptr<ntuple>(new ntuple(tchain ) );
+  NtupleView = std::unique_ptr<ntuple>(new ntuple( tchain ) );
   
 }
 
@@ -242,7 +242,7 @@ void CreateHistos::run(){
     if(nentries > 0) cout<< "Contains "+green;
     else cout<< "Contains " + red;
     cout<< left << setw(8) << setfill(' ')  << nentries;
-    cout<<endc+" events. File: "+black<< filename.ReplaceAll(Parameter.dataset.inputfolder,"") <<endc+" loaded."<<endl;
+    cout<<endc+" events. File:  "<< filename.ReplaceAll(Parameter.dataset.inputfolder,"") <<" loaded."<<endl;
 
     
 
