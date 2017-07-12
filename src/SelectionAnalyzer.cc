@@ -1044,7 +1044,8 @@ double SelectionAnalyzer::getJetToTauFakeDown( Float_t inputPt ){
 
 double SelectionAnalyzer::getMSSMHighUncert(Float_t pt1, Float_t pt2,  TString shift){
   if(shift == "up") return (1 + 0.05*pt1/1000 )*(1 + 0.05*pt2/1000 );
-  if(shift == "down") return max(0.0, (1 - 0.5*pt1/1000 )*(1 - 0.5*pt2/1000 ));
+  //if(shift == "down") return max(0.0, (1 - 0.5*pt1/1000 )*(1 - 0.5*pt2/1000 ));
+  if(shift == "down") return max(0.0, (1 - 0.35*pt1/1000 )*(1 - 0.35*pt2/1000 ));
   return 1;
 }
 

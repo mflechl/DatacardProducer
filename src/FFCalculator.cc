@@ -52,6 +52,7 @@ void FFCalculator::applyFF(float var, float weight, TString cat, TString strVar,
             this->getCorrectUncertaintyString( tmp );
             if(doMC && tmp.Contains("qcd")) continue;
             this->GetHistbyName( fname+"_"+s_jetFakes+"_"+tmp+sub,strVar)->Fill(usedVar, weight*FFObj[cat]->value(FFinputs, syst) );
+
           }
         }
       }
@@ -191,6 +192,7 @@ void FFCalculator::getFF2Inputs(vector<double>&inputs){
   inputs.push_back( this->getNjets() );
   inputs.push_back( NtupleView->m_vis );
   inputs.push_back( NtupleView->mt_tot );
+
 }
 
 
