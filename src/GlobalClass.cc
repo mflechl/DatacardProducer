@@ -11,6 +11,9 @@ using namespace std;
 GlobalClass::GlobalClass()
 {  
   TH1::SetDefaultSumw2(1);
+
+  ifstream i("config/ParameterConfig.json");
+  i >> Parameters;
 }
 GlobalClass::~GlobalClass()
 {
@@ -533,20 +536,23 @@ TH1D* GlobalClass::JITHistoCreator(TString name, TString strVar){
     }
   }
   else if(strVar == s_mttot){
-    if(Parameter.variable.mttot.doVarBins){
+    if(Parameters["Binning"][strVar.Data()]["doVarBins"]){
       usingVarBins = 1;
-      if( name.Contains("_btag") ){
-        binning = channel + "_btag";
+
+      if( name.Contains("_btag") )        binning = "btag";
+      else if( name.Contains("_nobtag") ) binning = "nobtag";
+      try{
+        histograms[name] = this->getBinnedHisto(name,Parameters["Binning"][strVar.Data()]["varBins"].at(binning.Data() ) ) ;
       }
-      else if( name.Contains("_nobtag") ){
-        binning = channel + "_nobtag";
+      catch(const out_of_range& err){
+        histograms[name] = this->getBinnedHisto(name,Parameters["Binning"][strVar.Data()]["varBins"].at("default") ) ;
       }
-      histograms[name] = this->getBinnedHisto(name,Parameter.variable.mttot.varBins.at(binning)) ;
+      
     }
     else{
-      nbins = Parameter.variable.mttot.nbins;
-      nmin  = Parameter.variable.mttot.nmin;
-      nmax  = Parameter.variable.mttot.nmax;
+      nbins = Parameters["Binning"][strVar.Data()]["nbins"];
+      nmin  = Parameters["Binning"][strVar.Data()]["nmin"];
+      nmax  = Parameters["Binning"][strVar.Data()]["nmax"];
     }
   }
   else if(strVar == s_Hpt){

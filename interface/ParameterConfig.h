@@ -1,11 +1,12 @@
 #include "Settings.h"
 
+
 const struct Parameter{
 
   struct dataset{
 
-    TString inputfolder ="/data/higgs/data_2016/ntuples_"+version+"/"+channel+"/ntuples_"+doSvfit+"_merged/";
-    TString appendix = channel+"_"+version+"_TES"+reduced+".root";
+    TString inputfolder ="/data/higgs/data_2016/ntuples_"+version+"/CHANNEL/ntuples_"+doSvfit+"_merged/";
+    TString appendix = "CHANNEL_"+version+"_TES"+reduced+".root";
 
     vector<TString> tES_shifts = {"T0Up","T1Up","T10Up","T0Down","T1Down","T10Down"};
     vector<TString> eES_shifts = {"E0Up","E0Down","E1Up","E1Down"};

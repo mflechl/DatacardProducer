@@ -6,6 +6,10 @@
 #include "TFile.h"
 #include "TH1D.h"
 #include "ParameterConfig.h"
+#include <fstream>
+#include "json.hpp"
+
+using json = nlohmann::json;
 
 
 class GlobalClass{
@@ -67,6 +71,14 @@ class GlobalClass{
   Int_t isJEC=0; //0->no correction; 1->jecUp; -1->jecDown;
   TString testEnv = "";
   TString folder;
+  int applyMTCut;
+  TString FFiso;
+  TString FFversion;
+  TString channel;
+  vector<TString> categories;
+  json Parameters;
+
+
 };
 
 

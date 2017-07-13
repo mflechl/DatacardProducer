@@ -7,12 +7,41 @@
 #include <TObject.h>
 #include <algorithm>
 
+
 using namespace std;
 
-CreateHistos::CreateHistos(TString testEnv_){
+CreateHistos::CreateHistos(TString testEnv_, TString ch){
 
   testEnv = testEnv_;
+  channel = ch;
+  #ifdef CHANNEL
+    channel = CHANNEL;
+  #endif
+
   folder = channel;
+
+  if(channel != "tt"){
+    applyMTCut = 1;
+    FFiso = "tight";
+    categories={s_nobtag_tight,s_btag_tight,s_nobtag_loosemt,s_btag_loosemt};
+  }
+  else{
+    applyMTCut = 0;
+    FFiso = "medium";
+    categories={ s_nobtag,s_btag };
+  }
+
+  FFversion = FF_build +FFiso+".root";
+
+  #ifdef USE_CONST_CAT
+    categories = const_categories;
+  #endif
+
+  #ifdef APPLY_MT_CUT
+    applyMTCut = APPLY_MT_CUT;
+  #endif
+
+
   if(testEnv == "test")    cout << "testing availability of input files" << endl;
   if(testEnv == "minimal") cout << "creating minimal datacard" << endl;
   if(testEnv == "nlo"){
@@ -135,6 +164,7 @@ TString CreateHistos::getFilestring(TString input, TString ES, TString mass){
 
   TString newstring = input;
   newstring.ReplaceAll("XXX",mass);
+  newstring.ReplaceAll("CHANNEL",channel);
   if(ES == "") newstring.ReplaceAll("_TES",ES);
   else newstring.ReplaceAll("TES",ES);
 

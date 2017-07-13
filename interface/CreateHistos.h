@@ -6,7 +6,7 @@
 class CreateHistos : public SelectionAnalyzer{
  public:
 
-  CreateHistos(TString testEnv_);
+  CreateHistos(TString testEnv_, TString ch);
 
   ~CreateHistos();
 

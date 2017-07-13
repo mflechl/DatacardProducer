@@ -25,7 +25,7 @@ def main():
 
     for i,pl_var in enumerate( X.keys() ):
         t ="tight"
-        root_file = t + '_htt_mt.inputs-mssm-13TeV-'+pl_var+'.root'
+        root_file = t + '_htt_et.inputs-mssm-13TeV-'+pl_var+'.root'
         if not os.path.exists(root_file): continue
         tmp = ROOT.TFile(root_file)
 
