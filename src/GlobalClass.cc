@@ -120,14 +120,6 @@ int GlobalClass::passIso(TString type){
     if(channel == "et" && NtupleView->iso_1 < Parameter.analysisCut.elIso_base) return 1;
     if(channel == "mt" && NtupleView->iso_1 < Parameter.analysisCut.muIso_base) return 1;
   }
-  else if(type == "relaxed"){
-    if(channel == "et" && NtupleView->iso_1 < Parameter.analysisCut.elIso_relaxed) return 1;
-    if(channel == "mt" && NtupleView->iso_1 < Parameter.analysisCut.muIso_relaxed) return 1;
-  }
-  else if(type == "antiiso"){
-    if(channel == "et" && NtupleView->iso_1 < Parameter.analysisCut.elIso_antiIsoHigh && NtupleView->iso_1 > Parameter.analysisCut.elIso_antiIsoLow) return 1;
-    if(channel == "mt" && NtupleView->iso_1 < Parameter.analysisCut.muIso_antiIsoHigh && NtupleView->iso_1 > Parameter.analysisCut.muIso_antiIsoLow) return 1;
-  }
   return 0;
 }
 
@@ -170,8 +162,6 @@ int GlobalClass::CategorySelection(TString cat, TString iso){
   if(tmp == s_btag            )    return this->Btag("btag")   && this->TauIso(Tiso);
   if(tmp == s_nobtag_tight    )    return this->Btag("nobtag") && this->TightMt(iso);
   if(tmp == s_btag_tight      )    return this->Btag("btag")   && this->TightMt(iso);
-  if(tmp == s_nobtag_looseiso )    return this->Btag("nobtag") && this->LooseIso(iso);
-  if(tmp == s_btag_looseiso   )    return this->Btag("btag")   && this->LooseIso(iso);
   if(tmp == s_nobtag_loosemt  )    return this->Btag("nobtag") && this->LooseMt(iso);
   if(tmp == s_btag_loosemt    )    return this->Btag("btag")   && this->LooseMt(iso);
   
@@ -195,8 +185,6 @@ int GlobalClass::LooseBtagCategory(TString iso,TString cat){
       if(tmp == s_btag            )    return this->LooseBtag("btag");
       if(tmp == s_nobtag_tight    )    return this->LooseBtag("nobtag") && this->TightMt(iso,mt);
       if(tmp == s_btag_tight      )    return this->LooseBtag("btag")   && this->TightMt(iso,mt);
-      if(tmp == s_nobtag_looseiso )    return this->LooseBtag("nobtag") && this->LooseIso(iso,mt);
-      if(tmp == s_btag_looseiso   )    return this->LooseBtag("btag")   && this->LooseIso(iso,mt);
       if(tmp == s_nobtag_loosemt  )    return this->LooseBtag("nobtag") && this->LooseMt(iso,mt);
       if(tmp == s_btag_loosemt    )    return this->LooseBtag("btag")   && this->LooseMt(iso,mt);
 
@@ -258,15 +246,8 @@ int GlobalClass::TightMt(TString iso,TString mt){
   }
   if(iso == "FF") return 1;
   if(iso == "OS" || iso == "SS"){
-
-    if(FFiso == "loose_new" && NtupleView->NewMVAIDLoose_2 ) return 1;
-    if(FFiso == "medium_new" && NtupleView->NewMVAIDMedium_2 ) return 1;
-    if(FFiso == "tight_new" && NtupleView->NewMVAIDTight_2 ) return 1;
-
-    if(FFiso == "loose" && NtupleView->byLooseIsolationMVArun2v1DBoldDMwLT_2 ) return 1;
     if(FFiso == "medium" && NtupleView->byMediumIsolationMVArun2v1DBoldDMwLT_2 ) return 1;
     if(FFiso == "tight" && NtupleView->byTightIsolationMVArun2v1DBoldDMwLT_2 ) return 1;
-    if(FFiso == "vtight" && NtupleView->byVTightIsolationMVArun2v1DBoldDMwLT_2 ) return 1;
   }
     
   
@@ -285,40 +266,15 @@ int GlobalClass::LooseMt(TString iso,TString mt){
 
   if(iso == "FF") return 1;
   if(iso == "OS" || iso == "SS"){
-
-      if(FFiso == "loose_new" && NtupleView->NewMVAIDLoose_2 ) return 1;
-      if(FFiso == "medium_new" && NtupleView->NewMVAIDMedium_2 ) return 1;
-      if(FFiso == "tight_new" && NtupleView->NewMVAIDTight_2 ) return 1;
-
-      if(FFiso == "loose" && NtupleView->byLooseIsolationMVArun2v1DBoldDMwLT_2 ) return 1;
       if(FFiso == "medium" && NtupleView->byMediumIsolationMVArun2v1DBoldDMwLT_2 ) return 1;
       if(FFiso == "tight" && NtupleView->byTightIsolationMVArun2v1DBoldDMwLT_2) return 1;
-      if(FFiso == "vtight" && NtupleView->byVTightIsolationMVArun2v1DBoldDMwLT_2) return 1;
   }
   
   
   return 0;
   
 }
-int GlobalClass::LooseIso(TString iso,TString mt){
 
-  if(applyMTCut){
-    if( mt == "SR" && this->getMT() >  Parameter.analysisCut.mTHigh) return 0;
-    if( mt == "CR" && this->getMT() <  Parameter.analysisCut.mTHigh) return 0;
-  }
-
-    if(iso == "OS" || iso == "SS"){
-
-      if(UseIso == "loose" && !NtupleView->byLooseIsolationMVArun2v1DBoldDMwLT_2) return 0;
-      if(UseIso == "medium" && !NtupleView->byMediumIsolationMVArun2v1DBoldDMwLT_2) return 0;
-      if(FFiso == "tight" && !NtupleView->byTightIsolationMVArun2v1DBoldDMwLT_2) return 1;
-      if(FFiso == "vtight" && !NtupleView->byVTightIsolationMVArun2v1DBoldDMwLT_2) return 1;
-    }
-    if(iso == "FF") return 1;
-
-
-  return 0;
-}
 
 int GlobalClass::W_CR(TString sign, TString iso, TString cat, bool mtcut){
   if(sign == "OS" && NtupleView->q_1 * NtupleView->q_2 > 0) return 0;
@@ -333,10 +289,7 @@ int GlobalClass::W_CR(TString sign, TString iso, TString cat, bool mtcut){
 
     if(iso == "medium" && NtupleView->byMediumIsolationMVArun2v1DBoldDMwLT_2) return 1;
     if(iso == "tight" && NtupleView->byTightIsolationMVArun2v1DBoldDMwLT_2) return 1;
-    if(iso == "loose" && !NtupleView->byTightIsolationMVArun2v1DBoldDMwLT_2){
-      if(UseIso == "loose" && NtupleView->byLooseIsolationMVArun2v1DBoldDMwLT_2) return 1;
-      if(UseIso == "medium" && NtupleView->byMediumIsolationMVArun2v1DBoldDMwLT_2) return 1;
-     }
+
   }
   return 0;
 
@@ -412,66 +365,6 @@ int GlobalClass::returnBin(vector<double> bins, double value){
   return -1;
 }
 
-double GlobalClass::get2DVar(TString sub){
-
-
-
-  if( channel != "tt" ){
-    if( sub.Contains(Parameter.variable2D.D2_0Jet.name) ){
-      int binX=this->returnBin(Parameter.variable2D.D2_0Jet.binsX,NtupleView->pt_2);
-      int binY=this->returnBin(Parameter.variable2D.D2_0Jet.binsY,NtupleView->m_vis);
-      //if(binX>=0 && binY>=0) return binX+binY*(Parameter.variable2D.D2_0Jet.binsX.size()-1);
-      if(binX>=0 && binY>=0) return binY+binX*(Parameter.variable2D.D2_0Jet.binsY.size()-1);
-    }
-    else if( sub.Contains(Parameter.variable2D.D2_boosted.name) ){
-      int binX= (doSvfit=="SVFIT") ? this->returnBin(Parameter.variable2D.D2_boosted.binsX,NtupleView->pt_sv) : this->returnBin(Parameter.variable2D.D2_boosted.binsX,this->CalcHPt());
-      int binY= (doSvfit=="SVFIT") ? this->returnBin(Parameter.variable2D.D2_boosted.binsY_svfit,NtupleView->m_sv) : this->returnBin(Parameter.variable2D.D2_boosted.binsY_mvis,NtupleView->m_vis); 
-      if(binX>=0 && binY>=0) {
-        if(doSvfit=="SVFIT") return binY+binX*(Parameter.variable2D.D2_boosted.binsY_svfit.size()-1);
-        else return binY+binX*(Parameter.variable2D.D2_boosted.binsY_mvis.size()-1);
-        //return binX+binY*(Parameter.variable2D.D2_boosted.binsX.size()-1);
-      }
-    }
-    else if( sub.Contains(Parameter.variable2D.D2_vbf.name) ){
-      int binX=this->returnBin(Parameter.variable2D.D2_vbf.binsX,this->getMjj());
-      int binY= (doSvfit=="SVFIT") ? this->returnBin(Parameter.variable2D.D2_vbf.binsY_svfit,NtupleView->m_sv) : this->returnBin(Parameter.variable2D.D2_vbf.binsY_mvis,NtupleView->m_vis); 
-      if(binX>=0 && binY>=0) {
-        if(doSvfit=="SVFIT") return binY+binX*(Parameter.variable2D.D2_vbf.binsY_svfit.size()-1);
-        else return binY+binX*(Parameter.variable2D.D2_vbf.binsY_mvis.size()-1);
-        //return binX+binY*(Parameter.variable2D.D2_vbf.binsX.size()-1);
-      }
-    }
-  }
-
-  else if( channel == "tt" ){
-    if( sub.Contains(Parameter.variable2D_tt.D2_0Jet.name) ){
-      int binX= (doSvfit=="SVFIT") ? this->returnBin(Parameter.variable2D_tt.D2_0Jet.binsX,NtupleView->m_sv) : this->returnBin(Parameter.variable2D_tt.D2_0Jet.binsX,NtupleView->m_vis);
-      if( binX>=0 ) return binX;
-    }
-    else if( sub.Contains(Parameter.variable2D_tt.D2_boosted.name) ){
-      int binX= (doSvfit=="SVFIT") ? this->returnBin(Parameter.variable2D_tt.D2_boosted.binsX,NtupleView->pt_sv) : this->returnBin(Parameter.variable2D_tt.D2_boosted.binsX,this->CalcHPt());
-      int binY= (doSvfit=="SVFIT") ? this->returnBin(Parameter.variable2D_tt.D2_boosted.binsY_svfit,NtupleView->m_sv) : this->returnBin(Parameter.variable2D_tt.D2_boosted.binsY_mvis,NtupleView->m_vis); 
-      if(binX>=0 && binY>=0) {
-        if(doSvfit=="SVFIT") return binY+binX*(Parameter.variable2D_tt.D2_boosted.binsY_svfit.size()-1);
-        else return binY+binX*(Parameter.variable2D_tt.D2_boosted.binsY_mvis.size()-1);
-        //return binX+binY*(Parameter.variable2D.D2_boosted.binsX.size()-1);
-      }
-    }
-    else if( sub.Contains(Parameter.variable2D_tt.D2_vbf.name) ){
-      int binX=this->returnBin(Parameter.variable2D_tt.D2_vbf.binsX,this->getMjj());
-      int binY= (doSvfit=="SVFIT") ? this->returnBin(Parameter.variable2D_tt.D2_vbf.binsY_svfit,NtupleView->m_sv) : this->returnBin(Parameter.variable2D_tt.D2_vbf.binsY_mvis,NtupleView->m_vis); 
-      if(binX>=0 && binY>=0) {
-        if(doSvfit=="SVFIT") return binY+binX*(Parameter.variable2D_tt.D2_vbf.binsY_svfit.size()-1);
-        else return binY+binX*(Parameter.variable2D_tt.D2_vbf.binsY_mvis.size()-1);
-        //return binX+binY*(Parameter.variable2D.D2_vbf.binsX.size()-1);
-      }
-    }
-  }
-  
-  else return -1;
-  
-}
-
 void GlobalClass::resetZeroBins(TString hist, TString var){
 
   if(resetZero){
@@ -496,115 +389,4 @@ void GlobalClass::resetZeroBins(TH1D* hist){
     }
   }
   
-}
-
-double GlobalClass::getWSFUncertainty( TString cat ){
-
-  if(channel == "mt"){
-    if( cat.Contains(s_0jet) ) return 0.1;
-    else if( cat.Contains(s_boosted) ) return 0.1;
-    else if( cat.Contains(s_vbf) ) return 0.3;
-  }
-  else if(channel == "et"){
-    if( cat.Contains(s_0jet) ) return 0.1;
-    else if( cat.Contains(s_boosted) ) return 0.1;
-    else if( cat.Contains(s_vbf) ) return 0.3;
-  }
-
-  return 1;
-  
-}
-
-double GlobalClass::getQCDSFUncertainty( TString cat ){
-
-  if(channel == "mt"){
-    if( cat.Contains(s_0jet) ) return 0.15;
-    else if( cat.Contains(s_boosted) ) return 0.15;
-    else if( cat.Contains(s_vbf) ) return 0.3;
-  }
-  else if(channel == "et"){
-    if( cat.Contains(s_0jet) ) return 0.15;
-    else if( cat.Contains(s_boosted) ) return 0.15;
-    else if( cat.Contains(s_vbf) ) return 0.3;
-  }
-
-  return 1;
-  
-}
-
-double GlobalClass::getRenormScale( TString cat ){
-
-  double HiggsPt = (doSvfit=="SVIFT") ? NtupleView->pt_sv : this->CalcHPt();
-
-  if(channel == "mt"){
-    if(cat == s_0jet) return 0.929 + 0.0001702 * NtupleView->pt_2;
-    else if(cat == s_boosted) return 0.919 - 0.0010055 * HiggsPt;
-    else if(cat == s_vbf) return 1.026 + 0.000066 * NtupleView->mjj;
-  }
-  else if(channel == "et"){
-    if(cat == s_0jet) return 0.973 + 0.0003405 * NtupleView->pt_2;
-    else if(cat == s_boosted) return 0.986 - 0.0000278 * HiggsPt;
-    else if(cat == s_vbf) return 0.971 + 0.0000327 * NtupleView->mjj;
-  }
-  else if(channel == "tt"){
-    if(cat == s_0jet) return 0.814 + 0.0027094 * NtupleView->pt_1;
-    else if(cat == s_boosted) return 0.973 - 0.0008596 * HiggsPt;
-    else if(cat == s_vbf) return 1.094 + 0.0000545 * NtupleView->mjj;
-  }
-
-  return 1;
-
-}
-
-double GlobalClass::getZmumuWeight( TString cat ){
-
-  double HiggsPt = (doSvfit=="SVIFT") ? NtupleView->pt_sv : this->CalcHPt();
-
-  if( cat == s_0jet ) return 1.;
-  else if( cat == s_boosted && channel != "tt" ){
-    if( HiggsPt<100 )      return 0.971;
-    else if( HiggsPt<150 ) return 0.975;
-    else if( HiggsPt<200 ) return 0.96;
-    else if( HiggsPt<250 ) return 0.964;
-    else if( HiggsPt<300 ) return 0.934;
-    else                   return 0.942;
-  } 
-  else if( cat == s_boosted && channel == "tt" ){
-    if( HiggsPt<100 )      return 0.973;
-    else if( HiggsPt<170 ) return 0.959;
-    else if( HiggsPt<300 ) return 0.934;
-    else                   return 0.993;
-  }   
-  else if(cat == s_vbf && channel != "tt" ){
-    if( this->getMjj()<300 )  return 1;
-    if( this->getMjj()<700 )  return 1.043;
-    if( this->getMjj()<1100 ) return 0.965;
-    if( this->getMjj()<1500 ) return 0.901;
-    else                      return 0.888;
-  } 
-  else if(cat == s_vbf && channel == "tt" ){
-    if( this->getMjj()<300 )  return 1.05;
-    if( this->getMjj()<500 )  return 1.032;
-    if( this->getMjj()<800 )  return 1.044;
-    else                      return 1.002;
-  }
-  
-  return 1;
-  
-}
-
-double GlobalClass::applyZmumuUncertainty( TString cat ){
-
-  if( cat == s_vbf ) return this->getZmumuWeight(cat);
-  else return 1;
-  
-} 
-
-TString GlobalClass::return2DString( TString cat ){
-
-  if( cat.Contains(s_0jet) )           return "0jet_";
-  else if( cat.Contains(s_boosted) )   return "boosted_";
-  else if( cat.Contains(s_vbf) )       return "vbf_";
-  else                                 return "";
-             
 }

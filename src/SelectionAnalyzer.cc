@@ -17,24 +17,18 @@ void SelectionAnalyzer::initDYSelections(TString cat, TString strVar, TString ex
   this->GetHistbyName(s_ZL+s_CMSdyShape+s_13TeVDown+sub,strVar);
   this->GetHistbyName(s_ZL+s_CMSZLShape+channel+"_"+s_13TeVUp+sub,strVar);
   this->GetHistbyName(s_ZL+s_CMSZLShape+channel+"_"+s_13TeVDown+sub,strVar);
-
-  this->GetHistbyName(s_ZL+s_CMSzmumu+s_13TeVUp+sub,strVar);
-  this->GetHistbyName(s_ZL+s_CMSzmumu+s_13TeVDown+sub,strVar);
   this->GetHistbyName(s_ZLL+sub,strVar);
+
   this->GetHistbyName(s_ZJ+sub,strVar);
   this->GetHistbyName(s_ZJ+s_CMSdyShape+s_13TeVUp+sub,strVar);
   this->GetHistbyName(s_ZJ+s_CMSdyShape+s_13TeVDown+sub,strVar);
   this->GetHistbyName(s_ZJ+s_CMSjetToTauFake+s_13TeVUp+sub,strVar);
   this->GetHistbyName(s_ZJ+s_CMSjetToTauFake+s_13TeVDown+sub,strVar);
-  this->GetHistbyName(s_ZJ+s_CMSzmumu+s_13TeVUp+sub,strVar);
-  this->GetHistbyName(s_ZJ+s_CMSzmumu+s_13TeVDown+sub,strVar);
   
   this->GetHistbyName(s_ZTT+sub,strVar);
   this->GetHistbyName(s_ZTT+s_CMSdyShape+s_13TeVUp+sub,strVar);
   this->GetHistbyName(s_ZTT+s_CMSdyShape+s_13TeVDown+sub,strVar);
 
-  this->GetHistbyName(s_ZTT+s_CMSzmumu+s_13TeVUp+sub,strVar);
-  this->GetHistbyName(s_ZTT+s_CMSzmumu+s_13TeVDown+sub,strVar);
   this->GetHistbyName(s_ZTT+s_CMSmssmHigh+channel+"_"+s_13TeVUp+sub,strVar);
   this->GetHistbyName(s_ZTT+s_CMSmssmHigh+channel+"_"+s_13TeVDown+sub,strVar);  
 
@@ -143,10 +137,6 @@ void SelectionAnalyzer::DYSelections(float var, float weight, TString cat, TStri
       	  this->GetHistbyName(s_ZL+s_CMSdyShape_stat_m400pt80+s_13TeVDown+sub,strVar)->Fill(usedVar, (weight/NtupleView->ZWeight)*statpt80down );
       	  this->GetHistbyName(s_ZL+s_CMSdyShape_stat_tjXsec+s_13TeVUp+sub,strVar)->Fill(usedVar, (weight/NtupleView->ZWeight)*ttup );
       	  this->GetHistbyName(s_ZL+s_CMSdyShape_stat_tjXsec+s_13TeVDown+sub,strVar)->Fill(usedVar, (weight/NtupleView->ZWeight)*ttdown );
-	  
-
-          this->GetHistbyName(s_ZL+s_CMSzmumu+s_13TeVUp+sub,strVar)->Fill(usedVar, weight * this->applyZmumuUncertainty( cat ) );
-          this->GetHistbyName(s_ZL+s_CMSzmumu+s_13TeVDown+sub,strVar)->Fill(usedVar, weight / this->applyZmumuUncertainty( cat ) );
         }
         else if( this->TSelection() ){
 
@@ -163,9 +153,6 @@ void SelectionAnalyzer::DYSelections(float var, float weight, TString cat, TStri
       	  this->GetHistbyName(s_ZTT+s_CMSdyShape_stat_m400pt80+s_13TeVDown+sub,strVar)->Fill(usedVar, (weight/NtupleView->ZWeight)*statpt80down );
       	  this->GetHistbyName(s_ZTT+s_CMSdyShape_stat_tjXsec+s_13TeVUp+sub,strVar)->Fill(usedVar, (weight/NtupleView->ZWeight)*ttup );
       	  this->GetHistbyName(s_ZTT+s_CMSdyShape_stat_tjXsec+s_13TeVDown+sub,strVar)->Fill(usedVar, (weight/NtupleView->ZWeight)*ttdown );
-
-          this->GetHistbyName(s_ZTT+s_CMSzmumu+s_13TeVUp+sub,strVar)->Fill(usedVar, weight * this->applyZmumuUncertainty( cat ) );
-          this->GetHistbyName(s_ZTT+s_CMSzmumu+s_13TeVDown+sub,strVar)->Fill(usedVar, weight / this->applyZmumuUncertainty( cat ) );
 
           if(channel == "et"){
             if( this->ShapeSelector(0,"nom") ){
@@ -209,8 +196,6 @@ void SelectionAnalyzer::DYSelections(float var, float weight, TString cat, TStri
 
           this->GetHistbyName(s_ZJ+s_CMSjetToTauFake+s_13TeVUp+sub,strVar)->Fill(usedVar, weight*this->getJetToTauFakeUp(NtupleView->pt_2) );
           this->GetHistbyName(s_ZJ+s_CMSjetToTauFake+s_13TeVDown+sub,strVar)->Fill(usedVar, weight*this->getJetToTauFakeDown(NtupleView->pt_2) );
-          this->GetHistbyName(s_ZJ+s_CMSzmumu+s_13TeVUp+sub,strVar)->Fill(usedVar, weight * this->applyZmumuUncertainty( cat ) );
-          this->GetHistbyName(s_ZJ+s_CMSzmumu+s_13TeVDown+sub,strVar)->Fill(usedVar, weight / this->applyZmumuUncertainty( cat ) );
         }
 
         ////////////////////////////////////////////////////////////////
@@ -885,11 +870,6 @@ void SelectionAnalyzer::signalSelections(float var, float weight, TString cat, T
   
 
     if(calcFF) this->applyFF(usedVar,weight,cat,strVar,fname+mass,0,"");
-
-    if(fname == s_ggH){
-      if( this->Baseline(sign,cat) )                 this->GetHistbyName(fname+mass+s_CMSscalegg+s_13TeVUp+sub,strVar)->Fill(usedVar, weight*this->getRenormScale(cat) );
-      if( this->Baseline(sign,cat) )                 this->GetHistbyName(fname+mass+s_CMSscalegg+s_13TeVDown+sub,strVar)->Fill(usedVar, weight*(2-this->getRenormScale(cat) ) );
-    }
     return;
   }
   else if(fname.Contains(s_jecUp)     ){

@@ -18,7 +18,6 @@ class GlobalClass{
   GlobalClass();
   ~GlobalClass();
 
-  double get2DVar(TString sub);
   int returnBin(vector<double> bins, double value);
 
   int getNjets();
@@ -39,15 +38,6 @@ class GlobalClass{
   int LooseBtag(TString btag);
   int TightMt(TString iso,TString mt = "SR");
   int LooseMt(TString iso,TString mt = "SR");
-  int LooseIso(TString iso,TString mt = "SR");
-
-  double getWSFUncertainty( TString cat );
-  double getQCDSFUncertainty( TString cat );
-  double getRenormScale( TString cat );
-  double getZmumuWeight( TString cat );
-  double applyZmumuUncertainty( TString cat );
-  TString return2DString( TString cat );
-
   int W_CR(TString sign, TString iso, TString cat, bool mtcut=true );
 
   TH1D* GetHistbyName(TString name, TString strVar="");

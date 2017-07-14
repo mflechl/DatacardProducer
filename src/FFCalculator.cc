@@ -28,7 +28,6 @@ void FFCalculator::applyFF(float var, float weight, TString cat, TString strVar,
   TString sub = extend + "+" + strVar +"_" + cat + "+";
   float usedVar=var;
   bool validCat =  std::find(Parameter.category.categoriesForQCDest.begin(), Parameter.category.categoriesForQCDest.end(), cat) != Parameter.category.categoriesForQCDest.end() ;
-  if(extend=="2D") usedVar = this->get2DVar(sub)+0.1;
   /////////////////////////////////////////////////////////////////////////////////////////////////////////
   /////////////////////////////////////////////////////////////////////////////////////////////////////////
   if(isJEC==0){
