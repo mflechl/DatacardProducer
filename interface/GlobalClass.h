@@ -76,8 +76,7 @@ class GlobalClass{
   TString FFversion;
   TString channel;
   vector<TString> categories;
-  json Binning;
-  json Analysis;
+  json Parameters;
 
 
 };

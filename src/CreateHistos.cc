@@ -12,41 +12,42 @@ using namespace std;
 
 CreateHistos::CreateHistos(TString testEnv_, TString ch){
 
-  //-------------
-  // Use channel defined in Settings. Otherwise use argument given to class
+  testEnv = testEnv_;
+  channel = ch;
   #ifdef CHANNEL
     channel = CHANNEL;
-  #else
-    channel = ch;
   #endif
-  //-------------
-  // Apply mtcut strategy as defined in Settings. Otherwise use config from Analysis.json
-  #ifdef APPLY_MT_CUT
-    applyMTCut = APPLY_MT_CUT;
-  #else
-    applyMTCut = Analysis["applyMTCut"][channel.Data()];
-  #endif
-  //-------------
-  // Use categories as defined in Settings. Otherwise use categories from Analysis.json
+
+  folder = channel;
+
+  if(channel != "tt"){
+    applyMTCut = 1;
+    FFiso = "tight";
+    categories={s_nobtag_tight,s_btag_tight,s_nobtag_loosemt,s_btag_loosemt};
+  }
+  else{
+    applyMTCut = 0;
+    FFiso = "medium";
+    categories={ s_nobtag,s_btag };
+  }
+
+  FFversion = FF_build +FFiso+".root";
+
   #ifdef USE_CONST_CAT
     categories = const_categories;
-  #else
-    categories = Analysis["categories"][channel.Data()];
   #endif
-  //-------------
+
+  #ifdef APPLY_MT_CUT
+    applyMTCut = APPLY_MT_CUT;
+  #endif
 
 
-  testEnv = testEnv_;
-  folder = channel;
   if(testEnv == "test")    cout << "testing availability of input files" << endl;
   if(testEnv == "minimal") cout << "creating minimal datacard" << endl;
   if(testEnv == "nlo"){
     folder = channel + "_nlo";
     cout << "creating nlo datacard" << endl;
   }
-
-  FFiso =  Analysis["FFiso"][channel.Data()];
-  FFversion = FF_build +FFiso+".root";
 
   vector<TString> masspoints = Parameter.dataset.masspoints;
   

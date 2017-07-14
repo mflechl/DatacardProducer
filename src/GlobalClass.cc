@@ -12,10 +12,8 @@ GlobalClass::GlobalClass()
 {  
   TH1::SetDefaultSumw2(1);
 
-  ifstream A("config/Analysis.json");
-  ifstream B("config/Binning.json");
-  B >> Binning;
-  A >> Analysis;
+  ifstream i("config/ParameterConfig.json");
+  i >> Parameters;
 }
 GlobalClass::~GlobalClass()
 {
@@ -112,13 +110,24 @@ int GlobalClass::Baseline(TString sign, TString cat){
 
 int GlobalClass::passMTCut(){
   if( !applyMTCut ) return 1;
-  if( this->getMT() < Analysis["MT"]["low"][channel.Data()] ) return 1;
+  if( this->getMT() < Parameter.analysisCut.mTLow ) return 1;
   return 0;
 }
 
 int GlobalClass::passIso(TString type){
   if(channel == "tt") return 1;
-  if(NtupleView->iso_1 < Analysis["iso"][type.Data()][channel.Data()] ) return 1;
+  if(type == "base"){
+    if(channel == "et" && NtupleView->iso_1 < Parameter.analysisCut.elIso_base) return 1;
+    if(channel == "mt" && NtupleView->iso_1 < Parameter.analysisCut.muIso_base) return 1;
+  }
+  else if(type == "relaxed"){
+    if(channel == "et" && NtupleView->iso_1 < Parameter.analysisCut.elIso_relaxed) return 1;
+    if(channel == "mt" && NtupleView->iso_1 < Parameter.analysisCut.muIso_relaxed) return 1;
+  }
+  else if(type == "antiiso"){
+    if(channel == "et" && NtupleView->iso_1 < Parameter.analysisCut.elIso_antiIsoHigh && NtupleView->iso_1 > Parameter.analysisCut.elIso_antiIsoLow) return 1;
+    if(channel == "mt" && NtupleView->iso_1 < Parameter.analysisCut.muIso_antiIsoHigh && NtupleView->iso_1 > Parameter.analysisCut.muIso_antiIsoLow) return 1;
+  }
   return 0;
 }
 
@@ -244,8 +253,8 @@ int GlobalClass::TauIso(TString Tiso){
 int GlobalClass::TightMt(TString iso,TString mt){
 
   if(applyMTCut){
-    if( mt == "SR" && this->getMT() >  Analysis["MT"]["low"][channel.Data()] ) return 0;
-    if( mt == "CR" && this->getMT() <  Analysis["MT"]["high"][channel.Data()] ) return 0;
+    if( mt == "SR" && this->getMT() >  Parameter.analysisCut.mTLow) return 0;
+    if( mt == "CR" && this->getMT() <  Parameter.analysisCut.mTHigh) return 0;
   }
   if(iso == "FF") return 1;
   if(iso == "OS" || iso == "SS"){
@@ -260,15 +269,18 @@ int GlobalClass::TightMt(TString iso,TString mt){
     if(FFiso == "vtight" && NtupleView->byVTightIsolationMVArun2v1DBoldDMwLT_2 ) return 1;
   }
     
+  
+
+
   return 0;
 }
 int GlobalClass::LooseMt(TString iso,TString mt){
 
   if(applyMTCut){
     if( mt == "SR" 
-        && !(this->getMT() > Analysis["MT"]["low"][channel.Data()]
-             && this->getMT() < Analysis["MT"]["high"][channel.Data()] ) ) return 0;
-    if( mt == "CR" && this->getMT() <  Analysis["MT"]["high"][channel.Data()] ) return 0;
+        && !(this->getMT() > Parameter.analysisCut.mTLow
+             && this->getMT() < Parameter.analysisCut.mTHigh) ) return 0;
+    if( mt == "CR" && this->getMT() <  Parameter.analysisCut.mTHigh) return 0;
   }
 
   if(iso == "FF") return 1;
@@ -291,8 +303,8 @@ int GlobalClass::LooseMt(TString iso,TString mt){
 int GlobalClass::LooseIso(TString iso,TString mt){
 
   if(applyMTCut){
-    if( mt == "SR" && this->getMT() >  Analysis["MT"]["high"][channel.Data()] ) return 0;
-    if( mt == "CR" && this->getMT() <  Analysis["MT"]["high"][channel.Data()] ) return 0;
+    if( mt == "SR" && this->getMT() >  Parameter.analysisCut.mTHigh) return 0;
+    if( mt == "CR" && this->getMT() <  Parameter.analysisCut.mTHigh) return 0;
   }
 
     if(iso == "OS" || iso == "SS"){
@@ -311,7 +323,7 @@ int GlobalClass::LooseIso(TString iso,TString mt){
 int GlobalClass::W_CR(TString sign, TString iso, TString cat, bool mtcut){
   if(sign == "OS" && NtupleView->q_1 * NtupleView->q_2 > 0) return 0;
   if(sign == "SS" && NtupleView->q_1 * NtupleView->q_2 < 0) return 0;
-  if(mtcut && this->getMT() < Analysis["MT"]["high"][channel.Data()] ) return 0;
+  if(mtcut && this->getMT() < Parameter.analysisCut.mTHigh ) return 0;
   if( cat.Contains("nobtag") && NtupleView->nbtag > 0 ) return 0;
   if( cat.Contains("btag") && !cat.Contains("loosebtag") && !cat.Contains("nobtag") && !(NtupleView->nbtag > 0) ) return 0;
   if( cat.Contains("loosebtag") && !(NtupleView->njetspt20 > 0) ) return 0;
@@ -357,30 +369,264 @@ TH1D* GlobalClass::getBinnedHisto(TString name,vector<double> input){
 
 TH1D* GlobalClass::JITHistoCreator(TString name, TString strVar){
 
+  int nbins = 1;
+  double nmin = 0;
+  double nmax = 1;
   TString binning = "default";
 
-  if(strVar == s_mttot){
-    if( name.Contains("btag") && !name.Contains("nobtag") )  binning = "btag";
-    else binning = "nobtag";
+  int usingVarBins = 0;
+
+  if(strVar == s_norm){
+    nbins = 4;
+    nmin  = 0;
+    nmax  = 4;
   }
-  if(strVar == s_pt1 || strVar == s_pt2){
-    binning = channel;
+  
+  if(strVar == s_mvis){
+    if(Parameter.variable.m_vis.doVarBins) {
+      usingVarBins = 1;
+      histograms[name] = this->getBinnedHisto(name,Parameter.variable.m_vis.varBins.at(binning)) ;
+    }
+    else{
+      nbins = Parameter.variable.m_vis.nbins;
+      nmin  = Parameter.variable.m_vis.nmin;;
+      nmax  = Parameter.variable.m_vis.nmax;
+    }
   }
 
-  if(Binning[strVar.Data()]["doVarBins"]){
-    try{
-      histograms[name] = this->getBinnedHisto(name,Binning[strVar.Data()]["varBins"].at(binning.Data() ) ) ;
+  if(strVar == s_njet ){
+    if(Parameter.variable.njet.doVarBins) {
+      usingVarBins = 1;
+      histograms[name] = this->getBinnedHisto(name,Parameter.variable.njet.varBins.at(binning)) ;
     }
-    catch(const out_of_range& err){
-      histograms[name] = this->getBinnedHisto(name,Binning[strVar.Data()]["varBins"].at("default") ) ;
-    }   
+    else{
+      nbins = Parameter.variable.njet.nbins;
+      nmin  = Parameter.variable.njet.nmin;;
+      nmax  = Parameter.variable.njet.nmax;
+    }
   }
-  else{
-    histograms[name] = new TH1D(name,"", Binning[strVar.Data()]["nbins"], Binning[strVar.Data()]["nmin"], Binning[strVar.Data()]["nmax"]  ) ;
+
+  if(strVar == s_nbtag ){
+    if(Parameter.variable.nbtag.doVarBins) {
+      usingVarBins = 1;
+      histograms[name] = this->getBinnedHisto(name,Parameter.variable.nbtag.varBins.at(binning)) ;
+    }
+    else{
+      nbins = Parameter.variable.nbtag.nbins;
+      nmin  = Parameter.variable.nbtag.nmin;;
+      nmax  = Parameter.variable.nbtag.nmax;
+    }
   }
+
+  if(strVar == s_msv){
+    if(Parameter.variable.m_sv.doVarBins) {
+      usingVarBins = 1;
+      histograms[name] = this->getBinnedHisto(name,Parameter.variable.m_sv.varBins.at(binning)) ;
+    }
+    else{
+      nbins = Parameter.variable.m_sv.nbins;
+      nmin  = Parameter.variable.m_sv.nmin;;
+      nmax  = Parameter.variable.m_sv.nmax;
+    }
+  }
+
+  if(strVar == s_ptsv){
+    if(Parameter.variable.pt_sv.doVarBins) {
+      usingVarBins = 1;
+      histograms[name] = this->getBinnedHisto(name,Parameter.variable.pt_sv.varBins.at(binning)) ;
+    }
+    else{
+      nbins = Parameter.variable.pt_sv.nbins;
+      nmin  = Parameter.variable.pt_sv.nmin;;
+      nmax  = Parameter.variable.pt_sv.nmax;
+    }
+  }
+
+  else if(strVar == s_jpt1
+          || strVar == s_jpt2
+        ){
+    if(Parameter.variable.jpt.doVarBins){
+      usingVarBins = 1;
+      histograms[name] = this->getBinnedHisto(name,Parameter.variable.jpt.varBins.at(binning)) ;
+    }
+    else{
+      nbins = Parameter.variable.jpt.nbins;
+      nmin  = Parameter.variable.jpt.nmin;
+      nmax  = Parameter.variable.jpt.nmax;
+    }
+  }
+  else if(strVar == s_pt1 || strVar == s_pt2){
+    if(Parameter.variable.pt.doVarBins){
+      usingVarBins = 1;
+
+      //      binning = channel;
+
+      histograms[name] = this->getBinnedHisto(name,Parameter.variable.pt.varBins.at(binning)) ;
+    }
+    else{
+      nbins = Parameter.variable.pt.nbins;
+      nmin  = Parameter.variable.pt.nmin;
+      nmax  = Parameter.variable.pt.nmax;
+    }
+  }
+  else if(strVar == s_eta1 || strVar == s_eta2){
+    if(Parameter.variable.eta.doVarBins){
+      usingVarBins = 1;
+      histograms[name] = this->getBinnedHisto(name,Parameter.variable.eta.varBins.at(binning)) ;
+    }
+    else{
+      nbins = Parameter.variable.eta.nbins;
+      nmin  = Parameter.variable.eta.nmin;
+      nmax  = Parameter.variable.eta.nmax;
+    }
+  }
+  else if(strVar == s_jeta1 || strVar == s_jeta2){
+    if(Parameter.variable.jeta.doVarBins){
+      usingVarBins = 1;
+      histograms[name] = this->getBinnedHisto(name,Parameter.variable.jeta.varBins.at(binning)) ;
+    }
+    else{
+      nbins = Parameter.variable.jeta.nbins;
+      nmin  = Parameter.variable.jeta.nmin;
+      nmax  = Parameter.variable.jeta.nmax;
+    }
+  }
+  else if(strVar == "jdeta"){
+    if(Parameter.variable.jdeta.doVarBins){
+      usingVarBins = 1;
+      histograms[name] = this->getBinnedHisto(name,Parameter.variable.jdeta.varBins.at(binning)) ; 
+    }
+    else{
+      nbins = Parameter.variable.jdeta.nbins;
+      nmin  = Parameter.variable.jdeta.nmin;
+      nmax  = Parameter.variable.jdeta.nmax;
+    }
+  }
+  else if(strVar == s_mt1){
+    if(Parameter.variable.mt_1.doVarBins){
+      usingVarBins = 1;
+      histograms[name] = this->getBinnedHisto(name,Parameter.variable.mt_1.varBins.at(binning)) ;
+    }
+    else{
+      nbins = Parameter.variable.mt_1.nbins;
+      nmin  = Parameter.variable.mt_1.nmin;
+      nmax  = Parameter.variable.mt_1.nmax;
+    }
+  }
+  else if(strVar == s_mt2){
+    if(Parameter.variable.mt_2.doVarBins){
+      usingVarBins = 1;
+      histograms[name] = this->getBinnedHisto(name,Parameter.variable.mt_2.varBins.at(binning)) ;
+    }
+    else{
+      nbins = Parameter.variable.mt_2.nbins;
+      nmin  = Parameter.variable.mt_2.nmin;
+      nmax  = Parameter.variable.mt_2.nmax;
+    }
+  }
+  else if(strVar == s_met){
+    if(Parameter.variable.met.doVarBins){
+      usingVarBins = 1;
+      histograms[name] = this->getBinnedHisto(name,Parameter.variable.met.varBins.at(binning)) ;
+    }
+    else{
+      nbins = Parameter.variable.met.nbins;
+      nmin  = Parameter.variable.met.nmin;
+      nmax  = Parameter.variable.met.nmax;
+    }
+  }
+  else if(strVar == s_mttot){
+    if(Parameters["Binning"][strVar.Data()]["doVarBins"]){
+      usingVarBins = 1;
+
+      if( name.Contains("_btag") )        binning = "btag";
+      else if( name.Contains("_nobtag") ) binning = "nobtag";
+      try{
+        histograms[name] = this->getBinnedHisto(name,Parameters["Binning"][strVar.Data()]["varBins"].at(binning.Data() ) ) ;
+      }
+      catch(const out_of_range& err){
+        histograms[name] = this->getBinnedHisto(name,Parameters["Binning"][strVar.Data()]["varBins"].at("default") ) ;
+      }
+      
+    }
+    else{
+      nbins = Parameters["Binning"][strVar.Data()]["nbins"];
+      nmin  = Parameters["Binning"][strVar.Data()]["nmin"];
+      nmax  = Parameters["Binning"][strVar.Data()]["nmax"];
+    }
+  }
+  else if(strVar == s_Hpt){
+    if(Parameter.variable.Hpt.doVarBins){
+      usingVarBins = 1;
+      histograms[name] = this->getBinnedHisto(name,Parameter.variable.Hpt.varBins.at(binning)) ;
+    }
+    else{
+      nbins = Parameter.variable.Hpt.nbins;
+      nmin  = Parameter.variable.Hpt.nmin;
+      nmax  = Parameter.variable.Hpt.nmax;
+    }
+  }
+  else if(strVar == "High_mt_1"){
+    if(Parameter.variable.High_mt_1.doVarBins){
+      usingVarBins = 1;
+      histograms[name] = this->getBinnedHisto(name,Parameter.variable.High_mt_1.varBins.at(binning)) ;
+    }
+    else{
+      nbins = Parameter.variable.High_mt_1.nbins;
+      nmin  = Parameter.variable.High_mt_1.nmin;
+      nmax  = Parameter.variable.High_mt_1.nmax;
+    }
+  }
+  else if(strVar == "Low_mt_1"){
+    if(Parameter.variable.Low_mt_1.doVarBins){
+      usingVarBins = 1;
+      histograms[name] = this->getBinnedHisto(name,Parameter.variable.Low_mt_1.varBins.at(binning)) ;
+    }
+    else{
+      nbins = Parameter.variable.Low_mt_1.nbins;
+      nmin  = Parameter.variable.Low_mt_1.nmin;
+      nmax  = Parameter.variable.Low_mt_1.nmax;
+    }
+  }
+  else if(strVar == "iso_1"){
+    if(Parameter.variable.iso_1.doVarBins){
+      usingVarBins = 1;
+      histograms[name] = this->getBinnedHisto(name,Parameter.variable.iso_1.varBins.at(binning)) ;
+    }
+    else{
+      nbins = Parameter.variable.iso_1.nbins;
+      nmin  = Parameter.variable.iso_1.nmin;
+      nmax  = Parameter.variable.iso_1.nmax;
+    }
+  }
+  else if(strVar == s_mjj){
+    if(Parameter.variable.mjj.doVarBins){
+      usingVarBins = 1;
+      histograms[name] = this->getBinnedHisto(name,Parameter.variable.mjj.varBins.at(binning)) ;
+    }
+    else{
+      nbins = Parameter.variable.mjj.nbins;
+      nmin  = Parameter.variable.mjj.nmin;
+      nmax  = Parameter.variable.mjj.nmax;
+    }
+  }
+  else if(strVar == "jeta1eta2"){
+    if(Parameter.variable.jeta1eta2.doVarBins){
+      usingVarBins = 1;
+      histograms[name] = this->getBinnedHisto(name,Parameter.variable.jeta1eta2.varBins.at(binning)) ;
+    }
+    else{
+      nbins = Parameter.variable.jeta1eta2.nbins;
+      nmin  = Parameter.variable.jeta1eta2.nmin;
+      nmax  = Parameter.variable.jeta1eta2.nmax;
+    }
+  }
+  
+  //else throw std::invalid_argument( "Cannot create histo: " + name + ". Binning not found"  );
+
+  if(!usingVarBins) histograms[name] = new TH1D(name,"", nbins, nmin, nmax  ) ;
 
   return histograms.at(name);
-
 
 }
 
