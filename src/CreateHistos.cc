@@ -13,34 +13,31 @@ using namespace std;
 CreateHistos::CreateHistos(TString testEnv_, TString ch){
 
   testEnv = testEnv_;
-  channel = ch;
   #ifdef CHANNEL
     channel = CHANNEL;
+  #else
+     channel = ch;
   #endif
 
   folder = channel;
 
-  if(channel != "tt"){
-    applyMTCut = 1;
-    FFiso = "tight";
-    categories={s_nobtag_tight,s_btag_tight,s_nobtag_loosemt,s_btag_loosemt};
-  }
-  else{
-    applyMTCut = 0;
-    FFiso = "medium";
-    categories={ s_nobtag,s_btag };
-  }
-
-  FFversion = FF_build +FFiso+".root";
-
   #ifdef USE_CONST_CAT
     categories = const_categories;
+  #else
+    for(auto cat : Analysis["categories"][channel.Data()] ){
+      categories.push_back( cat );
+    }    
   #endif
 
   #ifdef APPLY_MT_CUT
     applyMTCut = APPLY_MT_CUT;
+  #else
+    applyMTCut = Analysis["applyMTCut"][channel.Data()];   
   #endif
 
+  FFiso = Analysis["FFiso"][channel.Data()];
+  FFbuild = Analysis["FFbuild"][channel.Data()];
+  FFversion = FFbuild + FFiso+".root";
 
   if(testEnv == "test")    cout << "testing availability of input files" << endl;
   if(testEnv == "minimal") cout << "creating minimal datacard" << endl;

@@ -326,8 +326,8 @@ TH1D* GlobalClass::JITHistoCreator(TString name, TString strVar){
 
   TString binning = "default";
   if(strVar == s_mttot || strVar == s_mvis){
-    if( name.Contains("_btag") )        binning = "btag";
-    else if( name.Contains("_nobtag") ) binning = "nobtag";
+    if( name.Contains("btag") && !name.Contains("nobtag") )        binning = "btag";
+    else binning = "nobtag";
   }
   if(strVar == s_pt1 || strVar == s_pt2){
     binning = channel;
@@ -346,7 +346,6 @@ TH1D* GlobalClass::JITHistoCreator(TString name, TString strVar){
   else{
     histograms[name] = new TH1D(name,"", Binning[strVar.Data()]["nbins"], Binning[strVar.Data()]["nmin"], Binning[strVar.Data()]["nmax"]  ) ;
   }
-
 
   return histograms.at(name);
 

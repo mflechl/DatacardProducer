@@ -61,8 +61,9 @@ class GlobalClass{
   Int_t isJEC=0; //0->no correction; 1->jecUp; -1->jecDown;
   TString testEnv = "";
   TString folder;
-  int applyMTCut;
-  TString FFiso;
+  bool applyMTCut;
+  string FFiso;
+  string FFbuild;
   TString FFversion;
   TString channel;
   vector<TString> categories;

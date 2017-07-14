@@ -29,7 +29,6 @@ const int doMC=0;
 const double usedLuminosity=35.9; 
 const TString doSvfit="woSVFIT";
 const TString reduced="";//"";//"_reduced";
-const TString FF_build="fakeFactors_20170628_";
 const TString UseIso = "tight";
 
 
