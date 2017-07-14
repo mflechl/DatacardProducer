@@ -12,7 +12,9 @@ GlobalClass::GlobalClass()
 {  
   TH1::SetDefaultSumw2(1);
 
+  ifstream A("config/Analysis.json");
   ifstream B("config/Binning.json");
+  A >> Analysis;
   B >> Binning;
 }
 GlobalClass::~GlobalClass()

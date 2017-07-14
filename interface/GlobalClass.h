@@ -66,6 +66,7 @@ class GlobalClass{
   TString FFversion;
   TString channel;
   vector<TString> categories;
+  json Analysis;
   json Binning;
 
 
