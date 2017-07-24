@@ -10,9 +10,9 @@
 
 using namespace std;
 
-CreateHistos::CreateHistos(TString testEnv_, TString ch){
+CreateHistos::CreateHistos(TString runOption_, TString ch){
 
-  testEnv = testEnv_;
+  runOption = runOption_;
   #ifdef CHANNEL
     channel = CHANNEL;
   #else
@@ -39,21 +39,21 @@ CreateHistos::CreateHistos(TString testEnv_, TString ch){
   FFbuild = Analysis["FFbuild"][channel.Data()];
   FFversion = FFbuild + FFiso+".root";
 
-  if(testEnv == "test")    cout << "testing availability of input files" << endl;
-  if(testEnv == "minimal") cout << "creating minimal datacard" << endl;
-  if(testEnv == "nlo"){
+  if(runOption == "test")    cout << "testing availability of input files" << endl;
+  if(runOption == "minimal") cout << "creating minimal datacard" << endl;
+  if(runOption == "nlo"){
     folder = channel + "_nlo";
     cout << "creating nlo datacard" << endl;
   }
 
   vector<TString> masspoints = Parameter.dataset.masspoints;
   
-  if(testEnv == "minimal"){
+  if(runOption == "minimal"){
     masspoints = Parameter.dataset.test_masspoints;
   }
 
   vector<TString> shifts = {""};
-  if( (ptShift || testEnv == "test" ) && testEnv != "minimal"){    
+  if( (ptShift || runOption == "test" ) && runOption != "minimal"){    
     if(channel != "et"){
       shifts.insert( shifts.end(), Parameter.dataset.tES_shifts.begin(), Parameter.dataset.tES_shifts.end() );
     }
@@ -85,14 +85,14 @@ CreateHistos::CreateHistos(TString testEnv_, TString ch){
         files[s_ggH+shift+mass].first = this->getFilestring( Parameter.dataset.ggH, shift, mass );
         files[s_ggH+shift+mass].second = mass;
 
-        if(testEnv == "nlo") files[s_bbH+shift+mass].first = this->getFilestring( Parameter.dataset.bbHNLO, shift, mass );
+        if(runOption == "nlo") files[s_bbH+shift+mass].first = this->getFilestring( Parameter.dataset.bbHNLO, shift, mass );
         else files[s_bbH+shift+mass].first = this->getFilestring( Parameter.dataset.bbH, shift, mass );
         files[s_bbH+shift+mass].second = mass;   
     }
   }
   
 
-  if( jecShift  && testEnv != "minimal" ){
+  if( jecShift  && runOption != "minimal" ){
     for(auto jshift : {s_jecUp, s_jecDown} ){
       files[s_Z+jshift].first = this->getFilestring( Parameter.dataset.Z);
       files[s_W+jshift].first = this->getFilestring( Parameter.dataset.W);
@@ -223,6 +223,8 @@ void CreateHistos::run(){
   }
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
   TString filetype = "";
+  TString inputfolder = Parameter.dataset.inputfolder;
+  inputfolder.ReplaceAll("CHANNEL",channel);
   int fileindex = 0;
   float perc;
   TString filename = "";
@@ -238,7 +240,7 @@ void CreateHistos::run(){
 
 
     if( access(filename.Data(),F_OK ) != 0 ){
-      cout << red +" Warning "+endc+"File does not exist ->  " << filename.ReplaceAll(Parameter.dataset.inputfolder,"") << endl;
+      cout << red +" Warning "+endc+"File does not exist ->  " << filename.ReplaceAll(inputfolder,"") << endl;
       continue;
     }
 
@@ -260,7 +262,7 @@ void CreateHistos::run(){
 
     this->loadFile(filename);
     Int_t nentries=0;
-    if(testEnv == "test"){
+    if(runOption == "test"){
       nentries = min( Int_t(NtupleView->fChain->GetEntries()), Int_t( 10000 ) );
     }else{
       nentries = Int_t(NtupleView->fChain->GetEntries());
@@ -269,7 +271,7 @@ void CreateHistos::run(){
     if(nentries > 0) cout<< "Contains "+green;
     else cout<< "Contains " + red;
     cout<< left << setw(8) << setfill(' ')  << nentries;
-    cout<<endc+" events. File:  "<< filename.ReplaceAll(Parameter.dataset.inputfolder,"") <<" loaded."<<endl;
+    cout<<endc+" events. File:  "<< filename.ReplaceAll(inputfolder,"")<<endl;
 
     
 
@@ -285,6 +287,7 @@ void CreateHistos::run(){
 
       NtupleView->GetEntry(jentry);
 
+      if( !this->SpecialCuts() ) continue;
 
       if( channel== "mt" && (NtupleView->Flag_badMuons || NtupleView->Flag_duplicateMuons || !NtupleView->trg_singlemuon) ) continue;
       if( channel== "et" && ( !NtupleView->trg_singleelectron ) )continue;
@@ -376,6 +379,25 @@ void CreateHistos::run(){
   cout << "Done running over events." << endl;
   writeHistos( channel, cats, vars );
   
+}
+
+bool CreateHistos::SpecialCuts(){
+  if(runOption == "1p" && NtupleView->decayMode_2 < 4) return true;
+  if(runOption == "3p" && NtupleView->decayMode_2 == 10) return true;
+  if(runOption == "pt_l50" && NtupleView->pt_2 <= 50) return true;
+  if(runOption == "pt_5080" && NtupleView->pt_2 > 50 && NtupleView->pt_2 <= 80) return true;
+  if(runOption == "pt_g80" && NtupleView->pt_2 > 80) return true;
+  if(runOption == "pt_g80_1p" && NtupleView->pt_2 > 80 && NtupleView->decayMode_2 < 4) return true;
+  if(runOption == "pt_g80_3p" && NtupleView->pt_2 > 80 && NtupleView->decayMode_2 == 10) return true;
+  if(runOption == "pt_g100" && NtupleView->pt_2 > 100) return true;
+  if(runOption == "pt_g120" && NtupleView->pt_2 > 120) return true;
+  if(runOption == "nom") return true;
+  if(runOption == "nlo") return true;
+  if(runOption == "minimal") return true;
+  if(runOption == "test") return true;
+  return false;
+
+
 }
 
 float CreateHistos::recalcEffweight(){
@@ -936,7 +958,7 @@ void CreateHistos::writeHistos( TString channel, vector<TString> cats, vector<TS
   TString sub;
   TString tmp;
   TString D2="";
-  if(doMC) D2+="-MCsum";
+  if(runOption != "nom") D2="."+runOption;
 
   for(auto var : vars){
     outfile_name << "histos/"<<folder << "/htt_" << channel << ".inputs-mssm-13TeV-"<<var<<D2<<".root";

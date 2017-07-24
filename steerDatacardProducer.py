@@ -10,6 +10,7 @@ def main():
 	parser.add_argument('-t', dest='test', help='run test', action='store_true')
 	parser.add_argument('-m', dest='minimal', help='run minimal test', action='store_true')
 	parser.add_argument('-n', dest='nlo', help='run NLO signal', action='store_true')
+	parser.add_argument('-s', dest='special', help='run with control cuts', action='store_true')
 	parser.add_argument('-c', dest='channel', help='datacard channel',choices = ['mt','et','tt','all'], default = 'mt')
 	args = parser.parse_args()
 
@@ -28,11 +29,22 @@ def main():
 		testEnv = "minimal"
 	if args.nlo:
 		testEnv = "nlo"
+	if args.nlo:
+		testEnv = "nlo"
 
-	if args.channel != "all":
+	if args.channel != "all" and not args.special:
 		cmd = "./makeHTTDatacards {0} {1}".format(testEnv, args.channel)
 		p = sp.Popen(shlex.split(cmd),stdout = sys.__stdout__, stderr = sys.__stderr__, shell=False)
 		p.communicate()
+
+	elif args.special:
+		cmdList = []
+		#for s in ["1p","3p","pt_l50","pt_5080","pt_g80"]:
+		for s in ["pt_g80_1p","pt_g80_3p","pt_g100","pt_g120"]:
+			cmdList.append("./makeHTTDatacards {0} {1}".format(s, args.channel) )
+
+
+		applyCmdMulti(cmdList)		
 	else:
 		cmdList = []
 		for c in ["et","mt","tt"]:

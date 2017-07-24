@@ -3,9 +3,9 @@
 #include <iostream>
 #include <string>
 
-void runFile(TString isTest, TString ch) {
+void runFile(TString runOption, TString ch) {
 
-    CreateHistos *Analyzer = new CreateHistos(isTest, ch);
+    CreateHistos *Analyzer = new CreateHistos(runOption, ch);
     Analyzer->run();
     delete Analyzer;
   

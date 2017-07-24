@@ -9,7 +9,7 @@ class CreateHistos : public SelectionAnalyzer{
   CreateHistos(TString testEnv_, TString ch);
 
   ~CreateHistos();
-
+  bool SpecialCuts();
   float getAntiLep_tauscaling();
   TString getFilestring(TString input, TString ES="", TString mass="");
   TString ColorPrompt(TString input, TString color);
