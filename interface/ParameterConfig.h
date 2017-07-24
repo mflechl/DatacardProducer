@@ -37,18 +37,6 @@ const struct Parameter{
 
   } dataset;
 
-  struct analysisCut{
-    double mTHigh = 70;
-    double mTLow  = 40;
-    double muIso_base = 0.15;
-    double muIso_relaxed = 0.3;
-    double muIso_antiIsoLow = 0.15;
-    double muIso_antiIsoHigh = 0.3;
-    double elIso_base = 0.1;
-    double elIso_relaxed = 0.3;
-    double elIso_antiIsoLow = 0.1;
-    double elIso_antiIsoHigh = 0.3;
-  } analysisCut;
 
    struct category{
     vector<TString> categoriesForQCDest = {s_inclusive, s_nobtag, s_btag, s_nobtag_tight,s_btag_tight,s_nobtag_looseiso,s_btag_looseiso,s_nobtag_loosemt,s_btag_loosemt};
@@ -72,23 +60,6 @@ const struct Parameter{
     } tt;
   } FFsystematics;
 
-  struct QCD_OSSS
-  {
-    struct mt
-    {
-      double ZeroJet = 1.00;
-      double Boosted = 1.15;
-      double VBF = 1.20;
-    }mt;
-    struct et
-    {
-      double ZeroJet = 1.00;
-      double Boosted = 1.15;
-      double VBF = 1.20;
-      
-    }et;
-  } QCD_OSSS ;
-  
 } Parameter;
 
  
