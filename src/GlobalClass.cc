@@ -112,16 +112,13 @@ int GlobalClass::Baseline(TString sign, TString cat){
 
 int GlobalClass::passMTCut(){
   if( !applyMTCut ) return 1;
-  if( this->getMT() < Parameter.analysisCut.mTLow ) return 1;
+  if( this->getMT() < Analysis["MTCut"]["low"][channel.Data()] ) return 1;
   return 0;
 }
 
 int GlobalClass::passIso(TString type){
   if(channel == "tt") return 1;
-  if(type == "base"){
-    if(channel == "et" && NtupleView->iso_1 < Parameter.analysisCut.elIso_base) return 1;
-    if(channel == "mt" && NtupleView->iso_1 < Parameter.analysisCut.muIso_base) return 1;
-  }
+  if(NtupleView->iso_1 < Analysis["iso"][type.Data()][channel.Data()] ) return 1;
   return 0;
 }
 
@@ -158,8 +155,6 @@ int GlobalClass::CategorySelection(TString cat, TString iso){
   }
 
   if(tmp == s_inclusive       )    return 1;    
-
-  
   if(tmp == s_nobtag          )    return this->Btag("nobtag") && this->TauIso(Tiso);
   if(tmp == s_btag            )    return this->Btag("btag")   && this->TauIso(Tiso);
   if(tmp == s_nobtag_tight    )    return this->Btag("nobtag") && this->TightMt(iso);
@@ -243,27 +238,23 @@ int GlobalClass::TauIso(TString Tiso){
 int GlobalClass::TightMt(TString iso,TString mt){
 
   if(applyMTCut){
-    if( mt == "SR" && this->getMT() >  Parameter.analysisCut.mTLow) return 0;
-    if( mt == "CR" && this->getMT() <  Parameter.analysisCut.mTHigh) return 0;
+    if( mt == "SR" && this->getMT() >  Analysis["MTCut"]["low"][channel.Data()]) return 0;
+    if( mt == "CR" && this->getMT() <  Analysis["MTCut"]["high"][channel.Data()]) return 0;
   }
   if(iso == "FF") return 1;
   if(iso == "OS" || iso == "SS"){
     if(FFiso == "medium" && NtupleView->byMediumIsolationMVArun2v1DBoldDMwLT_2 ) return 1;
     if(FFiso == "tight" && NtupleView->byTightIsolationMVArun2v1DBoldDMwLT_2 ) return 1;
   }
-    
-  
-
-
   return 0;
 }
 int GlobalClass::LooseMt(TString iso,TString mt){
 
   if(applyMTCut){
     if( mt == "SR" 
-        && !(this->getMT() > Parameter.analysisCut.mTLow
-             && this->getMT() < Parameter.analysisCut.mTHigh) ) return 0;
-    if( mt == "CR" && this->getMT() <  Parameter.analysisCut.mTHigh) return 0;
+        && !(this->getMT() > Analysis["MTCut"]["low"][channel.Data()]
+             && this->getMT() < Analysis["MTCut"]["high"][channel.Data()]) ) return 0;
+    if( mt == "CR" && this->getMT() <  Analysis["MTCut"]["high"][channel.Data()]) return 0;
   }
 
   if(iso == "FF") return 1;
@@ -281,7 +272,7 @@ int GlobalClass::LooseMt(TString iso,TString mt){
 int GlobalClass::W_CR(TString sign, TString iso, TString cat, bool mtcut){
   if(sign == "OS" && NtupleView->q_1 * NtupleView->q_2 > 0) return 0;
   if(sign == "SS" && NtupleView->q_1 * NtupleView->q_2 < 0) return 0;
-  if(mtcut && this->getMT() < Parameter.analysisCut.mTHigh ) return 0;
+  if(mtcut && this->getMT() < Analysis["MTCut"]["high"][channel.Data()] ) return 0;
   if( cat.Contains("nobtag") && NtupleView->nbtag > 0 ) return 0;
   if( cat.Contains("btag") && !cat.Contains("loosebtag") && !cat.Contains("nobtag") && !(NtupleView->nbtag > 0) ) return 0;
   if( cat.Contains("loosebtag") && !(NtupleView->njetspt20 > 0) ) return 0;

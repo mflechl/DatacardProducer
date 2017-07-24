@@ -957,12 +957,12 @@ void CreateHistos::writeHistos( TString channel, vector<TString> cats, vector<TS
   stringstream outfile_name;
   TString sub;
   TString tmp;
-  TString D2="";
-  if(runOption != "nom") D2="."+runOption;
+  TString subDC="";
+  if(runOption != "nom") subDC="."+runOption;
 
   for(auto var : vars){
-    outfile_name << "histos/"<<folder << "/htt_" << channel << ".inputs-mssm-13TeV-"<<var<<D2<<".root";
-    //outfile_name << "histos/htt_" << channel+"_"+UseIso << ".inputs-mssm-13TeV-"<<var<<D2<<".root";
+    outfile_name << "histos/"<<folder << "/htt_" << channel << ".inputs-mssm-13TeV-"<<var<<subDC<<".root";
+    //outfile_name << "histos/htt_" << channel+"_"+UseIso << ".inputs-mssm-13TeV-"<<var<<subDC<<".root";
     outfile = new TFile(outfile_name.str().c_str(), "RECREATE") ;
 
     for(auto cat : cats){
