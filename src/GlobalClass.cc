@@ -316,15 +316,17 @@ TH1D* GlobalClass::getBinnedHisto(TString name,vector<double> input){
 TH1D* GlobalClass::JITHistoCreator(TString name, TString strVar){
 
   TString binning = "default";
-  if(strVar == s_mttot || strVar == s_mvis){
-    if( name.Contains("btag") && !name.Contains("nobtag") )        binning = "btag";
-    else binning = "nobtag";
-  }
-  if(strVar == s_pt1 || strVar == s_pt2){
-    binning = channel;
-  }
 
-  if(Binning[strVar.Data()]["doVarBins"]){
+
+  if(Binning[strVar.Data()]["doVarBins"]["check"]){
+
+    if(Binning[strVar.Data()]["doVarBins"]["type"] == (string)"cat"){
+      if( name.Contains("btag") && !name.Contains("nobtag") )        binning = "btag";
+      else binning = "nobtag";
+    }
+    if(Binning[strVar.Data()]["doVarBins"]["type"] == (string)"channel"){
+      binning = channel;
+    }  
 
     try{
       histograms[name] = this->getBinnedHisto(name,Binning[strVar.Data()]["varBins"].at(binning.Data() ) ) ;

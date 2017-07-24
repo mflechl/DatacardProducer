@@ -4,7 +4,10 @@
     "nbins": 4,
     "nmin" : 0,
     "nmax" : 4,
-    "doVarBins" : false,
+    "doVarBins":{
+      "check":false,
+      "type":""
+    },
     "varBins":
     {
       "default":[0,1,2,3,4]
@@ -15,7 +18,10 @@
     "nbins": 10,
     "nmin" : -0.5,
     "nmax" : 9.5,
-    "doVarBins" : false,
+    "doVarBins":{
+      "check":false,
+      "type":""
+    },
     "varBins":
     {
       "default":[0,3900]
@@ -26,7 +32,10 @@
     "nbins": 10,
     "nmin" : -0.5,
     "nmax" : 4.5,
-    "doVarBins" : false,
+    "doVarBins":{
+      "check":false,
+      "type":""
+    },
     "varBins":
     {
       "default":[0,3900]
@@ -37,7 +46,10 @@
     "nbins": 25,
     "nmin" : -2.5,
     "nmax" : 2.5,
-    "doVarBins" : false,
+    "doVarBins":{
+      "check":false,
+      "type":""
+    },
     "varBins":
     {
       "default":[0,3900]
@@ -48,7 +60,10 @@
     "nbins": 25,
     "nmin" : -2.5,
     "nmax" : 2.5,
-    "doVarBins" : false,
+    "doVarBins":{
+      "check":false,
+      "type":""
+    },
     "varBins":
     {
       "default":[0,3900]
@@ -59,7 +74,10 @@
     "nbins": 20,
     "nmin" : 0,
     "nmax" : 200,
-    "doVarBins" : false,
+    "doVarBins":{
+      "check":false,
+      "type":""
+    },
     "varBins":
     {
       "default":[0,3900]
@@ -70,7 +88,10 @@
     "nbins": 14,
     "nmin" : 0,
     "nmax" : 70,
-    "doVarBins" : true,
+    "doVarBins":{
+      "check":true,
+      "type":""
+    },
     "varBins":
     {
       "default":[0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,500]
@@ -81,10 +102,13 @@
     "nbins": 14,
     "nmin" : 30,
     "nmax" : 100,
-    "doVarBins" : true,
+    "doVarBins":{
+      "check":true,
+      "type":"channel"
+    },
     "varBins":
     {
-      "default":[30,35,40,45,50,55,60,65,70,75,80,85,90,95,100,120,140,160,180,200,250,300,350,400,500],
+      "default":[0,3900],
       "et":[30,35,40,45,50,55,60,65,70,75,80,85,90,95,100],
       "mt":[30,35,40,45,50,55,60,65,70,75,80,85,90,95,100],
       "tt":[40,45,50,55,60,65,70,75,80,85,90,95,100]
@@ -95,10 +119,13 @@
     "nbins": 14,
     "nmin" : 30,
     "nmax" : 100,
-    "doVarBins" : true,
+    "doVarBins":{
+      "check":true,
+      "type":"channel"
+    },
     "varBins":
     {
-      "default":[30,35,40,45,50,55,60,65,70,75,80,85,90,95,100,120,140,160,180,200,250,300,350,400,500],
+      "default":[0,3900],
       "et":[30,35,40,45,50,55,60,65,70,75,80,85,90,95,100],
       "mt":[30,35,40,45,50,55,60,65,70,75,80,85,90,95,100],
       "tt":[40,45,50,55,60,65,70,75,80,85,90,95,100]
@@ -109,10 +136,13 @@
     "nbins": 20,
     "nmin" : 0,
     "nmax" : 200,
-    "doVarBins" : true,
+    "doVarBins":{
+      "check":true,
+      "type":"cat"
+    },
     "varBins":
     {
-      "default":[10,25,40,55,70,85,100,115,130,145,160,175,190,205,220,235,250],
+      "default":[0,3900],
       "nobtag":[10,25,40,55,70,85,100,115,130,145,160,175,190,205,220,235,250],
       "btag":[10,30,50,70,90,110,130,150,170,190,210,230,250]
     }
@@ -122,7 +152,10 @@
     "nbins": 50,
     "nmin" : 0,
     "nmax" : 500,
-    "doVarBins" : true,
+    "doVarBins":{
+      "check":true,
+      "type":"cat"
+    },
     "varBins":
     {
       "default":[0,3200],
