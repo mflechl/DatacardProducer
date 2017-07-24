@@ -14,8 +14,10 @@ GlobalClass::GlobalClass()
 
   ifstream A("config/Analysis.json");
   ifstream B("config/Binning.json");
+  ifstream D("config/Datasets.json");
   A >> Analysis;
   B >> Binning;
+  D >> Datasets;
 }
 GlobalClass::~GlobalClass()
 {

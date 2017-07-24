@@ -63,59 +63,59 @@ CreateHistos::CreateHistos(TString runOption_, TString ch){
     }
   }
 
-  if(channel=="mt") files[s_data].first = this->getFilestring( Parameter.dataset.data_mt );
-  if(channel=="et") files[s_data].first = this->getFilestring( Parameter.dataset.data_et );
-  if(channel=="tt") files[s_data].first = this->getFilestring( Parameter.dataset.data_tt );
+  // if(channel=="mt") files[s_data].first = this->getFilestring( Parameter.dataset.data_mt );
+  // if(channel=="et") files[s_data].first = this->getFilestring( Parameter.dataset.data_et );
+  if(channel=="tt") files[s_data.Data()].first = this->getFilestring( Datasets["id"][s_data.Data()][channel.Data()] );
 
-  files[s_W].first = this->getFilestring( Parameter.dataset.W );
+  // files[s_W].first = this->getFilestring( Parameter.dataset.W );
 
-  for(auto shift : shifts ){
+  // for(auto shift : shifts ){
 
-    files[s_Z+shift].first = this->getFilestring( Parameter.dataset.Z, shift );
-    files[s_TT+shift].first = this->getFilestring( Parameter.dataset.TT, shift );
-    files[s_VV+shift].first = this->getFilestring( Parameter.dataset.VV, shift );
-    files[s_SMggH+shift].first = this->getFilestring( Parameter.dataset.SMggH, shift );
-    files[s_SMvbf+shift].first = this->getFilestring( Parameter.dataset.SMvbf, shift );
-    files[s_SMWminus+shift].first = this->getFilestring( Parameter.dataset.SMWminus, shift );
-    files[s_SMWplus+shift].first = this->getFilestring( Parameter.dataset.SMWplus, shift );
-    files[s_SMZH+shift].first = this->getFilestring( Parameter.dataset.SMZH, shift );
+  //   files[s_Z+shift].first = this->getFilestring( Parameter.dataset.Z, shift );
+  //   files[s_TT+shift].first = this->getFilestring( Parameter.dataset.TT, shift );
+  //   files[s_VV+shift].first = this->getFilestring( Parameter.dataset.VV, shift );
+  //   files[s_SMggH+shift].first = this->getFilestring( Parameter.dataset.SMggH, shift );
+  //   files[s_SMvbf+shift].first = this->getFilestring( Parameter.dataset.SMvbf, shift );
+  //   files[s_SMWminus+shift].first = this->getFilestring( Parameter.dataset.SMWminus, shift );
+  //   files[s_SMWplus+shift].first = this->getFilestring( Parameter.dataset.SMWplus, shift );
+  //   files[s_SMZH+shift].first = this->getFilestring( Parameter.dataset.SMZH, shift );
 
-    for(auto mass : masspoints){
+  //   for(auto mass : masspoints){
 
-        files[s_ggH+shift+mass].first = this->getFilestring( Parameter.dataset.ggH, shift, mass );
-        files[s_ggH+shift+mass].second = mass;
+  //       files[s_ggH+shift+mass].first = this->getFilestring( Parameter.dataset.ggH, shift, mass );
+  //       files[s_ggH+shift+mass].second = mass;
 
-        if(runOption == "nlo") files[s_bbH+shift+mass].first = this->getFilestring( Parameter.dataset.bbHNLO, shift, mass );
-        else files[s_bbH+shift+mass].first = this->getFilestring( Parameter.dataset.bbH, shift, mass );
-        files[s_bbH+shift+mass].second = mass;   
-    }
-  }
+  //       if(runOption == "nlo") files[s_bbH+shift+mass].first = this->getFilestring( Parameter.dataset.bbHNLO, shift, mass );
+  //       else files[s_bbH+shift+mass].first = this->getFilestring( Parameter.dataset.bbH, shift, mass );
+  //       files[s_bbH+shift+mass].second = mass;   
+  //   }
+  // }
   
 
-  if( jecShift  && runOption != "minimal" ){
-    for(auto jshift : {s_jecUp, s_jecDown} ){
-      files[s_Z+jshift].first = this->getFilestring( Parameter.dataset.Z);
-      files[s_W+jshift].first = this->getFilestring( Parameter.dataset.W);
-      files[s_TT+jshift].first = this->getFilestring( Parameter.dataset.TT);
-      files[s_VV+jshift].first = this->getFilestring( Parameter.dataset.VV);
-      files[s_SMggH+jshift].first = this->getFilestring( Parameter.dataset.SMggH);
-      files[s_SMvbf+jshift].first = this->getFilestring( Parameter.dataset.SMvbf);
-      files[s_SMWminus+jshift].first = this->getFilestring( Parameter.dataset.SMWminus);
-      files[s_SMWplus+jshift].first = this->getFilestring( Parameter.dataset.SMWplus);
-      files[s_SMZH+jshift].first = this->getFilestring( Parameter.dataset.SMZH);
+  // if( jecShift  && runOption != "minimal" ){
+  //   for(auto jshift : {s_jecUp, s_jecDown} ){
+  //     files[s_Z+jshift].first = this->getFilestring( Parameter.dataset.Z);
+  //     files[s_W+jshift].first = this->getFilestring( Parameter.dataset.W);
+  //     files[s_TT+jshift].first = this->getFilestring( Parameter.dataset.TT);
+  //     files[s_VV+jshift].first = this->getFilestring( Parameter.dataset.VV);
+  //     files[s_SMggH+jshift].first = this->getFilestring( Parameter.dataset.SMggH);
+  //     files[s_SMvbf+jshift].first = this->getFilestring( Parameter.dataset.SMvbf);
+  //     files[s_SMWminus+jshift].first = this->getFilestring( Parameter.dataset.SMWminus);
+  //     files[s_SMWplus+jshift].first = this->getFilestring( Parameter.dataset.SMWplus);
+  //     files[s_SMZH+jshift].first = this->getFilestring( Parameter.dataset.SMZH);
 
 
-      for(auto mass : masspoints){
-        files[s_ggH+jshift+mass].first = this->getFilestring(Parameter.dataset.ggH,"",mass);
-        files[s_ggH+jshift+mass].second = this->getFilestring( mass);
+  //     for(auto mass : masspoints){
+  //       files[s_ggH+jshift+mass].first = this->getFilestring(Parameter.dataset.ggH,"",mass);
+  //       files[s_ggH+jshift+mass].second = this->getFilestring( mass);
 
 
-        files[s_bbH+jshift+mass].first = this->getFilestring( Parameter.dataset.bbH,"",mass);
-        files[s_bbH+jshift+mass].second = this->getFilestring( mass);
+  //       files[s_bbH+jshift+mass].first = this->getFilestring( Parameter.dataset.bbH,"",mass);
+  //       files[s_bbH+jshift+mass].second = this->getFilestring( mass);
 
-      }
-    }
-  }
+  //     }
+  //   }
+  // }
 
   for(auto var : variables)      vars.push_back(var);
   for(auto cat : categories){
@@ -160,6 +160,10 @@ CreateHistos::~CreateHistos(){
 TString CreateHistos::getFilestring(TString input, TString ES, TString mass){
 
   TString newstring = input;
+  TString inputfolder ="/data/higgs/data_2016/ntuples_"+version+"/CHANNEL/ntuples_"+doSvfit+"_merged/";
+  TString appendix = "CHANNEL_"+version+"_TES.root";
+  
+  newstring = inputfolder + newstring + appendix;
   newstring.ReplaceAll("XXX",mass);
   newstring.ReplaceAll("CHANNEL",channel);
   if(ES == "") newstring.ReplaceAll("_TES",ES);

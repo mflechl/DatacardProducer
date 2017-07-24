@@ -54,7 +54,7 @@ class GlobalClass{
   vector<TString> cats;
   vector<TString> vars;
   //vector< vector<TString> > files; 
-  map<TString, pair<TString,TString> > files;
+  map<string, pair<string,string> > files;
 
   //ntuple *NtupleView;
   std::unique_ptr<ntuple> NtupleView;
@@ -69,6 +69,7 @@ class GlobalClass{
   vector<string> categories;
   json Analysis;
   json Binning;
+  json Datasets;
 
 
 };
