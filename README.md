@@ -14,33 +14,32 @@
 
 ## Usage
 
+**JSON config files**
+-   **config/Analysis.json**     
+    All non-boolean analysis cuts should be defined here. Additionally, the version of the Fake Faktor input files 
+    and  the luminosity (may be different for each channel) are defined here.
+
+-   **config/Binning.json** 
+    Variable or fixed binning for any variable used to produced datacards with is defined here
+
+-   **config/Datasets.json**    
+    All information concerning the samples to process are given here
+
 **Settings.h**  
-General configurations are given here. This includes the build of the FakeFactor File, version and production of the ntuples, variables to produce datacards with and some flags for debugging.
-To override some of the given Parameters from the steering script three defines are included.
-
--   **APPLY_MT_CUT**  
-    Takes 0 or 1 as argument. Is used to forcefully enable or disable the mt cut. Necessary e.g. to produce mt plots in et and mt channel.
-
--   **CHANNEL**  
-    Overrides the channel given by the steering skript.   
-    **WARNING** If option "all" is given to the steering script all datacards are produced with the same channel. 
-    
--   **USE_CONST_CAT**
-    
-    Uses the categories given in the Settings file. 
+General configurations and debug options are given here. Most important option is the vector of variables to produce datacards with.
 
 **steerDatacardProducer.py**
 
-Compiles the code and runs with the configuration given in Settings.h.
-Two additional flags can be set:
--   **-c**  
-    Produces a datacard with the given channel [mt, et, tt]. A full set of datacards is produced when option "all" is given.
+Compiles the code and runs with the configuration given in Settings.h and the JSON-files. 
 
--   **-t**  
-    Runs over all input samples but only reads 10000 events from each. Usefull to test availability of ntuples.
+-   Channel is specified with option [-c].  
+    Default value is "mt". To run over all channels simultaneously use "all"
 
--   **-m**  
-    Creates a minimal datacard without the systematic templates. Usefull for the first synchronisation steps.
+-   Minimal datacard is produced with option [-m].  
+    Produces a datacard for the specified channel and the variables given in Settings.h.
+    **Only creates nominal templates**.
+
+-   Test availability of sample with option [-t].   
+    Runs over 10000 events of each sample.
 
 
-Further information can be found here: https://wiki.hephy.at/index.php/HiggsSampleProduction
