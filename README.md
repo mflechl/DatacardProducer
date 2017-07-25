@@ -35,6 +35,8 @@ Compiles the code and runs with the configuration given in Settings.h and the JS
 -   Channel is specified with option [-c].  
     Default value is "mt". To run over all channels simultaneously use "all"
 
+-   Produce datacards using NLO bbH with option [-n].   
+
 -   Minimal datacard is produced with option [-m].  
     Produces a datacard for the specified channel and the variables given in Settings.h.
     **Only creates nominal templates**.

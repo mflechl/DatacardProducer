@@ -23,14 +23,14 @@ def main():
 	    sys.exit()
 
 	testEnv = "nom"
-	if args.test:
+	if args.nlo:
+		testEnv = "nlo"
+	elif args.test:
 		testEnv = "test"
-	if args.minimal:
+	elif args.minimal:
 		testEnv = "minimal"
-	if args.nlo:
-		testEnv = "nlo"
-	if args.nlo:
-		testEnv = "nlo"
+
+
 
 	if args.channel != "all" and not args.special:
 		cmd = "./makeHTTDatacards {0} {1}".format(testEnv, args.channel)
@@ -39,8 +39,7 @@ def main():
 
 	elif args.special:
 		cmdList = []
-		#for s in ["1p","3p","pt_l50","pt_5080","pt_g80"]:
-		for s in ["pt_g80_1p","pt_g80_3p","pt_g100","pt_g120"]:
+		for s in ["1p","3p","pt_l50","pt_5080","pt_g80","pt_g80_1p","pt_g80_3p","pt_g100","pt_g120"]:
 			cmdList.append("./makeHTTDatacards {0} {1}".format(s, args.channel) )
 
 
