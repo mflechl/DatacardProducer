@@ -15,8 +15,6 @@ void SelectionAnalyzer::initDYSelections(TString cat, TString strVar, TString ex
   this->GetHistbyName(s_ZL+sub,strVar);
   this->GetHistbyName(s_ZL+s_CMSdyShape+s_13TeVUp+sub,strVar);
   this->GetHistbyName(s_ZL+s_CMSdyShape+s_13TeVDown+sub,strVar);
-  this->GetHistbyName(s_ZL+s_CMSZLShape+channel+"_"+s_13TeVUp+sub,strVar);
-  this->GetHistbyName(s_ZL+s_CMSZLShape+channel+"_"+s_13TeVDown+sub,strVar);
   this->GetHistbyName(s_ZLL+sub,strVar);
 
   this->GetHistbyName(s_ZJ+sub,strVar);
@@ -66,8 +64,6 @@ void SelectionAnalyzer::initTSelections(TString cat, TString strVar, TString ext
   this->GetHistbyName(s_TT+sub,strVar);
   this->GetHistbyName(s_TT+s_CMSttShape+s_13TeVUp+sub,strVar);
   this->GetHistbyName(s_TT+s_CMSttShape+s_13TeVDown+sub,strVar);
-  this->GetHistbyName(s_TT+s_CMStauScale+channel+"_"+s_13TeVUp+sub,strVar);
-  this->GetHistbyName(s_TT+s_CMStauScale+channel+"_"+s_13TeVDown+sub,strVar);
 
 }
 
@@ -86,7 +82,7 @@ void SelectionAnalyzer::initSignalSelections(TString cat, TString strVar, TStrin
 
   TString sub = extend + "+" + strVar +"_" + cat + "+";
 
-  for(auto mass : Parameter.dataset.masspoints){
+  for(auto mass : masspoints){
     for(auto type : {s_ggH, s_bbH} ){
 
       this->GetHistbyName(type+mass+sub,strVar);

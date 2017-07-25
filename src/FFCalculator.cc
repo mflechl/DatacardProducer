@@ -10,7 +10,7 @@ FFCalculator::~FFCalculator(){
 
 void FFCalculator::initFakeFactors(){
   for(auto cat : cats){
-    if( std::find(Parameter.category.categoriesForQCDest.begin(), Parameter.category.categoriesForQCDest.end(), cat) == Parameter.category.categoriesForQCDest.end() ) continue;
+    if( std::find(categories.begin(), categories.end(), cat) == categories.end() ) continue;
     TString catSuffix = cat;
     if(cat == s_inclusive && channel != "tt") catSuffix = s_nobtag_tight;
     if(cat == s_inclusive && channel == "tt") catSuffix = s_nobtag;
@@ -27,7 +27,7 @@ void FFCalculator::applyFF(float var, float weight, TString cat, TString strVar,
 
   TString sub = extend + "+" + strVar +"_" + cat + "+";
   float usedVar=var;
-  bool validCat =  std::find(Parameter.category.categoriesForQCDest.begin(), Parameter.category.categoriesForQCDest.end(), cat) != Parameter.category.categoriesForQCDest.end() ;
+  bool validCat =  std::find(categories.begin(), categories.end(), cat) != categories.end() ;
   /////////////////////////////////////////////////////////////////////////////////////////////////////////
   /////////////////////////////////////////////////////////////////////////////////////////////////////////
   if(isJEC==0){
@@ -49,7 +49,6 @@ void FFCalculator::applyFF(float var, float weight, TString cat, TString strVar,
           for( auto syst : FFsyst[channel] ){
             TString tmp=syst;
             this->getCorrectUncertaintyString( tmp );
-            if(doMC && tmp.Contains("qcd")) continue;
             this->GetHistbyName( fname+"_"+s_jetFakes+"_"+tmp+sub,strVar)->Fill(usedVar, weight*FFObj[cat]->value(FFinputs, syst) );
 
           }
@@ -76,7 +75,6 @@ void FFCalculator::applyFF(float var, float weight, TString cat, TString strVar,
           for( auto syst : FFsyst[channel] ){
           TString tmp=syst;
           this->getCorrectUncertaintyString( tmp );
-          if(doMC && tmp.Contains("qcd")) continue;
           this->GetHistbyName( fname+"_"+s_jetFakes+"_"+tmp+sub,strVar)->Fill(usedVar, 0.5*weight*FFObj[cat]->value(FFinputs, syst) );
           }
         }
@@ -98,7 +96,6 @@ void FFCalculator::applyFF(float var, float weight, TString cat, TString strVar,
           for( auto syst : FFsyst[channel] ){
             TString tmp=syst;
             this->getCorrectUncertaintyString( tmp );
-            if(doMC && tmp.Contains("qcd")) continue;
             this->GetHistbyName( fname+"_"+s_jetFakes+"_"+tmp+sub,strVar)->Fill(usedVar, 0.5*weight*FFObj[cat]->value(FFinputs, syst) );
           }
         }
