@@ -5,11 +5,11 @@
 #include "TChain.h"
 #include "TFile.h"
 #include "TH1D.h"
-#include "ParameterConfig.h"
+#include "FakeFactorConfig.h"
 #include <fstream>
 #include "json.hpp"
 
-using json = nlohmann::json;
+using nlohmann::json;
 
 
 class GlobalClass{
@@ -54,21 +54,23 @@ class GlobalClass{
   vector<TString> cats;
   vector<TString> vars;
   //vector< vector<TString> > files; 
-  map<TString, pair<TString,TString> > files;
+  map<TString, pair<string,string> > files;
 
   //ntuple *NtupleView;
   std::unique_ptr<ntuple> NtupleView;
   Int_t isJEC=0; //0->no correction; 1->jecUp; -1->jecDown;
-  TString runOption = "";
+  string runOption = "";
   TString folder;
   bool applyMTCut;
   string FFiso;
   string FFbuild;
   TString FFversion;
-  TString channel;
+  string channel;
   vector<string> categories;
+  vector<string> masspoints;
   json Analysis;
   json Binning;
+  json Datasets;
 
 
 };

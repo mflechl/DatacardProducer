@@ -12,33 +12,19 @@ using namespace std;
 
 CreateHistos::CreateHistos(TString runOption_, TString ch){
 
+  // Basic initialization of channel categories and mt cut
   runOption = runOption_;
-  #ifdef CHANNEL
-    channel = CHANNEL;
-  #else
-     channel = ch;
-  #endif
+  channel = ch;
+  for(auto cat : Analysis["categories"][channel] ) categories.push_back( cat ); 
+  applyMTCut = Analysis["applyMTCut"][channel];   
 
-  folder = channel;
-
-  #ifdef USE_CONST_CAT
-    categories = const_categories;
-  #else
-    for(auto cat : Analysis["categories"][channel.Data()] ){
-      categories.push_back( cat );
-    }    
-  #endif
-
-  #ifdef APPLY_MT_CUT
-    applyMTCut = APPLY_MT_CUT;
-  #else
-    applyMTCut = Analysis["applyMTCut"][channel.Data()];   
-  #endif
-
-  FFiso = Analysis["FFiso"][channel.Data()];
-  FFbuild = Analysis["FFbuild"][channel.Data()];
+  // Initialization of FF version
+  FFiso = Analysis["FFiso"][channel];
+  FFbuild = Analysis["FFbuild"][channel];
   FFversion = FFbuild + FFiso+".root";
 
+  // Name of output folder and prompt for run option 
+  folder = channel;
   if(runOption == "test")    cout << "testing availability of input files" << endl;
   if(runOption == "minimal") cout << "creating minimal datacard" << endl;
   if(runOption == "nlo"){
@@ -46,76 +32,61 @@ CreateHistos::CreateHistos(TString runOption_, TString ch){
     cout << "creating nlo datacard" << endl;
   }
 
-  vector<TString> masspoints = Parameter.dataset.masspoints;
-  
-  if(runOption == "minimal"){
-    masspoints = Parameter.dataset.test_masspoints;
+  // Initialize masspoints
+  if(runOption == "minimal") for(auto mass : Datasets["masspoints"]["test"] ) masspoints.push_back( mass );
+  else for(auto mass : Datasets["masspoints"]["full"] ) masspoints.push_back( mass );
+
+  // Initialize set of energy scale shifts
+  vector<string> shifts = {""};
+  if( runOption != "minimal" ){    
+    for(auto shift : Datasets["shifts"][channel] ) shifts.push_back( shift );
   }
 
-  vector<TString> shifts = {""};
-  if( (ptShift || runOption == "test" ) && runOption != "minimal"){    
-    if(channel != "et"){
-      shifts.insert( shifts.end(), Parameter.dataset.tES_shifts.begin(), Parameter.dataset.tES_shifts.end() );
-    }
-    else if( channel=="et" ){
-      shifts.insert( shifts.end(), Parameter.dataset.min_shifts.begin(), Parameter.dataset.min_shifts.end() );
-      shifts.insert( shifts.end(), Parameter.dataset.eES_shifts.begin(), Parameter.dataset.eES_shifts.end() );
-    }
-  }
+  // Set of background samples to process
+  vector<TString> bkg_samples = { s_Z,
+                                  s_TT,
+                                  s_VV,
+                                  s_SMggH,
+                                  s_SMvbf,
+                                  s_SMWminus,
+                                  s_SMWplus,
+                                  s_SMZH };
 
-  if(channel=="mt") files[s_data].first = this->getFilestring( Parameter.dataset.data_mt );
-  if(channel=="et") files[s_data].first = this->getFilestring( Parameter.dataset.data_et );
-  if(channel=="tt") files[s_data].first = this->getFilestring( Parameter.dataset.data_tt );
-
-  files[s_W].first = this->getFilestring( Parameter.dataset.W );
-
+  // Create filepaths mapped to unique identifier for data an MC samples
+  files[s_data].first = this->getFilestring( Datasets["id"][s_data.Data()][channel] );
+  files[s_W].first = this->getFilestring( Datasets["id"][s_W.Data()] );
   for(auto shift : shifts ){
-
-    files[s_Z+shift].first = this->getFilestring( Parameter.dataset.Z, shift );
-    files[s_TT+shift].first = this->getFilestring( Parameter.dataset.TT, shift );
-    files[s_VV+shift].first = this->getFilestring( Parameter.dataset.VV, shift );
-    files[s_SMggH+shift].first = this->getFilestring( Parameter.dataset.SMggH, shift );
-    files[s_SMvbf+shift].first = this->getFilestring( Parameter.dataset.SMvbf, shift );
-    files[s_SMWminus+shift].first = this->getFilestring( Parameter.dataset.SMWminus, shift );
-    files[s_SMWplus+shift].first = this->getFilestring( Parameter.dataset.SMWplus, shift );
-    files[s_SMZH+shift].first = this->getFilestring( Parameter.dataset.SMZH, shift );
-
+    for( auto sample : bkg_samples ){
+      files[sample+shift].first = this->getFilestring(  Datasets["id"][sample.Data()], shift );
+    }
     for(auto mass : masspoints){
-
-        files[s_ggH+shift+mass].first = this->getFilestring( Parameter.dataset.ggH, shift, mass );
+        files[s_ggH+shift+mass].first = this->getFilestring( Datasets["id"]["ggH"], shift, mass );
         files[s_ggH+shift+mass].second = mass;
 
-        if(runOption == "nlo") files[s_bbH+shift+mass].first = this->getFilestring( Parameter.dataset.bbHNLO, shift, mass );
-        else files[s_bbH+shift+mass].first = this->getFilestring( Parameter.dataset.bbH, shift, mass );
+        if(runOption == "nlo") files[s_bbH.Data()+shift+mass].first = this->getFilestring( Datasets["id"]["bbHnlo"], shift, mass );
+        else files[s_bbH+shift+mass].first = this->getFilestring( Datasets["id"]["bbH"], shift, mass );
         files[s_bbH+shift+mass].second = mass;   
     }
   }
   
-
-  if( jecShift  && runOption != "minimal" ){
-    for(auto jshift : {s_jecUp, s_jecDown} ){
-      files[s_Z+jshift].first = this->getFilestring( Parameter.dataset.Z);
-      files[s_W+jshift].first = this->getFilestring( Parameter.dataset.W);
-      files[s_TT+jshift].first = this->getFilestring( Parameter.dataset.TT);
-      files[s_VV+jshift].first = this->getFilestring( Parameter.dataset.VV);
-      files[s_SMggH+jshift].first = this->getFilestring( Parameter.dataset.SMggH);
-      files[s_SMvbf+jshift].first = this->getFilestring( Parameter.dataset.SMvbf);
-      files[s_SMWminus+jshift].first = this->getFilestring( Parameter.dataset.SMWminus);
-      files[s_SMWplus+jshift].first = this->getFilestring( Parameter.dataset.SMWplus);
-      files[s_SMZH+jshift].first = this->getFilestring( Parameter.dataset.SMZH);
+  // ##############Deprecated in MSSM ##############
+  // ################################################
+  // if( jecShift  && runOption != "minimal" ){
+  //   for(auto jshift : {s_jecUp, s_jecDown} ){
+  //     for( auto sample : bkg_samples ){
+  //       files[sample.Data()+jshift].first = this->getFilestring(  Datasets["id"][sample.Data()] );
+  //     }
+  //     for(auto mass : masspoints){
+  //       files[s_ggH.Data()+jshift+mass].first = this->getFilestring(Datasets["id"]["ggH"],"",mass);
+  //       files[s_ggH.Data()+jshift+mass].second = this->getFilestring( mass);
 
 
-      for(auto mass : masspoints){
-        files[s_ggH+jshift+mass].first = this->getFilestring(Parameter.dataset.ggH,"",mass);
-        files[s_ggH+jshift+mass].second = this->getFilestring( mass);
+  //       files[s_bbH+jshift+mass].first = this->getFilestring( Datasets["id"]["bbH"],"",mass);
+  //       files[s_bbH+jshift+mass].second = this->getFilestring( mass);
 
-
-        files[s_bbH+jshift+mass].first = this->getFilestring( Parameter.dataset.bbH,"",mass);
-        files[s_bbH+jshift+mass].second = this->getFilestring( mass);
-
-      }
-    }
-  }
+  //     }
+  //   }
+  // }
 
   for(auto var : variables)      vars.push_back(var);
   for(auto cat : categories){
@@ -160,8 +131,12 @@ CreateHistos::~CreateHistos(){
 TString CreateHistos::getFilestring(TString input, TString ES, TString mass){
 
   TString newstring = input;
+  string v = Datasets["version"][channel];
+  TString inputfolder ="/data/higgs/data_2016/ntuples_"+v+"/"+channel+"/ntuples_"+doSvfit+"_merged/";
+  TString appendix = channel+"_"+v+"_TES.root";
+  
+  newstring = inputfolder + newstring + appendix;
   newstring.ReplaceAll("XXX",mass);
-  newstring.ReplaceAll("CHANNEL",channel);
   if(ES == "") newstring.ReplaceAll("_TES",ES);
   else newstring.ReplaceAll("TES",ES);
 
@@ -183,7 +158,7 @@ void CreateHistos::run(){
   float weight = 1;
   float weight_data = 1;
   float var = -999;
-  TString black = "\033[1;30m";
+  TString bold = "\033[1m";
   TString red = "\033[1;31m";
   TString green = "\033[1;32m";
   TString endc = "\033[0m";
@@ -195,12 +170,10 @@ void CreateHistos::run(){
   cout << endl;
   cout << "----Settings:-----" << endl;
   cout << left << setw(12) << setfill(' ')  << "Channel: "    << channel << endl;
-  cout << left << setw(12) << setfill(' ')  << "FF version: " << FFversion <<  endl;
-  cout << left << setw(12) << setfill(' ')  << "useMVAMET: "  << useMVAMET <<  endl;
-  cout << left << setw(12) << setfill(' ')  << "calcFF: "     << calcFF <<  endl;
-  cout << left << setw(12) << setfill(' ')  << "Pt Shift: "   << ptShift <<  endl;
-  cout << left << setw(12) << setfill(' ')  << "JEC Shift: "  << jecShift <<  endl;
-  cout << doSvfit << endl;
+  cout << left << setw(12) << setfill(' ')  << "Run Option: "   << runOption <<  endl;
+  if(calcFF) cout << left << setw(12) << setfill(' ')  << "FF version: " << FFversion <<  endl;
+  else cout << left << setw(12) << setfill(' ')  << "FF is not calculated !!"  <<  endl;
+  cout << "------------------" << endl;
   cout << endl;
   if(channel == "tt" && applyMTCut ) cout << "##### WARNING ######    mt cut applied in tt channel!!" << endl;
   else if(channel != "tt" && !applyMTCut) cout << "##### WARNING ######  NO  mt cut applied in mt or et channel!!" << endl;
@@ -223,9 +196,9 @@ void CreateHistos::run(){
   }
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
   TString filetype = "";
-  TString inputfolder = Parameter.dataset.inputfolder;
-  inputfolder.ReplaceAll("CHANNEL",channel);
   int fileindex = 0;
+  string remFolder = getFilestring("").Data();
+  remFolder = remFolder.substr(0, remFolder.find_last_of("/") );
   float perc;
   TString filename = "";
   TString mass = "";
@@ -240,7 +213,7 @@ void CreateHistos::run(){
 
 
     if( access(filename.Data(),F_OK ) != 0 ){
-      cout << red +" Warning "+endc+"File does not exist ->  " << filename.ReplaceAll(inputfolder,"") << endl;
+      cout << red +" Warning "+endc+"File does not exist ->  " << filename.ReplaceAll(remFolder,"") << endl;
       continue;
     }
 
@@ -271,7 +244,7 @@ void CreateHistos::run(){
     if(nentries > 0) cout<< "Contains "+green;
     else cout<< "Contains " + red;
     cout<< left << setw(8) << setfill(' ')  << nentries;
-    cout<<endc+" events. File:  "<< filename.ReplaceAll(inputfolder,"")<<endl;
+    cout<<endc+" events. File:  "<<bold + filename.ReplaceAll(remFolder,"") + endc<<endl;
 
     
 
@@ -299,16 +272,15 @@ void CreateHistos::run(){
       weight *= this->recalcEffweight();
       weight *= NtupleView->genweight;
       weight *= NtupleView->trk_sf;
-      weight *= usedLuminosity;
+      weight *= (float)Analysis["Luminosity"][channel];
 
       if(channel != "tt") weight *= NtupleView->antilep_tauscaling;
       else weight *= this->getAntiLep_tauscaling();
 
-      if(!doMC){
-        if( fileindex == 1 || fileindex == 6 ) weight *= NtupleView->ZWeight;
-        if( fileindex == 3 ) weight *= NtupleView->topWeight_run1;
-      }
-      else if(doMC) weight_data=weight;
+
+      if( fileindex == 1 || fileindex == 6 ) weight *= NtupleView->ZWeight;
+      if( fileindex == 3 ) weight *= NtupleView->topWeight_run1;
+
 
       for(auto cat : cats){
 
@@ -496,7 +468,7 @@ float CreateHistos::getAntiLep_tauscaling(){
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CreateHistos::EstimateFF(TString strVar, TString cat, TString extend){
 
-  if( std::find(Parameter.category.categoriesForQCDest.begin(), Parameter.category.categoriesForQCDest.end(), cat) == Parameter.category.categoriesForQCDest.end() ) return;
+  if( std::find(categories.begin(), categories.end(), cat) == categories.end() ) return;
   TString sub = extend + "+" + strVar +"_" + cat + "+";
 
   double normUp_jetFakes=0;
@@ -958,7 +930,7 @@ void CreateHistos::writeHistos( TString channel, vector<TString> cats, vector<TS
   TString sub;
   TString tmp;
   TString subDC="";
-  if(runOption != "nom") subDC="."+runOption;
+  if(runOption != "nom" && runOption != "nlo") subDC="."+runOption;
 
   for(auto var : vars){
     outfile_name << "histos/"<<folder << "/htt_" << channel << ".inputs-mssm-13TeV-"<<var<<subDC<<".root";
