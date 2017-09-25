@@ -1,9 +1,9 @@
 {
     "version":
     {
-        "mt":"v16",
-        "et":"v16",
-        "tt":"v16"
+        "mt":"v17",
+        "et":"v17",
+        "tt":"v17"
     },
     "id":
     {
@@ -23,7 +23,7 @@
         "qqH_SM125"     :"BASIS_ntuple_VBFHToTauTau_M125_powheg_MCSummer16_",
         "ggH_SM125"     :"BASIS_ntuple_GluGluHToTauTau_M125_powheg_MCSummer16_",
         "bbH"           :"BASIS_ntuple_SUSYGluGluToBBHToTauTau_M_XXX_pythia8_MCSummer16_",
-        "bbHnlo"        :"BASIS_ntuple_SUSYGluGluToBBHToTauTau_M_XXX_amcatnloFXFX_nom_MCSummer16_",
+        "bbHnlo"        :"BASIS_ntuple_SUSYGluGluToBBHToTauTau_M_XXX_amcatnloFXFX_MCSummer16_",
         "ggH"           :"BASIS_ntuple_SUSYGluGluToHToTauTau_M_XXX_pythia8_MCSummer16_"
     },
     "shifts":

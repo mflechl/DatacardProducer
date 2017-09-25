@@ -3,7 +3,6 @@
 #include <iostream>
 #include <sstream>
 #include <unistd.h>
-#include <boost/algorithm/string.hpp>
 #include <TObject.h>
 #include <algorithm>
 
@@ -292,6 +291,7 @@ void CreateHistos::run(){
           else if(strVar == s_ptsv)                           var = NtupleView->pt_sv;
           else if(strVar == s_mt1)                            var = this->getMT();
           else if(strVar == s_mt2)                            var = this->getMT2();
+          else if(strVar == s_mt3)                            var = this->getMT3();
           else if(strVar == s_jpt1)                           var = NtupleView->jpt_1;
           else if(strVar == s_jpt2)                           var = NtupleView->jpt_2;
           else if(strVar == s_njet)                           var = NtupleView->njets;
@@ -353,6 +353,14 @@ void CreateHistos::run(){
   
 }
 
+double CreateHistos::getMT3(){
+  TLorentzVector leg1,leg2;
+  leg1.SetPtEtaPhiM( NtupleView->pt_1,NtupleView->eta_1,NtupleView->phi_1,NtupleView->m_1 );
+  leg2.SetPtEtaPhiM( NtupleView->pt_2,NtupleView->eta_2,NtupleView->phi_2,NtupleView->m_2 );
+
+  return sqrt( 2*leg1.Pt() * leg2.Pt() * ( 1- TMath::Cos( leg1.DeltaPhi(leg2) ) ) );
+}
+
 bool CreateHistos::SpecialCuts(){
   if(runOption == "1p" && NtupleView->decayMode_2 < 4) return true;
   if(runOption == "3p" && NtupleView->decayMode_2 == 10) return true;
@@ -368,8 +376,6 @@ bool CreateHistos::SpecialCuts(){
   if(runOption == "minimal") return true;
   if(runOption == "test") return true;
   return false;
-
-
 }
 
 float CreateHistos::recalcEffweight(){

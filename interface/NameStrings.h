@@ -39,6 +39,7 @@ const TString s_met =                    "met";
 const TString s_mttot =                  "mttot";
 const TString s_mt1 =                    "mt_1";
 const TString s_mt2 =                    "mt_2";
+const TString s_mt3 =                    "mt_3";
 const TString s_pt1 =                    "pt_1";
 const TString s_pt2 =                    "pt_2";
 const TString s_eta1 =                   "eta_1";

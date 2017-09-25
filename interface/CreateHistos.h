@@ -10,9 +10,9 @@ class CreateHistos : public SelectionAnalyzer{
 
   ~CreateHistos();
   bool SpecialCuts();
+  double getMT3();
   float getAntiLep_tauscaling();
   TString getFilestring(TString input, TString ES="", TString mass="");
-  TString ColorPrompt(TString input, TString color);
   int isZFile(TString fileName);
   int isEWKZFile(TString fileName);
   int isSignalFile(TString fileName);
