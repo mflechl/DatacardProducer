@@ -437,11 +437,11 @@ float CreateHistos::getAntiLep_tauscaling(){
       if( NtupleView->gen_match_2 == 2                                                                                                                                                          
 	        || NtupleView->gen_match_2 == 4 ){
 
-        if( fabs(NtupleView->gen_match_2) < 0.4 ) scaleFactor_tautau =  1.22;
-      	else if( fabs(NtupleView->gen_match_2) < 0.8 ) scaleFactor_tautau =  1.12;
-      	else if( fabs(NtupleView->gen_match_2) < 1.2 ) scaleFactor_tautau =  1.26;
-      	else if( fabs(NtupleView->gen_match_2) < 1.7 ) scaleFactor_tautau =  1.22;
-      	else if( fabs(NtupleView->gen_match_2) < 2.3 ) scaleFactor_tautau =  2.39;
+        if( fabs(NtupleView->eta_2) < 0.4 ) scaleFactor_tautau =  1.22;
+      	else if( fabs(NtupleView->eta_2) < 0.8 ) scaleFactor_tautau =  1.12;
+      	else if( fabs(NtupleView->eta_2) < 1.2 ) scaleFactor_tautau =  1.26;
+      	else if( fabs(NtupleView->eta_2) < 1.7 ) scaleFactor_tautau =  1.22;
+      	else if( fabs(NtupleView->eta_2) < 2.3 ) scaleFactor_tautau =  2.39;
       }
 
       if( NtupleView->gen_match_1 == 1                                                                                                                                                        
@@ -454,11 +454,11 @@ float CreateHistos::getAntiLep_tauscaling(){
       if( NtupleView->gen_match_1 == 2                                                                                                                                                          
 	        || NtupleView->gen_match_1 == 4 ){
 
-        if( fabs(NtupleView->gen_match_1) < 0.4 ) scaleFactor_tautau *=  1.22;
-      	else if( fabs(NtupleView->gen_match_1) < 0.8 ) scaleFactor_tautau *=  1.12;
-      	else if( fabs(NtupleView->gen_match_1) < 1.2 ) scaleFactor_tautau *=  1.26;
-      	else if( fabs(NtupleView->gen_match_1) < 1.7 ) scaleFactor_tautau *=  1.22;
-      	else if( fabs(NtupleView->gen_match_1) < 2.3 ) scaleFactor_tautau *=  2.39;
+        if( fabs(NtupleView->eta_1) < 0.4 ) scaleFactor_tautau *=  1.22;
+      	else if( fabs(NtupleView->eta_1) < 0.8 ) scaleFactor_tautau *=  1.12;
+      	else if( fabs(NtupleView->eta_1) < 1.2 ) scaleFactor_tautau *=  1.26;
+      	else if( fabs(NtupleView->eta_1) < 1.7 ) scaleFactor_tautau *=  1.22;
+      	else if( fabs(NtupleView->eta_1) < 2.3 ) scaleFactor_tautau *=  2.39;
       }
       return scaleFactor_tautau;
 
