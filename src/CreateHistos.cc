@@ -253,7 +253,15 @@ void CreateHistos::run(){
     cout<< left << setw(8) << setfill(' ')  << nentries;
     cout<<endc+" events. File:  "<<bold + filename.ReplaceAll(remFolder,"") + endc<<endl;
 
-    
+    //    Double_t xxtest;
+    //    NtupleView->fChain->SetBranchAddress(s_mttot, &xxtest);
+
+    vector<Double_t> p_vars;
+    //    p_vars.reserve(vars.size());
+    for(auto strVar : vars){
+      p_vars.push_back(-1);
+      NtupleView->fChain->SetBranchAddress(strVar, &p_vars.back());
+    }
 
     for (Int_t jentry=0; jentry<nentries;jentry++){       
 
@@ -291,46 +299,21 @@ void CreateHistos::run(){
 
       for(auto cat : cats){
 
+	int ind=0;
         for(auto strVar : vars){
 
+	  //	  std::cout << "XXX " << p_vars.at(0) << std::endl;
+
           var = -999;
-          if(strVar == s_mvis)                                var = NtupleView->m_vis;
-          else if(strVar == s_msv)                            var = NtupleView->m_sv;
-          else if(strVar == s_ptsv)                           var = NtupleView->pt_sv;
-          else if(strVar == s_mt1)                            var = this->getMT();
-          else if(strVar == s_mt2)                            var = this->getMT2();
-          else if(strVar == s_mt3)                            var = this->getMT3();
-          else if(strVar == s_jpt1)                           var = NtupleView->jpt_1;
-          else if(strVar == s_jpt2)                           var = NtupleView->jpt_2;
-          else if(strVar == s_njet)                           var = NtupleView->njets;
-          else if(strVar == s_nbtag)                          var = NtupleView->nbtag;          
-          
-          else if(strVar == s_pt1)                            var = NtupleView->pt_1;
-          else if(strVar == s_pt2)                            var = NtupleView->pt_2;
-          else if(strVar == s_eta1)                           var = NtupleView->eta_1;
-          else if(strVar == s_eta2)                           var = NtupleView->eta_2;
-          else if(strVar == s_met)                            var = NtupleView->met;
-          else if(strVar == s_mttot)                          var = NtupleView->mt_tot;
-          else if(strVar == s_Hpt)                            var = this->CalcHPt(); 
 
+	  if ( p_vars.size()>ind )
+	    var=p_vars.at(ind);
+	  else
+	    continue;
+	  ++ind;
 
-          else if(strVar == "jeta_1"
-             && NtupleView->jpt_1 > 30)     var = NtupleView->jeta_1;
+	  //TODO: if you want to impose cuts, do it here - not when selecting variables (e.g. jeta_1)
 
-          else if(strVar == "jeta_2"
-             && NtupleView->jpt_2 > 30)     var = NtupleView->jeta_2;
-
-          else if(strVar == "mjj")          var = this->getMjj();
-
-          else if(strVar == "jeta1eta2"
-             && NtupleView->jpt_1 > 30
-             && NtupleView->jpt_2 > 30)     var = NtupleView->jeta1eta2;
-
-          else if(strVar == "jdeta"
-             && NtupleView->jpt_1 > 30
-             && NtupleView->jpt_2 > 30)     var = NtupleView->jdeta;
-
-          else continue;
 
           if( fileindex == 1 )                this->DYSelections(var, weight, cat, strVar, filetype);
           else if( fileindex == 2 )           this->signalSelections(var, weight, cat, strVar, filetype, mass);
@@ -342,8 +325,8 @@ void CreateHistos::run(){
 
         }
       }
-    }
-  }
+    }//end loop over entries
+  }//end loop over files
   cout.precision(10);
   for(auto cat : cats){
     for(auto strVar : vars){

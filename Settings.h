@@ -2,6 +2,7 @@
 
 using namespace std;
 
+//const vector<TString> variables={s_mvis+"_vs_"+s_pt2};
 const vector<TString> variables={s_mttot};
 //const vector<TString> variables={s_mttot,s_pt1,s_pt2,s_met,s_mvis};
 //const vector<TString> variables={s_eta1,s_eta2,s_njet,s_nbtag};
