@@ -32,7 +32,7 @@ class CreateHistos : public SelectionAnalyzer{
   void createInclusive(TString strVar, TString cat);
   float recalcEffweight();
 
-  void loadFile(TString filename);
+  void loadFile(TString filename, int isData=0);
   void run();
   void clearHistos();
   void writeHistos(TString channel, vector<TString> cats, vector<TString> vars);

@@ -11,6 +11,9 @@ SelectionAnalyzer::~SelectionAnalyzer(){
 void SelectionAnalyzer::initDYSelections(TString cat, TString strVar, TString extend){
 
   TString sub = extend + "+" + strVar +"_" + cat + "+";
+
+  if (DEBUG==2) std::cout << "SelectionAnalyzer::initDYSelections \t sub= " << sub << std::endl;
+
   this->GetHistbyName(s_Z+sub,strVar);
   this->GetHistbyName(s_ZL+sub,strVar);
   this->GetHistbyName(s_ZL+s_CMSdyShape+s_13TeVUp+sub,strVar);
@@ -51,6 +54,7 @@ void SelectionAnalyzer::initEWKZSelections(TString cat, TString strVar, TString 
 void SelectionAnalyzer::initTSelections(TString cat, TString strVar, TString extend){
 
   TString sub = extend + "+" + strVar +"_" + cat + "+";
+  if (DEBUG==2) std::cout << "SelectionAnalyzer::initTSelections \t sub= " << sub << std::endl;
   this->GetHistbyName(s_TTJ+sub,strVar);
   this->GetHistbyName(s_TTJ+s_CMSttShape+s_13TeVUp+sub,strVar);
   this->GetHistbyName(s_TTJ+s_CMSttShape+s_13TeVDown+sub,strVar);
@@ -70,6 +74,7 @@ void SelectionAnalyzer::initTSelections(TString cat, TString strVar, TString ext
 void SelectionAnalyzer::initVVSelections(TString cat, TString strVar, TString extend){
 
   TString sub = extend + "+" + strVar +"_" + cat + "+";
+  if (DEBUG==2) std::cout << "SelectionAnalyzer::initVVSelections \t sub= " << sub << std::endl;
   this->GetHistbyName(s_VVJ+sub,strVar);   
   this->GetHistbyName(s_VVT+sub,strVar);
   this->GetHistbyName(s_VVT+s_CMSmssmHigh+channel+"_"+s_13TeVUp+sub,strVar);
@@ -81,6 +86,7 @@ void SelectionAnalyzer::initVVSelections(TString cat, TString strVar, TString ex
 void SelectionAnalyzer::initSignalSelections(TString cat, TString strVar, TString extend){
 
   TString sub = extend + "+" + strVar +"_" + cat + "+";
+  if (DEBUG==2) std::cout << "SelectionAnalyzer::initSignalSelections \t sub= " << sub << std::endl;
 
   for(auto mass : masspoints){
     for(auto type : {s_ggH, s_bbH} ){

@@ -616,12 +616,12 @@ public :
    TBranch        *b_bmva_2;   //!
    TBranch        *b_bcsv_2;   //!
 
-   ntuple(TTree *tree=0);
+   ntuple(TTree *tree=0, int isData_=0);
    virtual ~ntuple();
    virtual Int_t    Cut(Long64_t entry);
    virtual Int_t    GetEntry(Long64_t entry);
    virtual Long64_t LoadTree(Long64_t entry);
-   virtual void     Init(TTree *tree);
+   virtual void     Init(TTree *tree,int isData_=0);
    virtual void     Loop();
    virtual Bool_t   Notify();
    virtual void     Show(Long64_t entry = -1);
@@ -630,7 +630,7 @@ public :
 #endif
 
 #ifdef ntuple_cxx
-ntuple::ntuple(TTree *tree) : fChain(0) 
+ntuple::ntuple(TTree *tree,int isData_) : fChain(0) 
 {
 // if parameter tree is not specified (or zero), connect the file
 // used to generate this class and read the Tree.
@@ -642,7 +642,7 @@ ntuple::ntuple(TTree *tree) : fChain(0)
       f->GetObject("TauCheck",tree);
 
    }
-   Init(tree);
+   Init(tree,isData_);
 }
 
 ntuple::~ntuple()
@@ -670,7 +670,7 @@ Long64_t ntuple::LoadTree(Long64_t entry)
    return centry;
 }
 
-void ntuple::Init(TTree *tree)
+void ntuple::Init(TTree *tree,int isData_)
 {
    // The Init() function is called when the selector needs to initialize
    // a new tree or chain. Typically here the branch addresses and branch
@@ -752,17 +752,23 @@ void ntuple::Init(TTree *tree)
    fChain->SetBranchAddress("topWeight", &topWeight, &b_topWeight);
    fChain->SetBranchAddress("topWeight_run1", &topWeight_run1, &b_topWeight_run1);
    fChain->SetBranchAddress("ZWeight", &ZWeight, &b_ZWeight);
-   fChain->SetBranchAddress("zpt_weight_nom", &zpt_weight_nom, &b_zpt_weight_nom);
-   fChain->SetBranchAddress("zpt_weight_esup", &zpt_weight_esup, &b_zpt_weight_esup);
-   fChain->SetBranchAddress("zpt_weight_esdown", &zpt_weight_esdown, &b_zpt_weight_esdown);
-   fChain->SetBranchAddress("zpt_weight_ttup", &zpt_weight_ttup, &b_zpt_weight_ttup);
-   fChain->SetBranchAddress("zpt_weight_ttdown", &zpt_weight_ttdown, &b_zpt_weight_ttdown);
-   fChain->SetBranchAddress("zpt_weight_statpt0up", &zpt_weight_statpt0up, &b_zpt_weight_statpt0up);
-   fChain->SetBranchAddress("zpt_weight_statpt0down", &zpt_weight_statpt0down, &b_zpt_weight_statpt0down);
-   fChain->SetBranchAddress("zpt_weight_statpt40up", &zpt_weight_statpt40up, &b_zpt_weight_statpt40up);
-   fChain->SetBranchAddress("zpt_weight_statpt40down", &zpt_weight_statpt40down, &b_zpt_weight_statpt40down);
-   fChain->SetBranchAddress("zpt_weight_statpt80up", &zpt_weight_statpt80up, &b_zpt_weight_statpt80up);
-   fChain->SetBranchAddress("zpt_weight_statpt80down", &zpt_weight_statpt80down, &b_zpt_weight_statpt80down);
+   if (!isData_){
+     fChain->SetBranchAddress("zpt_weight_nom", &zpt_weight_nom, &b_zpt_weight_nom);
+     fChain->SetBranchAddress("zpt_weight_esup", &zpt_weight_esup, &b_zpt_weight_esup);
+     fChain->SetBranchAddress("zpt_weight_esdown", &zpt_weight_esdown, &b_zpt_weight_esdown);
+     fChain->SetBranchAddress("zpt_weight_ttup", &zpt_weight_ttup, &b_zpt_weight_ttup);
+     fChain->SetBranchAddress("zpt_weight_ttdown", &zpt_weight_ttdown, &b_zpt_weight_ttdown);
+     fChain->SetBranchAddress("zpt_weight_statpt0up", &zpt_weight_statpt0up, &b_zpt_weight_statpt0up);
+     fChain->SetBranchAddress("zpt_weight_statpt0down", &zpt_weight_statpt0down, &b_zpt_weight_statpt0down);
+     fChain->SetBranchAddress("zpt_weight_statpt40up", &zpt_weight_statpt40up, &b_zpt_weight_statpt40up);
+     fChain->SetBranchAddress("zpt_weight_statpt40down", &zpt_weight_statpt40down, &b_zpt_weight_statpt40down);
+     fChain->SetBranchAddress("zpt_weight_statpt80up", &zpt_weight_statpt80up, &b_zpt_weight_statpt80up);
+     fChain->SetBranchAddress("zpt_weight_statpt80down", &zpt_weight_statpt80down, &b_zpt_weight_statpt80down);
+     fChain->SetBranchAddress("matchedJetPt03_1", &matchedJetPt03_1, &b_matchedJetPt03_1);
+     fChain->SetBranchAddress("matchedJetPt05_1", &matchedJetPt05_1, &b_matchedJetPt05_1);
+     fChain->SetBranchAddress("matchedJetPt03_2", &matchedJetPt03_2, &b_matchedJetPt03_2);
+     fChain->SetBranchAddress("matchedJetPt05_2", &matchedJetPt05_2, &b_matchedJetPt05_2);
+   }
    fChain->SetBranchAddress("gen_Mll", &gen_Mll, &b_gen_Mll);
    fChain->SetBranchAddress("genpX", &genpX, &b_genpX);
    fChain->SetBranchAddress("genpY", &genpY, &b_genpY);
@@ -777,10 +783,6 @@ void ntuple::Init(TTree *tree)
    fChain->SetBranchAddress("npu", &npu, &b_npu);
    fChain->SetBranchAddress("rho", &rho, &b_rho);
    fChain->SetBranchAddress("NUP", &NUP, &b_NUP);
-   fChain->SetBranchAddress("matchedJetPt03_1", &matchedJetPt03_1, &b_matchedJetPt03_1);
-   fChain->SetBranchAddress("matchedJetPt05_1", &matchedJetPt05_1, &b_matchedJetPt05_1);
-   fChain->SetBranchAddress("matchedJetPt03_2", &matchedJetPt03_2, &b_matchedJetPt03_2);
-   fChain->SetBranchAddress("matchedJetPt05_2", &matchedJetPt05_2, &b_matchedJetPt05_2);
    fChain->SetBranchAddress("gen_match_1", &gen_match_1, &b_gen_match_1);
    fChain->SetBranchAddress("gen_match_2", &gen_match_2, &b_gen_match_2);
    fChain->SetBranchAddress("gen_match_jetId_1", &gen_match_jetId_1, &b_gen_match_jetId_1);

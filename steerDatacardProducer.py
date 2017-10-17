@@ -8,6 +8,7 @@ import sys
 def main():
 	parser = argparse.ArgumentParser()
 	parser.add_argument('-t', dest='test', help='run test', action='store_true')
+	parser.add_argument('-q', dest='quicktest', help='run test on one sample', action='store_true')
 	parser.add_argument('-m', dest='minimal', help='run minimal test', action='store_true')
 	parser.add_argument('-n', dest='nlo', help='run NLO signal', action='store_true')
 	parser.add_argument('-s', dest='special', help='run with control cuts', action='store_true')
@@ -27,6 +28,8 @@ def main():
 		testEnv = "nlo"
 	elif args.test:
 		testEnv = "test"
+	elif args.quicktest:
+		testEnv = "quicktest"
 	elif args.minimal:
 		testEnv = "minimal"
 

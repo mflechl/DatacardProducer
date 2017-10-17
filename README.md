@@ -1,16 +1,21 @@
 ## Setup
 
-    cmsrel CMSSW_XXX  
-    cd CMSSW_XXX/src/  
+    cmsrel CMSSW_9_2_7  
+    cd CMSSW_9_2_7/src/  
     cmsenv  
     git clone https://github.com/CMS-HTT/Jet2TauFakes.git HTTutilities/Jet2TauFakes  
     mkdir HTTutilities/Jet2TauFakes/data/  
-    cp -r /afs/cern.ch/user/j/jbrandst/public/Htautau/FakeRate/2016/20170228/* HTTutilities/Jet2TauFakes/data/  
-    scram b -j 8  
+    #Instead of the below, you should use the gitlab repository. This is just a short cut:  
+    cp -r /afs/cern.ch/user/j/jbrandst/public/FFforMSSM/20170628_*/* HTTutilities/Jet2TauFakes/data/  
+    scram b -j 8
+    mkdir histos
+    mkdir histos/mt
+    mkdir histos/et
+    mkdir histos/tt
     git init  
     git remote add origin git@github.com:mflechl/DatacardProducer.git  
-    git checkout -b master/SM/MSSM  
-    git pull origin master/SM/MSSM  
+    git checkout -b SM2016
+    git pull origin SM2016
 
 ## Usage
 

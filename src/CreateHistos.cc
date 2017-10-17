@@ -24,8 +24,9 @@ CreateHistos::CreateHistos(TString runOption_, TString ch){
 
   // Name of output folder and prompt for run option 
   folder = channel;
-  if(runOption == "test")    cout << "testing availability of input files" << endl;
-  if(runOption == "minimal") cout << "creating minimal datacard" << endl;
+  if(runOption == "quicktest") cout << "testing code on one sample" << endl;
+  if(runOption == "test")      cout << "testing availability of input files" << endl;
+  if(runOption == "minimal")   cout << "creating minimal datacard" << endl;
   if(runOption == "nlo"){
     folder = channel + "_nlo";
     cout << "creating nlo datacard" << endl;
@@ -33,11 +34,11 @@ CreateHistos::CreateHistos(TString runOption_, TString ch){
 
   // Initialize masspoints
   if(runOption == "minimal") for(auto mass : Datasets["masspoints"]["test"] ) masspoints.push_back( mass );
-  else for(auto mass : Datasets["masspoints"]["full"] ) masspoints.push_back( mass );
+  else if (runOption != "quicktest") for(auto mass : Datasets["masspoints"]["full"] ) masspoints.push_back( mass );
 
   // Initialize set of energy scale shifts
   vector<string> shifts = {""};
-  if( runOption != "minimal" ){    
+  if( runOption != "minimal" && runOption != "quicktest" ){    
     for(auto shift : Datasets["shifts"][channel] ) shifts.push_back( shift );
   }
 
@@ -50,6 +51,7 @@ CreateHistos::CreateHistos(TString runOption_, TString ch){
                                   s_SMWminus,
                                   s_SMWplus,
                                   s_SMZH };
+  if (runOption == "quicktest") bkg_samples = { };
 
   // Create filepaths mapped to unique identifier for data an MC samples
   files[s_data].first = this->getFilestring( Datasets["id"][s_data.Data()][channel] );
@@ -143,11 +145,11 @@ TString CreateHistos::getFilestring(TString input, TString ES, TString mass){
 
 }
 
-void CreateHistos::loadFile(TString filename){
+void CreateHistos::loadFile(TString filename, int isData){
 
   TChain *tchain = new TChain("TauCheck");
   tchain->Add(filename);
-  NtupleView = std::unique_ptr<ntuple>(new ntuple( tchain ) );
+  NtupleView = std::unique_ptr<ntuple>(new ntuple( tchain, isData ) );
   
 }
 
@@ -203,6 +205,8 @@ void CreateHistos::run(){
   TString mass = "";
   cout.precision(3);
 
+  if ( DEBUG ) std::cout << "CreateHistos::run \t remFolder= " << remFolder << std::endl;
+
   for (auto const& file : files){
 
     filetype = file.first; 
@@ -210,6 +214,7 @@ void CreateHistos::run(){
     mass = file.second.second;
     filetype.ReplaceAll( mass, "" );
 
+  if ( DEBUG==2 ) std::cout << "CreateHistos::run \t filename= " << filename << std::endl;
 
     if( access(filename.Data(),F_OK ) != 0 ){
       cout << red +" Warning "+endc+"File does not exist ->  " << filename.ReplaceAll(remFolder,"") << endl;
@@ -218,6 +223,7 @@ void CreateHistos::run(){
 
     ////////////////////////////////
     // Fileindex      Filetype
+    // 0              data
     // 1              DY
     // 2              Signal
     // 3              TT
@@ -225,6 +231,8 @@ void CreateHistos::run(){
     // 5              Diboson
     // 6              EWK
     fileindex = this->getFiletype(filetype);
+    if ( DEBUG==2 ) std::cout << "CreateHistos::run \t fileindex= " << fileindex << std::endl;
+
     if(jecShift){
 
     }
@@ -232,9 +240,9 @@ void CreateHistos::run(){
     else if(filetype.Contains(s_jecDown)) this->isJEC=-1;
     else this->isJEC=0;
 
-    this->loadFile(filename);
+    this->loadFile(filename,fileindex==0);
     Int_t nentries=0;
-    if(runOption == "test"){
+    if(runOption == "test" || runOption == "quicktest"){
       nentries = min( Int_t(NtupleView->fChain->GetEntries()), Int_t( 10000 ) );
     }else{
       nentries = Int_t(NtupleView->fChain->GetEntries());
@@ -375,6 +383,7 @@ bool CreateHistos::SpecialCuts(){
   if(runOption == "nlo") return true;
   if(runOption == "minimal") return true;
   if(runOption == "test") return true;
+  if(runOption == "quicktest") return true;
   return false;
 }
 
