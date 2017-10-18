@@ -34,6 +34,37 @@ void SelectionAnalyzer::initDYSelections(TString cat, TString strVar, TString ex
   this->GetHistbyName(s_ZL+s_CMSefake+s_1p0p0+"_"+s_13TeVDown+sub,strVar);
   this->GetHistbyName(s_ZL+s_CMSefake+s_1p1p0+"_"+s_13TeVUp+sub,strVar);
   this->GetHistbyName(s_ZL+s_CMSefake+s_1p1p0+"_"+s_13TeVDown+sub,strVar);
+  this->GetHistbyName(s_ZTT+s_CMStauScale+s_1p0p0+"_"+s_13TeVUp+sub,strVar);
+  this->GetHistbyName(s_ZTT+s_CMStauScale+s_1p1p0+"_"+s_13TeVUp+sub,strVar);
+  this->GetHistbyName(s_ZTT+s_CMStauScale+s_3p0p0+"_"+s_13TeVUp+sub,strVar);
+  this->GetHistbyName(s_ZTT+s_CMStauScale+s_1p0p0+"_"+s_13TeVDown+sub,strVar);
+  this->GetHistbyName(s_ZTT+s_CMStauScale+s_1p1p0+"_"+s_13TeVDown+sub,strVar);
+  this->GetHistbyName(s_ZTT+s_CMStauScale+s_3p0p0+"_"+s_13TeVDown+sub,strVar);
+
+  this->GetHistbyName(s_ZL+s_CMSdyShape_scale+s_13TeVUp+sub,strVar);
+  this->GetHistbyName(s_ZL+s_CMSdyShape_scale+s_13TeVDown+sub,strVar);
+  this->GetHistbyName(s_ZL+s_CMSdyShape_stat_m400pt0+s_13TeVUp+sub,strVar);
+  this->GetHistbyName(s_ZL+s_CMSdyShape_stat_m400pt0+s_13TeVDown+sub,strVar);
+  this->GetHistbyName(s_ZL+s_CMSdyShape_stat_m400pt40+s_13TeVUp+sub,strVar);
+  this->GetHistbyName(s_ZL+s_CMSdyShape_stat_m400pt40+s_13TeVDown+sub,strVar);
+  this->GetHistbyName(s_ZL+s_CMSdyShape_stat_m400pt80+s_13TeVUp+sub,strVar);
+  this->GetHistbyName(s_ZL+s_CMSdyShape_stat_m400pt80+s_13TeVDown+sub,strVar);
+  this->GetHistbyName(s_ZL+s_CMSdyShape_stat_tjXsec+s_13TeVUp+sub,strVar);
+  this->GetHistbyName(s_ZL+s_CMSdyShape_stat_tjXsec+s_13TeVDown+sub,strVar);
+  this->GetHistbyName(s_ZTT+s_CMSdyShape+s_13TeVUp+sub,strVar);
+  this->GetHistbyName(s_ZTT+s_CMSdyShape+s_13TeVDown+sub,strVar);
+  this->GetHistbyName(s_ZTT+s_CMSdyShape_scale+s_13TeVUp+sub,strVar);
+  this->GetHistbyName(s_ZTT+s_CMSdyShape_scale+s_13TeVDown+sub,strVar);
+  this->GetHistbyName(s_ZTT+s_CMSdyShape_stat_m400pt0+s_13TeVUp+sub,strVar);
+  this->GetHistbyName(s_ZTT+s_CMSdyShape_stat_m400pt0+s_13TeVDown+sub,strVar);
+  this->GetHistbyName(s_ZTT+s_CMSdyShape_stat_m400pt40+s_13TeVUp+sub,strVar);
+  this->GetHistbyName(s_ZTT+s_CMSdyShape_stat_m400pt40+s_13TeVDown+sub,strVar);
+  this->GetHistbyName(s_ZTT+s_CMSdyShape_stat_m400pt80+s_13TeVUp+sub,strVar);
+  this->GetHistbyName(s_ZTT+s_CMSdyShape_stat_m400pt80+s_13TeVDown+sub,strVar);
+  this->GetHistbyName(s_ZTT+s_CMSdyShape_stat_tjXsec+s_13TeVUp+sub,strVar);
+  this->GetHistbyName(s_ZTT+s_CMSdyShape_stat_tjXsec+s_13TeVDown+sub,strVar);
+   
+   
   
 }
 
@@ -64,6 +95,12 @@ void SelectionAnalyzer::initTSelections(TString cat, TString strVar, TString ext
   this->GetHistbyName(s_TT+sub,strVar);
   this->GetHistbyName(s_TT+s_CMSttShape+s_13TeVUp+sub,strVar);
   this->GetHistbyName(s_TT+s_CMSttShape+s_13TeVDown+sub,strVar);
+  this->GetHistbyName(s_TTT+s_CMStauScale+s_1p0p0+"_"+s_13TeVUp+sub,strVar);
+  this->GetHistbyName(s_TTT+s_CMStauScale+s_1p1p0+"_"+s_13TeVUp+sub,strVar);
+  this->GetHistbyName(s_TTT+s_CMStauScale+s_3p0p0+"_"+s_13TeVUp+sub,strVar);
+  this->GetHistbyName(s_TTT+s_CMStauScale+s_1p0p0+"_"+s_13TeVDown+sub,strVar);
+  this->GetHistbyName(s_TTT+s_CMStauScale+s_1p1p0+"_"+s_13TeVDown+sub,strVar);
+  this->GetHistbyName(s_TTT+s_CMStauScale+s_3p0p0+"_"+s_13TeVDown+sub,strVar);
 
 }
 
@@ -75,6 +112,12 @@ void SelectionAnalyzer::initVVSelections(TString cat, TString strVar, TString ex
   this->GetHistbyName(s_VVT+s_CMSmssmHigh+channel+"_"+s_13TeVUp+sub,strVar);
   this->GetHistbyName(s_VVT+s_CMSmssmHigh+channel+"_"+s_13TeVDown+sub,strVar);
   this->GetHistbyName(s_VV+sub,strVar);
+  this->GetHistbyName(s_VVT+s_CMStauScale+s_1p0p0+"_"+s_13TeVUp+sub,strVar);
+  this->GetHistbyName(s_VVT+s_CMStauScale+s_1p1p0+"_"+s_13TeVUp+sub,strVar);
+  this->GetHistbyName(s_VVT+s_CMStauScale+s_3p0p0+"_"+s_13TeVUp+sub,strVar);
+  this->GetHistbyName(s_VVT+s_CMStauScale+s_1p0p0+"_"+s_13TeVDown+sub,strVar);
+  this->GetHistbyName(s_VVT+s_CMStauScale+s_1p1p0+"_"+s_13TeVDown+sub,strVar);
+  this->GetHistbyName(s_VVT+s_CMStauScale+s_3p0p0+"_"+s_13TeVDown+sub,strVar);
 
 }
 
@@ -88,6 +131,12 @@ void SelectionAnalyzer::initSignalSelections(TString cat, TString strVar, TStrin
       this->GetHistbyName(type+mass+sub,strVar);
       this->GetHistbyName(type+mass+s_CMSmssmHigh+channel+"_"+s_13TeVUp+sub,strVar);
       this->GetHistbyName(type+mass+s_CMSmssmHigh+channel+"_"+s_13TeVDown+sub,strVar);
+      this->GetHistbyName(type+mass+s_CMStauScale+s_1p0p0+"_"+s_13TeVUp+sub,strVar);
+      this->GetHistbyName(type+mass+s_CMStauScale+s_1p1p0+"_"+s_13TeVUp+sub,strVar);
+      this->GetHistbyName(type+mass+s_CMStauScale+s_3p0p0+"_"+s_13TeVUp+sub,strVar);
+      this->GetHistbyName(type+mass+s_CMStauScale+s_1p0p0+"_"+s_13TeVDown+sub,strVar);
+      this->GetHistbyName(type+mass+s_CMStauScale+s_1p1p0+"_"+s_13TeVDown+sub,strVar);
+      this->GetHistbyName(type+mass+s_CMStauScale+s_3p0p0+"_"+s_13TeVDown+sub,strVar);
     }
   }
 
