@@ -319,7 +319,7 @@ TH1D* GlobalClass::JITHistoCreator(TString name, TString strVar){
 
   TString binning = "default";
 
-
+  if ( DEBUG==2) std::cout << "Trying to create histogram for variable " << strVar << endl;
   if(Binning[strVar.Data()]["doVarBins"]["check"]){
 
     if(Binning[strVar.Data()]["doVarBins"]["type"] == (string)"cat"){

@@ -36,6 +36,7 @@ class CreateHistos : public SelectionAnalyzer{
   void run();
   void clearHistos();
   void writeHistos(TString channel, vector<TString> cats, vector<TString> vars);
+  int get2DBin();
   
   TFile *outfile;
 

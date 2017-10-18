@@ -15,6 +15,7 @@ void SelectionAnalyzer::initDYSelections(TString cat, TString strVar, TString ex
   if (DEBUG==2) std::cout << "SelectionAnalyzer::initDYSelections \t sub= " << sub << std::endl;
 
   this->GetHistbyName(s_Z+sub,strVar);
+  if (DEBUG==2) std::cout << "XX SelectionAnalyzer::initDYSelections \t sub= " << sub << std::endl;
   this->GetHistbyName(s_ZL+sub,strVar);
   this->GetHistbyName(s_ZL+s_CMSdyShape+s_13TeVUp+sub,strVar);
   this->GetHistbyName(s_ZL+s_CMSdyShape+s_13TeVDown+sub,strVar);

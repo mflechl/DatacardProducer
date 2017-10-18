@@ -30,6 +30,8 @@ const TString s_btag_loosemt_wjets_cr =   s_btag_loosemt+s_wjets_cr;
 const TString s_nobtag_looseiso_wjets_cr= s_nobtag_looseiso+s_wjets_cr;
 const TString s_btag_looseiso_wjets_cr =   s_btag_looseiso+s_wjets_cr;
 
+const TString s_join2d =                 "|";
+
 const TString s_mvis =                   "m_vis";
 const TString s_msv =                    "m_sv";
 const TString s_ptsv =                   "pt_sv";
@@ -50,6 +52,7 @@ const TString s_jeta1 =                  "jeta1";
 const TString s_jeta2 =                  "jeta2";
 const TString s_njet =                   "njet";
 const TString s_nbtag =                  "nbtag";
+const TString s_dm2 =                    "decayMode_2";
 
 const TString s_tau  =                   "TauPt";
 const TString s_jec =                    "jec";  

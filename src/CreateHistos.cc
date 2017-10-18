@@ -6,6 +6,7 @@
 #include <TObject.h>
 #include <algorithm>
 
+//#include "boost/variant.hpp"
 
 using namespace std;
 
@@ -61,12 +62,12 @@ CreateHistos::CreateHistos(TString runOption_, TString ch){
       files[sample+shift].first = this->getFilestring(  Datasets["id"][sample.Data()], shift );
     }
     for(auto mass : masspoints){
-        files[s_ggH+shift+mass].first = this->getFilestring( Datasets["id"]["ggH"], shift, mass );
-        files[s_ggH+shift+mass].second = mass;
+      files[s_ggH+shift+mass].first = this->getFilestring( Datasets["id"]["ggH"], shift, mass );
+      files[s_ggH+shift+mass].second = mass;
 
-        if(runOption == "nlo") files[s_bbH.Data()+shift+mass].first = this->getFilestring( Datasets["id"]["bbHnlo"], shift, mass );
-        else files[s_bbH+shift+mass].first = this->getFilestring( Datasets["id"]["bbH"], shift, mass );
-        files[s_bbH+shift+mass].second = mass;   
+      if(runOption == "nlo") files[s_bbH.Data()+shift+mass].first = this->getFilestring( Datasets["id"]["bbHnlo"], shift, mass );
+      else files[s_bbH+shift+mass].first = this->getFilestring( Datasets["id"]["bbH"], shift, mass );
+      files[s_bbH+shift+mass].second = mass;   
     }
   }
   
@@ -186,11 +187,11 @@ void CreateHistos::run(){
     for(auto cat : cats){
       for(auto strVar : vars){
 
-          initDYSelections(cat,strVar);
-          initTSelections(cat,strVar);
-          initVVSelections(cat,strVar);
-          initEWKZSelections(cat,strVar);
-          //initSignalSelections(cat,strVar);
+	initDYSelections(cat,strVar);
+	initTSelections(cat,strVar);
+	initVVSelections(cat,strVar);
+	initEWKZSelections(cat,strVar);
+	//initSignalSelections(cat,strVar);
 
       }
     }
@@ -214,7 +215,7 @@ void CreateHistos::run(){
     mass = file.second.second;
     filetype.ReplaceAll( mass, "" );
 
-  if ( DEBUG==2 ) std::cout << "CreateHistos::run \t filename= " << filename << std::endl;
+    if ( DEBUG==2 ) std::cout << "CreateHistos::run \t filename= " << filename << std::endl;
 
     if( access(filename.Data(),F_OK ) != 0 ){
       cout << red +" Warning "+endc+"File does not exist ->  " << filename.ReplaceAll(remFolder,"") << endl;
@@ -256,11 +257,53 @@ void CreateHistos::run(){
     //    Double_t xxtest;
     //    NtupleView->fChain->SetBranchAddress(s_mttot, &xxtest);
 
-    vector<Double_t> p_vars;
+    //    vector<vector<Double_t>> p_vars(vars.size());
+    //    vector<vector<int>> p_vars(vars.size());
+    //    vector<vector< boost::variant<float,int>  >> p_vars(vars.size());
+    vector<vector<TString>> p_types(vars.size());
+
+    union u { int i; float f; }; //this only works because int and float both have 4 bit. Otherwise the SetBranchAddress option below may give weird results (e.g. int and double).
+    vector<vector<u>> p_vars(vars.size());
+
+    //    vector<vector<TString>> var1(vars.size());
     //    p_vars.reserve(vars.size());
+    TString var1;
+
+    int ind=0;
+    for (auto strType: vartypes){
+      TObjArray *toa = strType.Tokenize(s_join2d);
+      for (Int_t i = 0; i < toa->GetEntries(); i++){
+	p_types.at(ind).push_back(((TObjString *)(toa->At(i)))->String());
+      }
+      ++ind;
+    }
+    for (int i=0; i<p_types.size(); i++){
+      for (int j=0; j<p_types.at(i).size(); j++){
+	cout << i << "," << j << ": " << p_types.at(i).at(j) << endl;
+      }}
+    
+    ind=0;
     for(auto strVar : vars){
-      p_vars.push_back(-1);
-      NtupleView->fChain->SetBranchAddress(strVar, &p_vars.back());
+      
+      TObjArray *toa = strVar.Tokenize(s_join2d);
+      p_vars.at(ind).reserve(5); //needed, otherwise address changes when new space is allocated 
+      for (Int_t i = 0; i < toa->GetEntries(); i++){
+	var1=((TObjString *)(toa->At(i)))->String();
+	if (DEBUG) std::cout << "CreateHistos::run \t var1= " << var1 << std::endl;
+
+	u tmp; tmp.i=-1;
+	p_vars.at(ind).push_back(tmp);
+	NtupleView->fChain->SetBranchAddress(var1, &p_vars.at(ind).back());
+
+	if (DEBUG==2){
+	  for (int i=0; i<p_vars.at(ind).size(); i++){
+	    std::cout << "CreateHistos::run \t i= " << i << " " << &p_vars.at(ind).at(i) << std::endl;
+	  }
+	}
+
+      }
+      if (DEBUG) std::cout << "CreateHistos::run \t size for first var set= " << p_vars.at(ind).size() << std::endl;
+      ++ind;
     }
 
     for (Int_t jentry=0; jentry<nentries;jentry++){       
@@ -302,18 +345,32 @@ void CreateHistos::run(){
 	int ind=0;
         for(auto strVar : vars){
 
-	  //	  std::cout << "XXX " << p_vars.at(0) << std::endl;
-
           var = -999;
 
-	  if ( p_vars.size()>ind )
-	    var=p_vars.at(ind);
-	  else
+	  if ( p_vars.size()>ind ){
+	    if (p_vars.at(ind).size()>1){ //2D histos
+	      int ind_bin=this->get2DBin();
+	      var=p_vars.at(ind).at(0).f; //placeholder
+	    } else{
+	      var=p_vars.at(ind).at(0).f;
+	    }
+	  } else
 	    continue;
+
+	  if ( DEBUG && jentry<10 && cat==cats.at(0) ){  
+	    for (int i=0; i<p_vars.at(ind).size(); i++){ 
+	      //	      std::cout << "var "<<i<<" = ";
+	      std::cout << ((TObjString*) (strVar.Tokenize("|")->At(i)))->String() << " = ";
+	      if (p_types.at(ind).at(i)=="int") std::cout << p_vars.at(ind).at(i).i;
+	      if (p_types.at(ind).at(i)=="float") std::cout << p_vars.at(ind).at(i).f;
+	      std::cout << " \t" << flush;
+	    }
+	    cout << std::endl;
+	    //	    std::cout << "var1= " << p_vars.at(ind).at(0).i << flush; if (p_vars.at(ind).size()>=1) std::cout << " , var2= " << p_vars.at(ind).at(1).i; cout << std::endl; 
+	  }
 	  ++ind;
 
 	  //TODO: if you want to impose cuts, do it here - not when selecting variables (e.g. jeta_1)
-
 
           if( fileindex == 1 )                this->DYSelections(var, weight, cat, strVar, filetype);
           else if( fileindex == 2 )           this->signalSelections(var, weight, cat, strVar, filetype, mass);
@@ -342,6 +399,10 @@ void CreateHistos::run(){
   cout << "Done running over events." << endl;
   writeHistos( channel, cats, vars );
   
+}
+
+int CreateHistos::get2DBin(){
+  return 1;
 }
 
 double CreateHistos::getMT3(){
