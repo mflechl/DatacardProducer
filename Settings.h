@@ -40,7 +40,7 @@ const int jecShift=0;
 const int useMVAMET=0;
 const TString doSvfit="woSVFIT";
 
-const int DEBUG=1;
+const int DEBUG=0;
 
 
 
