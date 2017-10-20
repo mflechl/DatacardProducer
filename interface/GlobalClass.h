@@ -42,9 +42,11 @@ class GlobalClass{
 
   TH1D* GetHistbyName(TString name, TString strVar="");
   TH1D* JITHistoCreator(TString name, TString strVar);
-  void returnBinning(double*, vector<double> input);
-  int returnBins(vector<double> input);
-  TH1D* getBinnedHisto(TString name,vector<double> input);
+  //  void returnBinning(double*, vector<double> input);
+  void returnBinning(double*, vector<double> input1d,vector<double> input2d={});
+  int returnBins(vector<double> input1d,vector<double> input2d={});
+  //  TH1D* getBinnedHisto(TString name,vector<double> input);
+  TH1D* getBinnedHisto(TString name,vector<double> input1d,vector<double> input2d={}, TString strVar="");
   void resetZeroBins(TString hist, TString var);
   void resetZeroBins(TH1D* hist);
 
@@ -72,6 +74,8 @@ class GlobalClass{
   json Binning;
   json Datasets;
 
+  std::map<TString,std::vector<double>> binning1d; //dynamic arrays would be faster
+  std::map<TString,std::vector<double>> binning2d;
 
 };
 

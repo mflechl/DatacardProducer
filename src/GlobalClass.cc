@@ -300,18 +300,39 @@ TH1D* GlobalClass::GetHistbyName(TString name, TString strVar){
   }
 }
 
-void GlobalClass::returnBinning(double* returnHisto, vector<double> input){
-  for(int i=0; i<input.size(); i++) returnHisto[i]=input.at(i);
+//void GlobalClass::returnBinning(double* returnHisto, vector<double> input){
+//  for(int i=0; i<input.size(); i++) returnHisto[i]=input.at(i);
+//}
+void GlobalClass::returnBinning(double* returnHisto, vector<double> input1d, vector<double> input2d){
+  if (input2d.size()>0) for(int i=0; i<this->returnBins(input1d,input2d)+1; i++) returnHisto[i]=i-0.5; //bins: -0.5;0.5;1.5; etc
+  else for(int i=0; i<input1d.size(); i++) returnHisto[i]=input1d.at(i);
 }
 
-int GlobalClass::returnBins(vector<double> input){
-  return input.size();
+//int GlobalClass::returnBins(vector<double> input){
+//  return input.size();
+//}
+int GlobalClass::returnBins(vector<double> input1d,vector<double> input2d){
+  if (input2d.size()>0) return (input1d.size()-1)*(input2d.size()-1);
+  else return input1d.size()-1;
 }
 
-TH1D* GlobalClass::getBinnedHisto(TString name,vector<double> input){
-  double binning[this->returnBins(input)];
-  this->returnBinning(binning,input);
-  TH1D* tmp=new TH1D(name,"",this->returnBins(input)-1,&binning[0]);
+//TH1D* GlobalClass::getBinnedHisto(TString name,vector<double> input){
+//  double binning[this->returnBins(input)];
+//  this->returnBinning(binning,input);
+//  TH1D* tmp=new TH1D(name,"",this->returnBins(input)-1,&binning[0]);
+//  return tmp;
+//}
+TH1D* GlobalClass::getBinnedHisto(TString name,vector<double> input1d,vector<double> input2d, TString strVar){
+  double binning[this->returnBins(input1d,input2d)+1];
+  this->returnBinning(binning,input1d,input2d);
+  TH1D* tmp=new TH1D(name,"",this->returnBins(input1d,input2d),&binning[0]);
+
+  //save binning
+  if ( strVar!="" && binning1d.find(strVar) == binning1d.end() ) { //does not exist yet
+    binning1d.insert(make_pair(strVar,input1d));
+    binning2d.insert(make_pair(strVar,input2d));
+  }
+
   return tmp;
 }
 
@@ -320,6 +341,7 @@ TH1D* GlobalClass::JITHistoCreator(TString name, TString strVar){
   TString binning = "default";
 
   if ( DEBUG==2) std::cout << "Trying to create histogram for variable " << strVar << endl;
+
   if(Binning[strVar.Data()]["doVarBins"]["check"]){
 
     if(Binning[strVar.Data()]["doVarBins"]["type"] == (string)"cat"){
@@ -330,16 +352,29 @@ TH1D* GlobalClass::JITHistoCreator(TString name, TString strVar){
       binning = channel;
     }  
 
-    try{
-      histograms[name] = this->getBinnedHisto(name,Binning[strVar.Data()]["varBins"].at(binning.Data() ) ) ;
+    if ( strVar.Contains(s_join2d) ){
+      try{
+	histograms[name] = this->getBinnedHisto(name,Binning[strVar.Data()]["varBins_1D"].at(binning.Data() ), Binning[strVar.Data()]["varBins_2D"].at(binning.Data() ), strVar ) ;
+      }
+      catch(const out_of_range& err){
+	histograms[name] = this->getBinnedHisto(name,Binning[strVar.Data()]["varBins_1D"].at("default"),Binning[strVar.Data()]["varBins_2D"].at("default"), strVar ) ;
+      }
+    } else{
+      try{
+	histograms[name] = this->getBinnedHisto(name,Binning[strVar.Data()]["varBins"].at(binning.Data() ) ) ;
+      }
+      catch(const out_of_range& err){
+	histograms[name] = this->getBinnedHisto(name,Binning[strVar.Data()]["varBins"].at("default") ) ;
+      }
     }
-    catch(const out_of_range& err){
-      histograms[name] = this->getBinnedHisto(name,Binning[strVar.Data()]["varBins"].at("default") ) ;
-    }
-    
+   
   }
   else{
-    histograms[name] = new TH1D(name,"", Binning[strVar.Data()]["nbins"], Binning[strVar.Data()]["nmin"], Binning[strVar.Data()]["nmax"]  ) ;
+    if ( strVar.Contains(s_join2d) ){
+      histograms[name] = new TH1D(name,"", Binning[strVar.Data()]["nbins"], Binning[strVar.Data()]["nmin"], Binning[strVar.Data()]["nmax"]  ) ; //TODO!!
+    } else{
+      histograms[name] = new TH1D(name,"", Binning[strVar.Data()]["nbins"], Binning[strVar.Data()]["nmin"], Binning[strVar.Data()]["nmax"]  ) ;
+    }
   }
 
   return histograms.at(name);

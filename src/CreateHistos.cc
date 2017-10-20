@@ -262,7 +262,7 @@ void CreateHistos::run(){
     //    vector<vector< boost::variant<float,int>  >> p_vars(vars.size());
     vector<vector<TString>> p_types(vars.size());
 
-    union u { int i; float f; }; //this only works because int and float both have 4 bit. Otherwise the SetBranchAddress option below may give weird results (e.g. int and double).
+    //    union u { int i; float f; }; //this only works because int and float both have 4 bit. Otherwise the SetBranchAddress option below may give weird results (e.g. int and double).
     vector<vector<u>> p_vars(vars.size());
 
     //    vector<vector<TString>> var1(vars.size());
@@ -349,10 +349,10 @@ void CreateHistos::run(){
 
 	  if ( p_vars.size()>ind ){
 	    if (p_vars.at(ind).size()>1){ //2D histos
-	      int ind_bin=this->get2DBin();
-	      var=p_vars.at(ind).at(0).f; //placeholder
+	      var=(float)this->get2DBin(strVar,p_vars.at(ind),p_types.at(ind));
 	    } else{
-	      var=p_vars.at(ind).at(0).f;
+	      if (p_types.at(ind).at(0)=="float") var=p_vars.at(ind).at(0).f;
+	      if (p_types.at(ind).at(0)=="int")   var=p_vars.at(ind).at(0).i;
 	    }
 	  } else
 	    continue;
@@ -401,8 +401,31 @@ void CreateHistos::run(){
   
 }
 
-int CreateHistos::get2DBin(){
-  return 1;
+float CreateHistos::getUnionVal(u var, TString vartype){
+  if (vartype=="int") return var.i;
+  else return var.f;
+}
+
+int CreateHistos::getBin(float var, std::vector<double> bins){
+  for (int i=0; i<bins.size()-1; i++)
+    if ( bins[i]<var && var<bins[i+1] ) return i;
+
+  return -1; //if bins.size()==0 or if under/overflow
+}
+
+int CreateHistos::get2DBin(const TString var,std::vector<u> p_vars,std::vector<TString> p_types){
+
+  float val[2]={0};
+  int bin[2];
+  for (int i=0; i<=1; i++)
+    val[i]=this->getUnionVal(p_vars.at(i),p_types.at(i));
+  bin[0]=this->getBin(val[0],binning1d[var]);
+  bin[1]=this->getBin(val[1],binning2d[var]);
+
+  int ret_bin=bin[0]*(binning2d[var].size()-1)+bin[1];
+  if (DEBUG==2) std::cout << "CreateHistos::get2DBin: var= " << var << " " << binning1d[var].size()-1 << " val 0,1= " << val[0] << " " << val[1] << " BINS 0,1,ret= " << bin[0] << " " << bin[1] << " " << ret_bin << std::endl;
+
+  return ret_bin;
 }
 
 double CreateHistos::getMT3(){
@@ -992,7 +1015,8 @@ void CreateHistos::writeHistos( TString channel, vector<TString> cats, vector<TS
   if(runOption != "nom" && runOption != "nlo") subDC="."+runOption;
 
   for(auto var : vars){
-    outfile_name << "histos/"<<folder << "/htt_" << channel << ".inputs-mssm-13TeV-"<<var<<subDC<<".root";
+    TString var_string=var;
+    outfile_name << "histos/"<<folder << "/htt_" << channel << ".inputs-mssm-13TeV-"<<var_string.ReplaceAll("|","_vs_")<<subDC<<".root";
     //outfile_name << "histos/htt_" << channel+"_"+UseIso << ".inputs-mssm-13TeV-"<<var<<subDC<<".root";
     outfile = new TFile(outfile_name.str().c_str(), "RECREATE") ;
 

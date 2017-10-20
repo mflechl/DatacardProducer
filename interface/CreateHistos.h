@@ -9,6 +9,9 @@ class CreateHistos : public SelectionAnalyzer{
   CreateHistos(TString testEnv_, TString ch);
 
   ~CreateHistos();
+
+  union u { int i; float f; };
+
   bool SpecialCuts();
   double getMT3();
   float getAntiLep_tauscaling();
@@ -36,7 +39,9 @@ class CreateHistos : public SelectionAnalyzer{
   void run();
   void clearHistos();
   void writeHistos(TString channel, vector<TString> cats, vector<TString> vars);
-  int get2DBin();
+  int get2DBin(const TString var,std::vector<u> v,std::vector<TString> vtype);
+  float getUnionVal(u var, TString vartype);
+  int getBin(float var, std::vector<double> bins);
   
   TFile *outfile;
 
