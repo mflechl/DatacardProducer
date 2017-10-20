@@ -39,7 +39,7 @@ class CreateHistos : public SelectionAnalyzer{
   void run();
   void clearHistos();
   void writeHistos(TString channel, vector<TString> cats, vector<TString> vars);
-  int get2DBin(const TString var,std::vector<u> v,std::vector<TString> vtype);
+  int get2DBin(const TString var,std::map<TString, u> p_vars,std::vector<TString> p_names,std::vector<TString> p_types);
   float getUnionVal(u var, TString vartype);
   int getBin(float var, std::vector<double> bins);
   

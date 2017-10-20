@@ -4,12 +4,19 @@ using namespace std;
 
 //WHAT CURRENTLY DOES NOT WORK:
 //- any variable with type other than int or float
-//- use the same variable twice, e.g. mvis/pt2 (2D) and mvis (1D) in one go (reason: pointer arithmetics and SetBranchAddress)
 
 //const vector<TString> variables={s_mttot+s_join2d+s_pt2}; //mt_tot|pt_2
 //const vector<TString> variables={s_mvis+s_join2d+s_pt2}; //m_vis|pt_2
-const vector<TString> variables={s_dm2+s_join2d+s_mvis,s_pt1};
-const vector<TString> vartypes={"int"+s_join2d+"float","float"};
+const vector<TString> variables={
+  s_dm2+s_join2d+s_mvis,
+  s_pttt+s_join2d+s_mvis,
+  s_mvis
+};
+const vector<TString> vartypes={
+  "int"+s_join2d+"float",
+  "float"+s_join2d+"float",
+  "float"
+};
 //const vector<TString> variables={s_mvis};
 //const vector<TString> variables={s_pt2};
 //const vector<TString> variables={s_mttot};
@@ -33,7 +40,7 @@ const int jecShift=0;
 const int useMVAMET=0;
 const TString doSvfit="woSVFIT";
 
-const int DEBUG=0;
+const int DEBUG=1;
 
 
 

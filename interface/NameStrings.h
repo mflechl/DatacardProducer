@@ -35,6 +35,7 @@ const TString s_join2d =                 "|";
 const TString s_mvis =                   "m_vis";
 const TString s_msv =                    "m_sv";
 const TString s_ptsv =                   "pt_sv";
+const TString s_pttt =                   "pt_tt";
 const TString s_Hpt =                    "Hpt";
 const TString s_mjj =                    "mjj";
 const TString s_met =                    "met";
