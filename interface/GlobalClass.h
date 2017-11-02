@@ -70,6 +70,8 @@ class GlobalClass{
   string channel;
   vector<string> categories;
   vector<string> masspoints;
+  std::map<TString,string> def_var_name;
+  std::map<TString,string> def_var_type;
   json Analysis;
   json Binning;
   json Datasets;

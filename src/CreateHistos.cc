@@ -15,7 +15,12 @@ CreateHistos::CreateHistos(TString runOption_, TString ch){
   // Basic initialization of channel categories and mt cut
   runOption = runOption_;
   channel = ch;
-  for(auto cat : Analysis["categories"][channel] ) categories.push_back( cat ); 
+  for(auto cat : Analysis["categories"][channel] ){
+    categories.push_back( cat ); 
+    def_var_name[categories.back()]= Analysis["def_var_name"][channel][categories.back()];
+    def_var_type[categories.back()]= Analysis["def_var_type"][channel][categories.back()];
+    //    def_var_type.push_back( Analysis["def_var_type"][channel][categories.back()] );
+  }
   applyMTCut = Analysis["applyMTCut"][channel];   
 
   // Initialization of FF version
@@ -184,16 +189,20 @@ void CreateHistos::run(){
 
 
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  if(doInitialize){
 
+  if(doInitialize){
+    TString m_var;
     for(auto cat : cats){
       for(auto strVar : vars){
 
-	initDYSelections(cat,strVar);
-	initTSelections(cat,strVar);
-	initVVSelections(cat,strVar);
-	initEWKZSelections(cat,strVar);
-	//initSignalSelections(cat,strVar);
+	m_var=this->getVarName(strVar,cat);
+	if (DEBUG) std::cout << cat << " " << strVar << " " << m_var << std::endl;
+
+	initDYSelections(cat,m_var);
+	initTSelections(cat,m_var);
+	initVVSelections(cat,m_var);
+	initEWKZSelections(cat,m_var);
+	//initSignalSelections(cat,m_var);
 
       }
     }
@@ -263,40 +272,44 @@ void CreateHistos::run(){
     map<TString, u> p_vars; //this only works because int and float both have 4 bit. Otherwise the SetBranchAddress option below may give weird results (e.g. int and double)
 
     TString var1;
-    int ind=0;
-    for (auto strType: vartypes){
-      TObjArray *toa = strType.Tokenize(s_join2d);
-      for (Int_t i = 0; i < toa->GetEntries(); i++){
-	p_types.at(ind).push_back(((TObjString *)(toa->At(i)))->String());
+    //    int ind=0;
+
+    //    for(auto strVar : vars){
+    for(int ind=0; ind<vars.size(); ind++){
+      //      TString m_var=vars.at(ind);
+      //      TString m_type=vartypes.at(ind);
+
+      bool break_cat_loop=true;
+      if ( vars.at(ind) == "default" ) break_cat_loop=false;
+
+      for(auto cat : categories){
+	TString m_var=this->getVarName(vars.at(ind),cat);
+	TString m_type=this->getVarType(vartypes.at(ind),cat);
+
+	this->splitString(m_type,s_join2d,p_types.at(ind));
+	this->splitString(m_var,s_join2d,p_names.at(ind));
+
+	for( auto vname : p_names.at(ind) ){
+	  if (DEBUG) std::cout << "CreateHistos::run \t vname= " << vname << "\t" << cat << std::endl;
+
+	  u tmp; tmp.i=-1;
+	  p_vars.insert(make_pair(vname,tmp));
+	  NtupleView->fChain->SetBranchAddress(vname, &p_vars[vname]);
+
+	  if (DEBUG==2){
+	    for (int i=0; i<p_names.at(ind).size(); i++){
+	      std::cout << "CreateHistos::run \t i= " << i << " " << &p_vars[p_names.at(ind).at(i)] << std::endl;
+	    }
+	  }
+	}
+	if (break_cat_loop) break;
       }
-      ++ind;
     }
+
     if (DEBUG)
       for (int i=0; i<p_types.size(); i++)
 	for (int j=0; j<p_types.at(i).size(); j++)
 	  cout << i << "," << j << ": " << p_types.at(i).at(j) << endl;
-    
-    ind=0;
-    for(auto strVar : vars){
-      TObjArray *toa = strVar.Tokenize(s_join2d);
-      for (Int_t i = 0; i < toa->GetEntries(); i++){
-	var1=((TObjString *)(toa->At(i)))->String();
-	p_names.at(ind).push_back(var1);
-	if (DEBUG) std::cout << "CreateHistos::run \t var1= " << var1 << std::endl;
-
-	u tmp; tmp.i=-1;
-	p_vars.insert(make_pair(var1,tmp));
-	NtupleView->fChain->SetBranchAddress(var1, &p_vars[var1]);
-
-	if (DEBUG==2){
-	  for (int i=0; i<p_names.at(ind).size(); i++){
-	    std::cout << "CreateHistos::run \t i= " << i << " " << &p_vars[p_names.at(ind).at(i)] << std::endl;
-	  }
-	}
-
-      }
-      ++ind;
-    }
 
     for (Int_t jentry=0; jentry<nentries;jentry++){       
 
@@ -334,26 +347,29 @@ void CreateHistos::run(){
 
       for(auto cat : cats){
 
-	int ind=0;
-        for(auto strVar : vars){
+	//        for(auto strVar : vars){
+        for(int ind=0; ind<vars.size(); ind++){
+
+	  TString m_var=this->getVarName(vars.at(ind),cat);
+	  TString m_type=this->getVarType(vartypes.at(ind),cat);
+
+	  std::vector<TString> vnames=this->splitString(m_var,s_join2d);
+	  std::vector<TString> vtypes=this->splitString(m_type,s_join2d);
 
           var = -999;
 
-	  if ( p_names.size()>ind ){
-	    if (p_names.at(ind).size()>1){ //2D histos
-	      var=(float)this->get2DBin(strVar,p_vars,p_names.at(ind),p_types.at(ind));
-	    } else{
-	      if (p_types.at(ind).at(0)=="float") var=p_vars[p_names.at(ind).at(0)].f;
-	      if (p_types.at(ind).at(0)=="int")   var=p_vars[p_names.at(ind).at(0)].i;
-	    }
-	  } else
-	    continue;
+	  if (vnames.size()>1){ //2D histos
+	    var=(float)this->get2DBin(m_var,p_vars,vnames,vtypes);
+	  } else{
+	    if (vtypes.at(0)=="float") var=p_vars[vnames.at(0)].f;
+	    if (vtypes.at(0)=="int")   var=p_vars[vnames.at(0)].i;
+	  }
 
 	  if ( DEBUG && jentry<10 && cat==cats.at(0) ){  
-	    for (int i=0; i<p_names.at(ind).size(); i++){ 
-	      std::cout << ((TObjString*) (strVar.Tokenize("|")->At(i)))->String() << " = ";
-	      if (p_types.at(ind).at(i)=="int")   std::cout << p_vars[p_names.at(ind).at(i)].i;
-	      if (p_types.at(ind).at(i)=="float") std::cout << p_vars[p_names.at(ind).at(i)].f;
+	    for (int i=0; i<vnames.size(); i++){ 
+	      std::cout << ((TObjString*) (m_var.Tokenize("|")->At(i)))->String() << " = ";
+	      if (vtypes.at(i)=="int")   std::cout << p_vars[vnames.at(i)].i;
+	      if (vtypes.at(i)=="float") std::cout << p_vars[vnames.at(i)].f;
 	      std::cout << " \t" << flush;
 	    }
 	    cout << std::endl;
@@ -362,25 +378,26 @@ void CreateHistos::run(){
 
 	  //TODO: if you want to impose cuts, do it here - not when selecting variables (e.g. jeta_1)
 
-          if( fileindex == 1 )                this->DYSelections(var, weight, cat, strVar, filetype);
-          else if( fileindex == 2 )           this->signalSelections(var, weight, cat, strVar, filetype, mass);
-          else if( fileindex == 3 )           this->TSelections(var, weight, cat, strVar, filetype);
-          else if( fileindex == 4 )           this->WSelections(var, weight, cat, strVar, filetype);             
-          else if( fileindex == 5 )           this->VVSelections(var, weight, cat, strVar, filetype);                 
-          else if( fileindex == 6 )           this->EWKZSelections(var, weight, cat, strVar, filetype);       
-          else if( filetype == s_data )       this->dataSelections(var, weight_data, cat, strVar, filetype);
+          if( fileindex == 1 )                this->DYSelections(var, weight, cat, m_var, filetype);
+          else if( fileindex == 2 )           this->signalSelections(var, weight, cat, m_var, filetype, mass);
+          else if( fileindex == 3 )           this->TSelections(var, weight, cat, m_var, filetype);
+          else if( fileindex == 4 )           this->WSelections(var, weight, cat, m_var, filetype);             
+          else if( fileindex == 5 )           this->VVSelections(var, weight, cat, m_var, filetype);                 
+          else if( fileindex == 6 )           this->EWKZSelections(var, weight, cat, m_var, filetype);       
+          else if( filetype == s_data )       this->dataSelections(var, weight_data, cat, m_var, filetype);
 
-        }
-      }
+        }//end loop over vars
+      }//end loop over cats
     }//end loop over entries
   }//end loop over files
   cout.precision(10);
   for(auto cat : cats){
     for(auto strVar : vars){
-      this->EstimateW(strVar, cat);
-      this->EstimateQCD(strVar, cat);
-      if(calcFF) this->EstimateFF(strVar, cat);
-      //if(cat != s_inclusive) this->createInclusive(strVar, cat);
+      TString m_var=this->getVarName(strVar,cat);
+      this->EstimateW(m_var, cat);
+      this->EstimateQCD(m_var, cat);
+      if(calcFF) this->EstimateFF(m_var, cat);
+      //if(cat != s_inclusive) this->createInclusive(m_var, cat);
     }
   }
   
@@ -390,6 +407,37 @@ void CreateHistos::run(){
   writeHistos( channel, cats, vars );
   
 }
+
+TString CreateHistos::getVarName(TString str, TString cat, int returnType){ //returnType: default 0
+  if ( str=="default" ){
+    TString m_var=def_var_name[cat];
+    if (returnType) m_var=def_var_type[cat];
+    if ( m_var != "" ) return m_var;
+    else{
+      if ( cat.Contains("_") ) return this->getVarName( str , cat.Remove( cat.Last('_') ), returnType ); //recursive!
+      else{ cout << "Cannot find category" << endl; return "none"; }
+    }
+  } else{
+    return str;
+  }
+}
+TString CreateHistos::getVarType(TString str, TString cat){
+  return getVarName(str,cat,1);
+}
+
+void CreateHistos::splitString(TString str,TString sep,vector<TString>& vec){
+  TObjArray *toa = str.Tokenize(sep);
+  for (Int_t i = 0; i < toa->GetEntries(); i++){
+    vec.push_back(((TObjString *)(toa->At(i)))->String());
+  }
+}
+
+std::vector<TString> CreateHistos::splitString(TString str,TString sep){
+  std::vector<TString> vec;
+  this->splitString(str,sep,vec);
+  return vec;
+}
+
 
 float CreateHistos::getUnionVal(u var, TString vartype){
   if (vartype=="int") return var.i;

@@ -7,6 +7,7 @@ using namespace std;
 
 //const vector<TString> variables={s_mttot+s_join2d+s_pt2}; //mt_tot|pt_2
 //const vector<TString> variables={s_mvis+s_join2d+s_pt2}; //m_vis|pt_2
+
 const vector<TString> variables={
   s_dm2+s_join2d+s_mvis,
   s_pttt+s_join2d+s_mvis,
@@ -17,11 +18,17 @@ const vector<TString> vartypes={
   "float"+s_join2d+"float",
   "float"
 };
-//const vector<TString> variables={s_mvis};
-//const vector<TString> variables={s_pt2};
-//const vector<TString> variables={s_mttot};
-//const vector<TString> variables={s_mttot,s_pt1,s_pt2,s_met,s_mvis};
-//const vector<TString> variables={s_eta1,s_eta2,s_njet,s_nbtag};
+
+/*
+const vector<TString> variables={
+  "default",
+  s_mvis
+};
+const vector<TString> vartypes={
+  "default",
+  "float"
+};
+*/
 
 //negative bins in histograms will be set to zero
 const int resetZero=0;
@@ -40,8 +47,4 @@ const int jecShift=0;
 const int useMVAMET=0;
 const TString doSvfit="woSVFIT";
 
-const int DEBUG=0;
-
-
-
-
+const int DEBUG=1;

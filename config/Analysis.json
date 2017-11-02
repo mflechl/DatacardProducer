@@ -10,6 +10,44 @@
     "et":["btag_tight","btag_loosemt","nobtag_tight","nobtag_loosemt"],
     "tt":["btag","nobtag"]
   },
+  "def_var_name":
+  {
+    "mt":{
+	"btag_tight": "decayMode_2|m_vis",
+    	"btag_loosemt": "m_vis", 
+    	"nobtag_tight": "mjj|m_vis",
+    	"nobtag_loosemt": "pt_tt|m_vis"
+	},
+    "et":{
+	"btag_tight": "decayMode_2|m_vis",
+	"btag_loosemt": "m_vis", 
+    	"nobtag_tight": "mjj|m_vis",
+    	"nobtag_loosemt": "pt_tt|m_vis"
+	},
+    "tt":{
+	"btag": "m_vis", 
+	"nobtag": "decayMode_2|m_vis"
+	}
+  },
+  "def_var_type":
+  {
+    "mt":{
+	"btag_tight": "int|float",
+    	"btag_loosemt": "float", 
+    	"nobtag_tight": "float|float",
+    	"nobtag_loosemt": "float|float"
+	},
+    "et":{
+	"btag_tight": "int|float",
+	"btag_loosemt": "float", 
+    	"nobtag_tight": "float|float",
+    	"nobtag_loosemt": "float|float"
+	},
+    "tt":{
+	"btag": "float", 
+	"nobtag": "int|float"
+	}
+  },
   "FFiso":
   {
     "mt":"tight",

@@ -42,7 +42,11 @@ class CreateHistos : public SelectionAnalyzer{
   int get2DBin(const TString var,std::map<TString, u> p_vars,std::vector<TString> p_names,std::vector<TString> p_types);
   float getUnionVal(u var, TString vartype);
   int getBin(float var, std::vector<double> bins);
-  
+  TString getVarName(TString strVar, TString cat, int returnType=0);
+  TString getVarType(TString strVar, TString cat);
+  void splitString(TString str,TString sep,vector<TString>& vec);
+  std::vector<TString> splitString(TString str,TString sep);
+
   TFile *outfile;
 
   
