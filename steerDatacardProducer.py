@@ -15,8 +15,9 @@ def main():
 	parser.add_argument('-c', dest='channel', help='datacard channel',choices = ['mt','et','tt','all'], default = 'mt')
 	args = parser.parse_args()
 
-	print 'Compiling...'
-	proc = sp.Popen(shlex.split('make -B') , stdout=sp.PIPE, stderr=sp.PIPE)
+	print 'Compiling... (only what has changed... not fully tested yet!)'
+#	proc = sp.Popen(shlex.split('make -B') , stdout=sp.PIPE, stderr=sp.PIPE)
+	proc = sp.Popen(shlex.split('make') , stdout=sp.PIPE, stderr=sp.PIPE)
 	(out, err) = proc.communicate()
 	print err
 	if err != '':

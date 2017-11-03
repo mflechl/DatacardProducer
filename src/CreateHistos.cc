@@ -1058,6 +1058,7 @@ void CreateHistos::writeHistos( TString channel, vector<TString> cats, vector<TS
   TString subDC="";
   if(runOption != "nom" && runOption != "nlo") subDC="."+runOption;
 
+  cout << endl;
   for(auto var : vars){
     cout << "#### " << var << endl;
     TString var_str=var;
