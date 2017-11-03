@@ -196,7 +196,8 @@ void CreateHistos::run(){
       for(auto strVar : vars){
 
 	m_var=this->getVarName(strVar,cat);
-	if (DEBUG) std::cout << cat << " " << strVar << " " << m_var << std::endl;
+	if (DEBUG && !cat.EndsWith("_cr") && !cat.EndsWith("loose_btag") )
+	  std::cout << "CreateHistos::run \t " << cat << " " << strVar << " " << m_var << std::endl;
 
 	initDYSelections(cat,m_var);
 	initTSelections(cat,m_var);
@@ -290,11 +291,13 @@ void CreateHistos::run(){
 	this->splitString(m_var,s_join2d,p_names.at(ind));
 
 	for( auto vname : p_names.at(ind) ){
-	  if (DEBUG) std::cout << "CreateHistos::run \t vname= " << vname << "\t" << cat << std::endl;
+	  if (DEBUG==2) std::cout << "CreateHistos::run \t vname= " << vname << "\t" << cat << std::endl;
 
 	  u tmp; tmp.i=-1;
-	  p_vars.insert(make_pair(vname,tmp));
-	  NtupleView->fChain->SetBranchAddress(vname, &p_vars[vname]);
+	  if ( p_vars.count(vname) == 0 ){
+	    p_vars.insert(make_pair(vname,tmp));
+	    NtupleView->fChain->SetBranchAddress(vname, &p_vars[vname]);
+	  }
 
 	  if (DEBUG==2){
 	    for (int i=0; i<p_names.at(ind).size(); i++){
@@ -307,6 +310,10 @@ void CreateHistos::run(){
     }
 
     if (DEBUG)
+      for (auto const& p_var : p_vars)
+	cout << "CreateHistos::run \t Reading variable " << p_var.first << " \t " << &(p_var.second) << endl;
+
+    if (DEBUG==2)
       for (int i=0; i<p_types.size(); i++)
 	for (int j=0; j<p_types.at(i).size(); j++)
 	  cout << i << "," << j << ": " << p_types.at(i).at(j) << endl;
@@ -365,16 +372,16 @@ void CreateHistos::run(){
 	    if (vtypes.at(0)=="int")   var=p_vars[vnames.at(0)].i;
 	  }
 
-	  if ( DEBUG && jentry<10 && cat==cats.at(0) ){  
+	  if ( DEBUG && jentry<4 && cat==cats.at(0) ){  
 	    for (int i=0; i<vnames.size(); i++){ 
-	      std::cout << ((TObjString*) (m_var.Tokenize("|")->At(i)))->String() << " = ";
+	      std::cout << "CreateHistos::run \t vnames_" << i << ": " << flush;
+	      std::cout << ((TObjString*) (m_var.Tokenize("|")->At(i)))->String() << " = " << flush;
 	      if (vtypes.at(i)=="int")   std::cout << p_vars[vnames.at(i)].i;
 	      if (vtypes.at(i)=="float") std::cout << p_vars[vnames.at(i)].f;
 	      std::cout << " \t" << flush;
 	    }
 	    cout << std::endl;
 	  }
-	  ++ind;
 
 	  //TODO: if you want to impose cuts, do it here - not when selecting variables (e.g. jeta_1)
 
@@ -404,7 +411,7 @@ void CreateHistos::run(){
   //cats.push_back(s_inclusive);
   
   cout << "Done running over events." << endl;
-  writeHistos( channel, cats, vars );
+  this->writeHistos( channel, cats, vars );
   
 }
 
@@ -516,67 +523,67 @@ float CreateHistos::recalcEffweight(){
 float CreateHistos::getAntiLep_tauscaling(){
 
 
-    if(channel == "mt"){
-      if(NtupleView->againstMuonTight3_2 > 0.5
-         && ( NtupleView->gen_match_2 == 2 
-             || NtupleView->gen_match_2 == 4)
-         ){
+  if(channel == "mt"){
+    if(NtupleView->againstMuonTight3_2 > 0.5
+       && ( NtupleView->gen_match_2 == 2 
+	    || NtupleView->gen_match_2 == 4)
+       ){
 
-        if(fabs(NtupleView->eta_2) < 1.2) return 1.28;       // +-0.06
-        else if (fabs(NtupleView->eta_2) < 1.7) return 2.6;   // +-2.6
-        else if (fabs(NtupleView->eta_2) < 2.3) return 2.1;  // +-0.9
-      }
+      if(fabs(NtupleView->eta_2) < 1.2) return 1.28;       // +-0.06
+      else if (fabs(NtupleView->eta_2) < 1.7) return 2.6;   // +-2.6
+      else if (fabs(NtupleView->eta_2) < 2.3) return 2.1;  // +-0.9
     }
-    if(channel == "et"){
-      if(NtupleView->againstElectronTightMVA6_2 > 0.5
-         && ( NtupleView->gen_match_2 == 1 
-             || NtupleView->gen_match_2 == 3)
-         ){
+  }
+  if(channel == "et"){
+    if(NtupleView->againstElectronTightMVA6_2 > 0.5
+       && ( NtupleView->gen_match_2 == 1 
+	    || NtupleView->gen_match_2 == 3)
+       ){
 
-        if(fabs(NtupleView->eta_2) < 1.46) return 1.42;       // +-0.06
-        else if (fabs(NtupleView->eta_2) > 1.558) return 1.994;   // +-2.6
-      }
+      if(fabs(NtupleView->eta_2) < 1.46) return 1.42;       // +-0.06
+      else if (fabs(NtupleView->eta_2) > 1.558) return 1.994;   // +-2.6
     }
-    if(channel == "tt"){
-      //run2 SF for VLoose for tau2
-      float scaleFactor_tautau = 1;
-      if( NtupleView->gen_match_2 == 1                                                                                                                                                        
-	        || NtupleView->gen_match_2 == 3 ){
+  }
+  if(channel == "tt"){
+    //run2 SF for VLoose for tau2
+    float scaleFactor_tautau = 1;
+    if( NtupleView->gen_match_2 == 1                                                                                                                                                        
+	|| NtupleView->gen_match_2 == 3 ){
 
-        if( fabs(NtupleView->eta_2 ) < 1.46) scaleFactor_tautau = 1.21;
-        else if( fabs(NtupleView->eta_2 ) > 1.558) scaleFactor_tautau =  1.38;
-      }  
-      //run2 SF with bad muon filter for cut-based Loose for tau2
-      if( NtupleView->gen_match_2 == 2                                                                                                                                                          
-	        || NtupleView->gen_match_2 == 4 ){
+      if( fabs(NtupleView->eta_2 ) < 1.46) scaleFactor_tautau = 1.21;
+      else if( fabs(NtupleView->eta_2 ) > 1.558) scaleFactor_tautau =  1.38;
+    }  
+    //run2 SF with bad muon filter for cut-based Loose for tau2
+    if( NtupleView->gen_match_2 == 2                                                                                                                                                          
+	|| NtupleView->gen_match_2 == 4 ){
 
-        if( fabs(NtupleView->eta_2) < 0.4 ) scaleFactor_tautau =  1.22;
-      	else if( fabs(NtupleView->eta_2) < 0.8 ) scaleFactor_tautau =  1.12;
-      	else if( fabs(NtupleView->eta_2) < 1.2 ) scaleFactor_tautau =  1.26;
-      	else if( fabs(NtupleView->eta_2) < 1.7 ) scaleFactor_tautau =  1.22;
-      	else if( fabs(NtupleView->eta_2) < 2.3 ) scaleFactor_tautau =  2.39;
-      }
-
-      if( NtupleView->gen_match_1 == 1                                                                                                                                                        
-	        || NtupleView->gen_match_1 == 3 ){
-
-        if( fabs(NtupleView->eta_1 ) < 1.46) scaleFactor_tautau *= 1.21;
-        else if( fabs(NtupleView->eta_1 ) > 1.558) scaleFactor_tautau *=  1.38;
-      }  
-      //run2 SF with bad muon filter for cut-based Loose for tau2
-      if( NtupleView->gen_match_1 == 2                                                                                                                                                          
-	        || NtupleView->gen_match_1 == 4 ){
-
-        if( fabs(NtupleView->eta_1) < 0.4 ) scaleFactor_tautau *=  1.22;
-      	else if( fabs(NtupleView->eta_1) < 0.8 ) scaleFactor_tautau *=  1.12;
-      	else if( fabs(NtupleView->eta_1) < 1.2 ) scaleFactor_tautau *=  1.26;
-      	else if( fabs(NtupleView->eta_1) < 1.7 ) scaleFactor_tautau *=  1.22;
-      	else if( fabs(NtupleView->eta_1) < 2.3 ) scaleFactor_tautau *=  2.39;
-      }
-      return scaleFactor_tautau;
-
+      if( fabs(NtupleView->eta_2) < 0.4 ) scaleFactor_tautau =  1.22;
+      else if( fabs(NtupleView->eta_2) < 0.8 ) scaleFactor_tautau =  1.12;
+      else if( fabs(NtupleView->eta_2) < 1.2 ) scaleFactor_tautau =  1.26;
+      else if( fabs(NtupleView->eta_2) < 1.7 ) scaleFactor_tautau =  1.22;
+      else if( fabs(NtupleView->eta_2) < 2.3 ) scaleFactor_tautau =  2.39;
     }
-    return 1.0;
+
+    if( NtupleView->gen_match_1 == 1                                                                                                                                                        
+	|| NtupleView->gen_match_1 == 3 ){
+
+      if( fabs(NtupleView->eta_1 ) < 1.46) scaleFactor_tautau *= 1.21;
+      else if( fabs(NtupleView->eta_1 ) > 1.558) scaleFactor_tautau *=  1.38;
+    }  
+    //run2 SF with bad muon filter for cut-based Loose for tau2
+    if( NtupleView->gen_match_1 == 2                                                                                                                                                          
+	|| NtupleView->gen_match_1 == 4 ){
+
+      if( fabs(NtupleView->eta_1) < 0.4 ) scaleFactor_tautau *=  1.22;
+      else if( fabs(NtupleView->eta_1) < 0.8 ) scaleFactor_tautau *=  1.12;
+      else if( fabs(NtupleView->eta_1) < 1.2 ) scaleFactor_tautau *=  1.26;
+      else if( fabs(NtupleView->eta_1) < 1.7 ) scaleFactor_tautau *=  1.22;
+      else if( fabs(NtupleView->eta_1) < 2.3 ) scaleFactor_tautau *=  2.39;
+    }
+    return scaleFactor_tautau;
+
+  }
+  return 1.0;
 
 }
 
@@ -920,8 +927,8 @@ void CreateHistos::EstimateW(TString strVar, TString cat){
   this->GetHistbyName("backgrounds_ss"+sub+"_wjets_ss_cr+",strVar)->Add( this->GetHistbyName(s_TT + sub + bt +"_wjets_ss_cr+",strVar) );
 
   double wjets_ss_cr_norm  = this->GetHistbyName("data_os_obs"+sub+"_wjets_cr+",strVar)->Integral() - this->GetHistbyName("backgrounds_os"+sub+"_wjets_cr+",strVar)->Integral();
-         wjets_ss_cr_norm -= (this->GetHistbyName("data_ss_obs"+sub+"_wjets_ss_cr+",strVar)->Integral() - this->GetHistbyName("backgrounds_ss"+sub+"_wjets_ss_cr+",strVar)->Integral() ) * R_QCD;
-         wjets_ss_cr_norm *= ( 1 /  ( R_W - R_QCD ) );
+  wjets_ss_cr_norm -= (this->GetHistbyName("data_ss_obs"+sub+"_wjets_ss_cr+",strVar)->Integral() - this->GetHistbyName("backgrounds_ss"+sub+"_wjets_ss_cr+",strVar)->Integral() ) * R_QCD;
+  wjets_ss_cr_norm *= ( 1 /  ( R_W - R_QCD ) );
 
 
   this->GetHistbyName(s_W+sub+"_wjets_ss_cr+",strVar)->Add( this->GetHistbyName(s_W+"_MC"+sub+"_wjets_ss_cr+",strVar) );
@@ -1052,12 +1059,14 @@ void CreateHistos::writeHistos( TString channel, vector<TString> cats, vector<TS
   if(runOption != "nom" && runOption != "nlo") subDC="."+runOption;
 
   for(auto var : vars){
-    TString var_string=var;
-    outfile_name << "histos/"<<folder << "/htt_" << channel << ".inputs-mssm-13TeV-"<<var_string.ReplaceAll("|","_vs_")<<subDC<<".root";
+    cout << "#### " << var << endl;
+    TString var_str=var;
+    outfile_name << "histos/"<<folder << "/htt_" << channel << ".inputs-mssm-13TeV-"<<var_str.ReplaceAll("|","_vs_")<<subDC<<".root";
     //outfile_name << "histos/htt_" << channel+"_"+UseIso << ".inputs-mssm-13TeV-"<<var<<subDC<<".root";
     outfile = new TFile(outfile_name.str().c_str(), "RECREATE") ;
 
     for(auto cat : cats){
+      TString var_string=this->getVarName(var,cat);
       //if(cat.Contains("loosebtag") ) continue;
       if(!keepDebugHistos
           && ( cat.Contains("loosebtag")
@@ -1072,9 +1081,11 @@ void CreateHistos::writeHistos( TString channel, vector<TString> cats, vector<TS
         ) continue;
       outfile->mkdir(channel +"_"+ cat );
       outfile->cd(channel +"_"+ cat); 
-      sub = "+" + var +"_" + cat + "+";
+      //!!      sub = "+" + var +"_" + cat + "+";
+      sub = "+" + var_string +"_" + cat + "+";
 
 
+      if (!cat.EndsWith("_cr") ) cout << "  -- " << var_string << "  \t" << cat << endl;
 
       for (auto const& name : histograms){
 
@@ -1108,13 +1119,13 @@ void CreateHistos::writeHistos( TString channel, vector<TString> cats, vector<TS
           tmp.ReplaceAll(s_jecUp,s_CMSjecScale+s_13TeVUp);
           tmp.ReplaceAll(s_jecDown,s_CMSjecScale+s_13TeVDown);
           tmp.ReplaceAll(s_jetToTauFakeUp,s_CMSjetToTauFake+s_13TeVUp);
+	  if (DEBUG==2) cout << "  -- " << var_string << "  \t" << cat << endl;
           tmp.ReplaceAll(s_jetToTauFakeDown,s_CMSjetToTauFake+s_13TeVDown);
           histograms.at( name.first )->SetName(tmp);
           this->resetZeroBins(histograms.at( name.first ));
           //if(histograms.at( name.first )->GetEntries() == 0 ) cout << "Warning: " << name.first << " not filled" << endl;
           histograms.at( name.first )->Write(tmp, TObject::kWriteDelete);
-          
-
+	  if (DEBUG==2) cout << " mm " << name.first << "  " << histograms.at( name.first ) << endl;
         }
       }
     }

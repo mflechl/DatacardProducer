@@ -945,7 +945,10 @@ void SelectionAnalyzer::dataSelections(float var, float weight, TString cat, TSt
     TString sign = "OS";
     if( cat.Contains("qcd_cr") ) sign = "SS";
 
-    if( this->Baseline(sign,cat) )   this->GetHistbyName("data_obs"+sub,strVar)->Fill(usedVar, weight);
+    if( this->Baseline(sign,cat) ){
+      //      cout << "########### " << sub << " : " << usedVar << "   \t" << this->GetHistbyName("data_obs"+sub,strVar) << endl;
+      this->GetHistbyName("data_obs"+sub,strVar)->Fill(usedVar, weight);
+    }
 
     if(calcFF) this->applyFF(var,weight,cat,strVar,fname,1,extend);
 

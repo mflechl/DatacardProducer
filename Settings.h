@@ -5,9 +5,7 @@ using namespace std;
 //WHAT CURRENTLY DOES NOT WORK:
 //- any variable with type other than int or float
 
-//const vector<TString> variables={s_mttot+s_join2d+s_pt2}; //mt_tot|pt_2
-//const vector<TString> variables={s_mvis+s_join2d+s_pt2}; //m_vis|pt_2
-
+/*
 const vector<TString> variables={
   s_dm2+s_join2d+s_mvis,
   s_pttt+s_join2d+s_mvis,
@@ -18,8 +16,9 @@ const vector<TString> vartypes={
   "float"+s_join2d+"float",
   "float"
 };
+*/
 
-/*
+//"default" is substitutes according to config/Analysis.json
 const vector<TString> variables={
   "default",
   s_mvis
@@ -28,7 +27,7 @@ const vector<TString> vartypes={
   "default",
   "float"
 };
-*/
+
 
 //negative bins in histograms will be set to zero
 const int resetZero=0;
@@ -47,4 +46,4 @@ const int jecShift=0;
 const int useMVAMET=0;
 const TString doSvfit="woSVFIT";
 
-const int DEBUG=1;
+const int DEBUG=0;

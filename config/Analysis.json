@@ -15,7 +15,7 @@
     "mt":{
 	"btag_tight": "decayMode_2|m_vis",
     	"btag_loosemt": "m_vis", 
-    	"nobtag_tight": "mjj|m_vis",
+    	"nobtag_tight": "pt_tt|m_vis",
     	"nobtag_loosemt": "pt_tt|m_vis"
 	},
     "et":{
