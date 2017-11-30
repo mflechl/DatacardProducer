@@ -13,37 +13,37 @@
   "def_var_name":
   {
     "mt":{
-	    "0jet":    "m_vis|decayMode_2",
-    	"boosted": "m_vis|pt_tt", 
-    	"vbf":     "m_vis|mjj"
+	    "0jet": "decayMode_2|m_vis",
+    	"boosted": "m_vis", 
+    	"vbf": "pt_tt|m_vis"
 	},
     "et":{
-      "0jet":    "m_vis|decayMode_2",
-      "boosted": "m_vis|pt_tt", 
-      "vbf":     "m_vis|mjj"
+	    "0jet": "decayMode_2|m_vis",
+	    "boosted": "m_vis", 
+    	"vbf": "mjj|m_vis"
 	},
     "tt":{
-	    "0jet":    "m_vis", 
-      "boosted": "m_vis|pt_tt", 
-      "vbf":     "m_vis|mjj"
+	    "0jet": "m_vis", 
+	    "boosted": "decayMode_2|m_vis",
+      "vbf": "decayMode_2|m_vis"
 	}
   },
   "def_var_type":
   {
     "mt":{
-	    "0jet":    "float|int",
-    	"boosted": "float|float", 
+	    "0jet":    "int|float",
+    	"boosted": "float", 
     	"vbf":     "float|float"
 	},
     "et":{
-      "0jet":    "float|int",
-      "boosted": "float|float", 
-      "vbf":     "float|float"
+	    "0jet":    "int|float",
+	    "boosted": "float", 
+    	"vbf":     "float|float"
 	},
     "tt":{
 	    "0jet":    "float", 
-      "boosted": "float|float", 
-      "vbf":     "float|float"
+	    "boosted": "int|float",
+      "vbf":     "int|float"
 	}
   },
   "FFiso":
