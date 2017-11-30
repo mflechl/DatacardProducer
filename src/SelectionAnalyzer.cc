@@ -603,15 +603,6 @@ void SelectionAnalyzer::WSelections(float var, float weight, TString cat, TStrin
      
       if(calcFF) this->applyFF(usedVar,weight,cat,strVar,fname,0,extend);
 
-      if( cat.Contains("looseiso") &&  cat.Contains("wjets_cr")){
-
-        if( this->W_CR("OS", "loose", cat, 0) )  this->GetHistbyName("OS_incl_"+fname+sub,strVar)->Fill(var, weight);
-        if( this->W_CR("SS", "loose", cat, 0) ) this->GetHistbyName("SS_incl_"+fname+sub,strVar)->Fill(var, weight);
-      } 
-      else if( cat.Contains("wjets_cr") ){
-        if( this->W_CR("OS", "tight", cat, 0) ) this->GetHistbyName("OS_incl_"+fname+sub,strVar)->Fill(var, weight);
-        if( this->W_CR("SS", "tight", cat, 0) ) this->GetHistbyName("SS_incl_"+fname+sub,strVar)->Fill(var, weight);
-      }
       
     }
     else if(fname == s_WjecUp){

@@ -100,21 +100,7 @@ CreateHistos::CreateHistos(TString runOption_, TString ch){
   for(auto var : variables)      vars.push_back(var);
   for(auto cat : categories){
     cats.push_back(cat);
-    if(channel != "tt"){
-      cats.push_back(cat+"_wjets_cr");
-      cats.push_back(cat+"_wjets_ss_cr");
-      cats.push_back(cat+"_qcd_cr");
-      cats.push_back(cat+"_loosebtag");
-      cats.push_back(cat+"_loosebtag_qcd_cr");
-      cats.push_back(cat+"_loosebtag_wjets_cr");
-      cats.push_back(cat+"_loosebtag_wjets_ss_cr");
-    }
-    else{
-      cats.push_back(cat+"_looseTiso");
-      cats.push_back(cat+"_qcd_cr");
-      cats.push_back(cat+"_looseTiso_qcd_cr");
-    }
-  };
+  }
 }
 
 CreateHistos::~CreateHistos(){

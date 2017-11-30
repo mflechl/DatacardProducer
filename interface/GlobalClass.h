@@ -25,23 +25,16 @@ class GlobalClass{
   float getJdeta();
   float getMT();
   float getMT2();
-  float CalcHPt();
+  float getHPt();
 
   int Baseline(TString sign, TString cat);
   int passMTCut();
   int passIso(TString type);
   int Vetos();
-  int CategorySelection(TString cat, TString iso);
+  int CategorySelection(TString cat, TString sign);
   bool zeroJetCat();
   bool boostedCat();
   bool vbfCat();
-  int LooseBtagCategory(TString cat, TString iso);
-  int Btag(TString btag);
-  int TauIso(TString  iso);
-  int LooseBtag(TString btag);
-  int TightMt(TString iso,TString mt = "SR");
-  int LooseMt(TString iso,TString mt = "SR");
-  int W_CR(TString sign, TString iso, TString cat, bool mtcut=true );
 
   TH1D* GetHistbyName(TString name, TString strVar="");
   TH1D* JITHistoCreator(TString name, TString strVar);

@@ -51,7 +51,7 @@ float GlobalClass::getMT2(){
   return NtupleView->pfmt_2;
 }
 
-float GlobalClass::CalcHPt(){
+float GlobalClass::getHPt(){
 
   TLorentzVector tau;
   TLorentzVector mu;
@@ -67,13 +67,15 @@ float GlobalClass::CalcHPt(){
 
 int GlobalClass::Baseline(TString sign, TString cat){
 
+  if(applyMTCut && this->getMT() < Analysis["MTCut"]["low"][channel] ) return 0;
 
   if( this->passIso("base") 
       && this->Vetos()
       && this->CategorySelection(cat,sign)
       ){
 
-      if( sign == "OS" || sign == "SS")  return 1;
+      if( ( sign == "OS" || sign == "SS") 
+          && NtupleView->byTightIsolationMVArun2v1DBoldDMwLT_2 )  return 1;
 
       if( sign == "FF" && NtupleView->byVLooseIsolationMVArun2v1DBoldDMwLT_2){
           if(!NtupleView->byTightIsolationMVArun2v1DBoldDMwLT_2) return 1;
@@ -111,23 +113,23 @@ int GlobalClass::passIso(TString type){
 //FIXME: temporary fix, has to be undone as soon as tauLepVeto is correct for etau channel
 int GlobalClass::Vetos(){
   if(NtupleView->passesThirdLepVeto){
-    if(channel == "et" && NtupleView->againstMuonLoose3_2 && NtupleView->againstElectronTightMVA6_2 && NtupleView->passesDiElectronVeto) return 1;
+    if(channel == "et" && NtupleView->passesTauLepVetos && NtupleView->passesDiElectronVeto) return 1;
     if(channel == "mt" && NtupleView->passesTauLepVetos && NtupleView->passesDiMuonVeto) return 1;
     if(channel == "tt" && NtupleView->passesTauLepVetos) return 1; 
   }
   return 0;
 }
 
-int GlobalClass::CategorySelection(TString cat, TString iso){
+int GlobalClass::CategorySelection(TString cat, TString sign){
 
-  if( (iso == "OS" || iso.Contains("FF") ) && NtupleView->q_1 * NtupleView->q_2 > 0 ) return 0;
-  if(iso == "SS" && NtupleView->q_1 * NtupleView->q_2 < 0 ) return 0;
+  if( (sign == "OS" || sign.Contains("FF") ) && NtupleView->q_1 * NtupleView->q_2 > 0 ) return 0;
+  if(sign == "SS" && NtupleView->q_1 * NtupleView->q_2 < 0 ) return 0;
 
 
-  if(tmp == s_inclusive     )    return 1;    
-  if(tmp == s_0jet          )    return this->zeroJetCat();
-  if(tmp == s_boosted       )    return this->boostedCat();
-  if(tmp == s_vbf           )    return this->vbfCat();
+  if(cat == s_inclusive     )    return 1;    
+  if(cat == s_0jet          )    return this->zeroJetCat();
+  if(cat == s_boosted       )    return this->boostedCat();
+  if(cat == s_vbf           )    return this->vbfCat();
   
   return 0;
 }
@@ -144,127 +146,7 @@ bool GlobalClass::vbfCat(){
   return 1;
 }
 
-int GlobalClass::LooseBtagCategory(TString iso,TString cat){
-  TString tmp = cat;
-  TString mt = "SR";
-  if(cat.Contains("wjets_cr") ) mt = "CR";
-  tmp.ReplaceAll("_wjets_cr","");
-  tmp.ReplaceAll("_qcd_cr","");
-  tmp.ReplaceAll("_loosebtag","");
 
-  if( this->passIso("base") && this->Vetos() ){
-
-      if(tmp == s_inclusive && NtupleView->byTightIsolationMVArun2v1DBoldDMwLT_2) return 1;
-
-      if(tmp == s_nobtag          )    return this->LooseBtag("nobtag");
-      if(tmp == s_btag            )    return this->LooseBtag("btag");
-      if(tmp == s_nobtag_tight    )    return this->LooseBtag("nobtag") && this->TightMt(iso,mt);
-      if(tmp == s_btag_tight      )    return this->LooseBtag("btag")   && this->TightMt(iso,mt);
-      if(tmp == s_nobtag_loosemt  )    return this->LooseBtag("nobtag") && this->LooseMt(iso,mt);
-      if(tmp == s_btag_loosemt    )    return this->LooseBtag("btag")   && this->LooseMt(iso,mt);
-
-  }
-  
-  return 0;
-}
-int GlobalClass::Btag(TString btag){
-
-  if(btag == "btag" 
-    && NtupleView->nbtag > 0  
-   // && NtupleView->njets <= 1
-    ) return 1;
-
-  if(btag == "nobtag" 
-     && NtupleView->nbtag ==0) return 1;
-
-  return 0;
-
-}
-
-int GlobalClass::LooseBtag(TString btag){
-
-  if(btag == "btag"
-    // && NtupleView->njets <= 1
-     && NtupleView->njetspt20 > 0) return 1;
-
-  if(btag == "nobtag" 
-     && NtupleView->nbtag ==0) return 1;
-
-  return 0;
-
-}
-
-int GlobalClass::TauIso(TString Tiso){
-
-  if(Tiso == "tight"){
-    if(NtupleView->byMediumIsolationMVArun2v1DBoldDMwLT_1 
-       && NtupleView->byMediumIsolationMVArun2v1DBoldDMwLT_2 ) return 1;
-  }
-  if(Tiso == "medium"){
-    if( NtupleView->byMediumIsolationMVArun2v1DBoldDMwLT_1
-        && !NtupleView->byMediumIsolationMVArun2v1DBoldDMwLT_2
-        && NtupleView->byLooseIsolationMVArun2v1DBoldDMwLT_2 ) return 1;
-  }
-  if(Tiso == "loose"){
-    if( NtupleView->byMediumIsolationMVArun2v1DBoldDMwLT_1
-        && !NtupleView->byMediumIsolationMVArun2v1DBoldDMwLT_2
-        && NtupleView->byVLooseIsolationMVArun2v1DBoldDMwLT_2 ) return 1;
-  }
-  if(Tiso == "no") return 1;
-}
-
-int GlobalClass::TightMt(TString iso,TString mt){
-
-  if(applyMTCut){
-    if( mt == "SR" && this->getMT() >  Analysis["MTCut"]["low"][channel]) return 0;
-    if( mt == "CR" && this->getMT() <  Analysis["MTCut"]["high"][channel]) return 0;
-  }
-  if(iso == "FF") return 1;
-  if(iso == "OS" || iso == "SS"){
-    if(FFiso == "medium" && NtupleView->byMediumIsolationMVArun2v1DBoldDMwLT_2 ) return 1;
-    if(FFiso == "tight" && NtupleView->byTightIsolationMVArun2v1DBoldDMwLT_2 ) return 1;
-  }
-  return 0;
-}
-int GlobalClass::LooseMt(TString iso,TString mt){
-
-  if(applyMTCut){
-    if( mt == "SR" 
-        && !(this->getMT() > Analysis["MTCut"]["low"][channel]
-             && this->getMT() < Analysis["MTCut"]["high"][channel]) ) return 0;
-    if( mt == "CR" && this->getMT() <  Analysis["MTCut"]["high"][channel]) return 0;
-  }
-
-  if(iso == "FF") return 1;
-  if(iso == "OS" || iso == "SS"){
-      if(FFiso == "medium" && NtupleView->byMediumIsolationMVArun2v1DBoldDMwLT_2 ) return 1;
-      if(FFiso == "tight" && NtupleView->byTightIsolationMVArun2v1DBoldDMwLT_2) return 1;
-  }
-  
-  
-  return 0;
-  
-}
-
-
-int GlobalClass::W_CR(TString sign, TString iso, TString cat, bool mtcut){
-  if(sign == "OS" && NtupleView->q_1 * NtupleView->q_2 > 0) return 0;
-  if(sign == "SS" && NtupleView->q_1 * NtupleView->q_2 < 0) return 0;
-  if(mtcut && this->getMT() < Analysis["MTCut"]["high"][channel] ) return 0;
-  if( cat.Contains("nobtag") && NtupleView->nbtag > 0 ) return 0;
-  if( cat.Contains("btag") && !cat.Contains("loosebtag") && !cat.Contains("nobtag") && !(NtupleView->nbtag > 0) ) return 0;
-  if( cat.Contains("loosebtag") && !(NtupleView->njetspt20 > 0) ) return 0;
-
-  if( this->passIso("base") 
-      && this->Vetos() ){
-
-    if(iso == "medium" && NtupleView->byMediumIsolationMVArun2v1DBoldDMwLT_2) return 1;
-    if(iso == "tight" && NtupleView->byTightIsolationMVArun2v1DBoldDMwLT_2) return 1;
-
-  }
-  return 0;
-
-}
 
 TH1D* GlobalClass::GetHistbyName(TString name, TString strVar){
 
