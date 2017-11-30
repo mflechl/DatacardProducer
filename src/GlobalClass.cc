@@ -76,8 +76,7 @@ int GlobalClass::Baseline(TString sign, TString cat){
       if( sign == "OS" || sign == "SS")  return 1;
 
       if( sign == "FF" && NtupleView->byVLooseIsolationMVArun2v1DBoldDMwLT_2){
-          if(FFiso == "medium" && !NtupleView->byMediumIsolationMVArun2v1DBoldDMwLT_2) return 1;
-          if(FFiso == "tight" && !NtupleView->byTightIsolationMVArun2v1DBoldDMwLT_2) return 1;
+          if(!NtupleView->byTightIsolationMVArun2v1DBoldDMwLT_2) return 1;
       }
 
       if( sign == "FF1"
@@ -124,35 +123,27 @@ int GlobalClass::CategorySelection(TString cat, TString iso){
   if( (iso == "OS" || iso.Contains("FF") ) && NtupleView->q_1 * NtupleView->q_2 > 0 ) return 0;
   if(iso == "SS" && NtupleView->q_1 * NtupleView->q_2 < 0 ) return 0;
 
-  if( cat.Contains("loosebtag") ){
-    if(cat.Contains("loosebtag_qcd_cr")) return LooseBtagCategory("SS",cat);
-    return LooseBtagCategory("OS",cat);
-  }
 
-  TString Tiso = "tight";
-  if(cat.Contains("loose") && (cat.Contains("btag") && !cat.Contains("nobtag")) ) Tiso = "loose";
-  else if(cat.Contains("loose")) Tiso = "medium";
-  
-  if(iso.Contains("FF") ) Tiso = "no";
-
-  TString tmp = cat;
-  tmp.ReplaceAll("_qcd_cr","");
-  if( !tmp.Contains("looseiso") && !tmp.Contains("loosemt") ){
-    tmp.ReplaceAll("_looseTiso","");
-  }
-
-  if(tmp == s_inclusive       )    return 1;    
-  if(tmp == s_nobtag          )    return this->Btag("nobtag") && this->TauIso(Tiso);
-  if(tmp == s_btag            )    return this->Btag("btag")   && this->TauIso(Tiso);
-  if(tmp == s_nobtag_tight    )    return this->Btag("nobtag") && this->TightMt(iso);
-  if(tmp == s_btag_tight      )    return this->Btag("btag")   && this->TightMt(iso);
-  if(tmp == s_nobtag_loosemt  )    return this->Btag("nobtag") && this->LooseMt(iso);
-  if(tmp == s_btag_loosemt    )    return this->Btag("btag")   && this->LooseMt(iso);
+  if(tmp == s_inclusive     )    return 1;    
+  if(tmp == s_0jet          )    return this->zeroJetCat();
+  if(tmp == s_boosted       )    return this->boostedCat();
+  if(tmp == s_vbf           )    return this->vbfCat();
   
   return 0;
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+bool GlobalClass::zeroJetCat(){
+  return 1;
+}
+bool GlobalClass::boostedCat(){
+  return 1;
+}
+bool GlobalClass::vbfCat(){
+  return 1;
+}
+
 int GlobalClass::LooseBtagCategory(TString iso,TString cat){
   TString tmp = cat;
   TString mt = "SR";

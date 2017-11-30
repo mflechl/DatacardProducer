@@ -32,6 +32,9 @@ class GlobalClass{
   int passIso(TString type);
   int Vetos();
   int CategorySelection(TString cat, TString iso);
+  bool zeroJetCat();
+  bool boostedCat();
+  bool vbfCat();
   int LooseBtagCategory(TString cat, TString iso);
   int Btag(TString btag);
   int TauIso(TString  iso);
