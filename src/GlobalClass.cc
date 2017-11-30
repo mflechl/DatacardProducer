@@ -66,22 +66,7 @@ float GlobalClass::CalcHPt(){
 }
 
 int GlobalClass::Baseline(TString sign, TString cat){
-  if( cat.Contains("looseiso") ){
-    if( cat.Contains("wjets_cr") ){
-      return this->W_CR("OS", "loose", cat, 1);
-    }
-    if( cat.Contains("wjets_ss_cr") ){
-      return this->W_CR("SS", "loose", cat, 1);
-    }
-  } 
-  else{
-    if( cat.Contains("wjets_cr") ){
-      return this->W_CR("OS", FFiso, cat, 1);
-    }
-    if( cat.Contains("wjets_ss_cr") ){
-      return this->W_CR("SS", FFiso, cat, 1);
-    }
-  }
+
 
   if( this->passIso("base") 
       && this->Vetos()

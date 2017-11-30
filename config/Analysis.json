@@ -6,59 +6,57 @@
   },
   "categories":
   {
-    "mt":["btag_tight","btag_loosemt","nobtag_tight","nobtag_loosemt"],
-    "et":["btag_tight","btag_loosemt","nobtag_tight","nobtag_loosemt"],
-    "tt":["btag","nobtag"]
+    "mt":["0jet","boosted","vbf"],
+    "et":["0jet","boosted","vbf"],
+    "tt":["0jet","boosted","vbf"]
   },
   "def_var_name":
   {
     "mt":{
-	"btag_tight": "decayMode_2|m_vis",
-    	"btag_loosemt": "m_vis", 
-    	"nobtag_tight": "pt_tt|m_vis",
-    	"nobtag_loosemt": "pt_tt|m_vis"
+	    "0jet": "decayMode_2|m_vis",
+    	"boosted": "m_vis", 
+    	"vbf": "pt_tt|m_vis"
 	},
     "et":{
-	"btag_tight": "decayMode_2|m_vis",
-	"btag_loosemt": "m_vis", 
-    	"nobtag_tight": "mjj|m_vis",
-    	"nobtag_loosemt": "pt_tt|m_vis"
+	    "0jet": "decayMode_2|m_vis",
+	    "boosted": "m_vis", 
+    	"vbf": "mjj|m_vis"
 	},
     "tt":{
-	"btag": "m_vis", 
-	"nobtag": "decayMode_2|m_vis"
+	    "0jet": "m_vis", 
+	    "boosted": "decayMode_2|m_vis",
+      "vbf": "decayMode_2|m_vis"
 	}
   },
   "def_var_type":
   {
     "mt":{
-	"btag_tight": "int|float",
-    	"btag_loosemt": "float", 
-    	"nobtag_tight": "float|float",
-    	"nobtag_loosemt": "float|float"
+	    "0jet":    "int|float",
+    	"boosted": "float", 
+    	"vbf":     "float|float"
 	},
     "et":{
-	"btag_tight": "int|float",
-	"btag_loosemt": "float", 
-    	"nobtag_tight": "float|float",
-    	"nobtag_loosemt": "float|float"
+	    "0jet":    "int|float",
+	    "boosted": "float", 
+    	"vbf":     "float|float"
 	},
     "tt":{
-	"btag": "float", 
-	"nobtag": "int|float"
+	    "0jet":    "float", 
+	    "boosted": "int|float",
+      "vbf":     "int|float"
 	}
   },
   "FFiso":
   {
-    "mt":"tight",
-    "et":"tight",
-    "tt":"medium"
+    "mt":"",
+    "et":"",
+    "tt":""
   },
   "FFbuild":
   {
-    "mt":"fakeFactors_20170628_",
-    "et":"fakeFactors_20170628_",
-    "tt":"fakeFactors_20170628_"
+    "mt":"fakeFactors_20170228",
+    "et":"fakeFactors_20170228",
+    "tt":"fakeFactors_20170228"
   },
   "applyMTCut":
   {
