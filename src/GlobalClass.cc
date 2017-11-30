@@ -5,6 +5,16 @@
 #include <sstream>
 #include <TObject.h>
 #include <algorithm>
+#include "TFile.h"
+#include "TH1D.h"
+#include "TH2F.h"
+#include "TFileCollection.h"
+#include <string>
+#include <sstream>
+#include <fstream>
+#include <sys/stat.h>
+
+
 
 using namespace std;
 
@@ -18,6 +28,10 @@ GlobalClass::GlobalClass()
   A >> Analysis;
   B >> Binning;
   D >> Datasets;
+
+  TFile* rootFile = new TFile("higgs_pt_v2_mssm_mode.root", "READ");
+  w = (RooWorkspace*)rootFile->Get("w");
+
 }
 GlobalClass::~GlobalClass()
 {

@@ -849,16 +849,80 @@ void SelectionAnalyzer::VVSelections(float var, float weight, TString cat, TStri
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void SelectionAnalyzer::signalSelections(float var, float weight, TString cat, TString strVar, TString fname, TString mass){
+
+TString SelectionAnalyzer::OwnReplace(TString in, TString oldS, TString newS){
+  TString tmp = in;
+  tmp.ReplaceAll( oldS,newS );
+  return tmp;
+}
+void SelectionAnalyzer::signalSelections(float var, float weight, TString cat, TString strVar, TString f, TString mass){
 
   TString sub = "+" + strVar +"_" + cat + "+";
+  double Pure_weight = weight;
+
+  vector<TString> fnames = {f};
+  if( f.Contains(s_ggH) && !f.Contains("SM125") ){
+    fnames.push_back( OwnReplace(f, s_ggH,"ggh_t") );
+    fnames.push_back( OwnReplace(f, s_ggH,"ggh_b") );
+    fnames.push_back( OwnReplace(f, s_ggH,"ggh_i") );
+    fnames.push_back( OwnReplace(f, s_ggH,"ggH_t") );
+    fnames.push_back( OwnReplace(f, s_ggH,"ggH_b") );
+    fnames.push_back( OwnReplace(f, s_ggH,"ggH_i") );
+    fnames.push_back( OwnReplace(f, s_ggH,"ggA_t") );
+    fnames.push_back( OwnReplace(f, s_ggH,"ggA_b") );
+    fnames.push_back( OwnReplace(f, s_ggH,"ggA_i") );
+  }
+
+
+  map<TString,float> ggP_weight;
+  if( f.Contains(s_ggH) && !f.Contains("SM125") ){
+    w->var("h_pt")->setVal(NtupleView->Higgs_genPt);
+  
+    TString s;
+    for( auto tmp : {"","T0Up","T1Up","T10Up","T0Down","T1Down","T10Down","TauPtUp","TauPtDown"} ){
+      s = tmp;
+
+      ggP_weight["ggh_b"+s] = w->function("h_"+mass+"_b_ratio")->getVal();
+      ggP_weight["ggh_i"+s] = w->function("h_"+mass+"_i_ratio")->getVal();
+      ggP_weight["ggh_t"+s] = w->function("h_"+mass+"_t_ratio")->getVal();
+      ggP_weight["ggH_b"+s] = w->function("H_"+mass+"_b_ratio")->getVal();
+      ggP_weight["ggH_i"+s] = w->function("H_"+mass+"_i_ratio")->getVal();
+      ggP_weight["ggH_t"+s] = w->function("H_"+mass+"_t_ratio")->getVal();
+      ggP_weight["ggA_b"+s] = w->function("A_"+mass+"_b_ratio")->getVal();
+      ggP_weight["ggA_i"+s] = w->function("A_"+mass+"_i_ratio")->getVal();
+      ggP_weight["ggA_t"+s] = w->function("A_"+mass+"_t_ratio")->getVal();
+    }
+  }
+
+
   float usedVar=var;
 
   TString sign = "OS";
   if( cat.Contains("qcd_cr") ) sign = "SS";
   
+for(auto fname : fnames) {
+  if( f.Contains(s_ggH) && !f.Contains("SM125") ){
+
+    try{
+      weight = Pure_weight *  ggP_weight.at(fname);
+    }
+    catch(const out_of_range& err){
+      weight = Pure_weight;
+    }
+
+  }
+  
 
   if(fname == s_ggH
+     || fname == "ggh_t"
+     || fname == "ggh_b"
+     || fname == "ggh_i"
+     || fname == "ggH_t"
+     || fname == "ggH_b"
+     || fname == "ggH_i"
+     || fname == "ggA_t"
+     || fname == "ggA_b"
+     || fname == "ggA_i"
      || fname == s_bbH
      || fname ==  s_SMggH
      || fname ==  s_SMvbf
@@ -866,10 +930,13 @@ void SelectionAnalyzer::signalSelections(float var, float weight, TString cat, T
      || fname ==  s_SMWplus
      || fname ==  s_SMZH){
 
+
+
     if( this->Baseline(sign,cat) ){
-      this->GetHistbyName(fname+mass+sub,strVar)->Fill(usedVar, weight);
+        this->GetHistbyName(fname+mass+sub,strVar)->Fill(usedVar, weight);
 
       if(channel != "tt"){
+
         if(this->TSelection()){
           if(channel == "et"){
             if(this->ShapeSelector(0,  "nom")){
@@ -885,12 +952,15 @@ void SelectionAnalyzer::signalSelections(float var, float weight, TString cat, T
               this->GetHistbyName(fname+mass+s_CMStauScale+s_3p0p0+"_"+s_13TeVDown+sub,strVar)->Fill(usedVar, weight);
             }
           }
+          
           this->GetHistbyName(fname+mass+s_CMSmssmHigh+channel+"_"+s_13TeVUp+sub,strVar)->Fill(usedVar, weight *this->getMSSMHighUncert(NtupleView->genPt_2, 0., "up") );
           this->GetHistbyName(fname+mass+s_CMSmssmHigh+channel+"_"+s_13TeVDown+sub,strVar)->Fill(usedVar, weight*this->getMSSMHighUncert(NtupleView->genPt_2, 0., "down") );
+
         }
         else{
           this->GetHistbyName(fname+mass+s_CMSmssmHigh+channel+"_"+s_13TeVUp+sub,strVar)->Fill(usedVar, weight );
           this->GetHistbyName(fname+mass+s_CMSmssmHigh+channel+"_"+s_13TeVDown+sub,strVar)->Fill(usedVar, weight );
+
         }
       }
       if(channel == "tt"){
@@ -915,67 +985,70 @@ void SelectionAnalyzer::signalSelections(float var, float weight, TString cat, T
   
 
     if(calcFF) this->applyFF(usedVar,weight,cat,strVar,fname+mass,0,"");
-    return;
+    
   }
   else if(fname.Contains(s_jecUp)     ){
 
     if( this->Baseline(sign,cat) )                   this->GetHistbyName(fname.ReplaceAll(s_jecUp,mass+s_jecUp)+sub,strVar)->Fill(usedVar, weight);
-    return;
+    
   }
   else if(fname.Contains(s_jecDown)     ){
 
     if( this->Baseline(sign,cat) )                   this->GetHistbyName(fname.ReplaceAll(s_jecDown,mass+s_jecDown)+sub,strVar)->Fill(usedVar, weight);
-    return;
+    
   }
 
   else if( fname .Contains("T0Up") && this->Baseline(sign,cat) ){
-      this->GetHistbyName(fname.ReplaceAll("T0Up","")+mass+s_CMStauScale+s_1p0p0+"_"+s_13TeVUp+sub,strVar)->Fill(usedVar, weight);
+      this->GetHistbyName(OwnReplace(fname,"T0Up","")+mass+s_CMStauScale+s_1p0p0+"_"+s_13TeVUp+sub,strVar)->Fill(usedVar, weight);
   }
   else if(fname.Contains("T1Up") && this->Baseline(sign,cat) ){
-      this->GetHistbyName(fname.ReplaceAll("T1Up","")+mass+s_CMStauScale+s_1p1p0+"_"+s_13TeVUp+sub,strVar)->Fill(usedVar, weight);
+      this->GetHistbyName(OwnReplace(fname,"T1Up","")+mass+s_CMStauScale+s_1p1p0+"_"+s_13TeVUp+sub,strVar)->Fill(usedVar, weight);
   }
   else if(fname.Contains("T10Up") && this->Baseline(sign,cat) ){
-      this->GetHistbyName(fname.ReplaceAll("T10Up","")+mass+s_CMStauScale+s_3p0p0+"_"+s_13TeVUp+sub,strVar)->Fill(usedVar, weight);
+      this->GetHistbyName(OwnReplace(fname,"T10Up","")+mass+s_CMStauScale+s_3p0p0+"_"+s_13TeVUp+sub,strVar)->Fill(usedVar, weight);
   }
   else if(fname.Contains("T0Down") && this->Baseline(sign,cat) ){
-      this->GetHistbyName(fname.ReplaceAll("T0Down","")+mass+s_CMStauScale+s_1p0p0+"_"+s_13TeVDown+sub,strVar)->Fill(usedVar, weight);
+      this->GetHistbyName(OwnReplace(fname,"T0Down","")+mass+s_CMStauScale+s_1p0p0+"_"+s_13TeVDown+sub,strVar)->Fill(usedVar, weight);
   }
   else if(fname.Contains("T1Down") && this->Baseline(sign,cat) ){
-      this->GetHistbyName(fname.ReplaceAll("T1Down","")+mass+s_CMStauScale+s_1p1p0+"_"+s_13TeVDown+sub,strVar)->Fill(usedVar, weight);
+      this->GetHistbyName(OwnReplace(fname,"T1Down","")+mass+s_CMStauScale+s_1p1p0+"_"+s_13TeVDown+sub,strVar)->Fill(usedVar, weight);
   }
   else if(fname.Contains("T10Down") && this->Baseline(sign,cat) ){
-      this->GetHistbyName(fname.ReplaceAll("T10Down","")+mass+s_CMStauScale+s_3p0p0+"_"+s_13TeVDown+sub,strVar)->Fill(usedVar, weight);    
+      this->GetHistbyName(OwnReplace(fname,"T10Down","")+mass+s_CMStauScale+s_3p0p0+"_"+s_13TeVDown+sub,strVar)->Fill(usedVar, weight);    
   }
   else if( fname.Contains(s_tauUp) ){
 
     if( this->Baseline(sign,cat) && this->TSelection() ){
       if(this->ShapeSelector(0,  "shape")){
-        this->GetHistbyName(fname.ReplaceAll(s_tauUp,mass)+s_CMStauScale+s_1p0p0+"_"+s_13TeVUp+sub,strVar)->Fill(usedVar, weight);
+        this->GetHistbyName(OwnReplace(fname,s_tauUp,mass)+s_CMStauScale+s_1p0p0+"_"+s_13TeVUp+sub,strVar)->Fill(usedVar, weight);
       }
       if(this->ShapeSelector(1,  "shape")){
-        this->GetHistbyName(fname.ReplaceAll(s_tauUp,mass)+s_CMStauScale+s_1p1p0+"_"+s_13TeVUp+sub,strVar)->Fill(usedVar, weight);
+        this->GetHistbyName(OwnReplace(fname,s_tauUp,mass)+s_CMStauScale+s_1p1p0+"_"+s_13TeVUp+sub,strVar)->Fill(usedVar, weight);
       }
       if(this->ShapeSelector(10,  "shape")){
-        this->GetHistbyName(fname.ReplaceAll(s_tauUp,mass)+s_CMStauScale+s_3p0p0+"_"+s_13TeVUp+sub,strVar)->Fill(usedVar, weight);
+        this->GetHistbyName(OwnReplace(fname,s_tauUp,mass)+s_CMStauScale+s_3p0p0+"_"+s_13TeVUp+sub,strVar)->Fill(usedVar, weight);
       }
     }
-    return;
+    
   }
   else if(fname.Contains(s_tauDown)  ) {
 
     if( this->Baseline(sign,cat) && this->TSelection() ){
       if(this->ShapeSelector(0,  "shape")){
-        this->GetHistbyName(fname.ReplaceAll(s_tauDown,mass)+s_CMStauScale+s_1p0p0+"_"+s_13TeVDown+sub,strVar)->Fill(usedVar, weight);
+        this->GetHistbyName(OwnReplace(fname,s_tauDown,mass)+s_CMStauScale+s_1p0p0+"_"+s_13TeVDown+sub,strVar)->Fill(usedVar, weight);
       }
       if(this->ShapeSelector(1,  "shape")){
-        this->GetHistbyName(fname.ReplaceAll(s_tauDown,mass)+s_CMStauScale+s_1p1p0+"_"+s_13TeVDown+sub,strVar)->Fill(usedVar, weight);
+        this->GetHistbyName(OwnReplace(fname,s_tauDown,mass)+s_CMStauScale+s_1p1p0+"_"+s_13TeVDown+sub,strVar)->Fill(usedVar, weight);
       }
       if(this->ShapeSelector(10,  "shape")){
-        this->GetHistbyName(fname.ReplaceAll(s_tauDown,mass)+s_CMStauScale+s_3p0p0+"_"+s_13TeVDown+sub,strVar)->Fill(usedVar, weight);
+        this->GetHistbyName(OwnReplace(fname,s_tauDown,mass)+s_CMStauScale+s_3p0p0+"_"+s_13TeVDown+sub,strVar)->Fill(usedVar, weight);
       }
     }
-    return;
+    
   }
+
+}
+
 
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

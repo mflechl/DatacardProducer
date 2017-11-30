@@ -8,6 +8,9 @@
 #include "FakeFactorConfig.h"
 #include <fstream>
 #include "json.hpp"
+#include "RooWorkspace.h"
+#include "RooRealVar.h"
+#include "RooFunctor.h"
 
 using nlohmann::json;
 
@@ -68,6 +71,7 @@ class GlobalClass{
   string channel;
   vector<string> categories;
   vector<string> masspoints;
+  RooWorkspace *w;
   json Analysis;
   json Binning;
   json Datasets;

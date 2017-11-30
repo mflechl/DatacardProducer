@@ -225,6 +225,7 @@ void CreateHistos::run(){
     // 5              Diboson
     // 6              EWK
     fileindex = this->getFiletype(filetype);
+    // if( fileindex != 2 || filetype.Contains("SM125") || filetype.Contains("bbH") ) continue;
     if(jecShift){
 
     }
@@ -246,7 +247,7 @@ void CreateHistos::run(){
     cout<<endc+" events. File:  "<<bold + filename.ReplaceAll(remFolder,"") + endc<<endl;
 
     
-
+    // nentries = 1;
     for (Int_t jentry=0; jentry<nentries;jentry++){       
 
       if(jentry % 200000 == 0){
@@ -985,6 +986,10 @@ void CreateHistos::writeHistos( TString channel, vector<TString> cats, vector<TS
                   || name.first.Contains(s_EWKZjecDown+"_"+s_jetFakes)
                   || name.first.Contains("_rest")               
                   )
+
+              && !name.first.Contains("ggh")
+              && !name.first.Contains("ggH")
+              && !name.first.Contains("ggA")
               && !name.first.Contains(s_ggH)
               && !name.first.Contains(s_bbH)
              ) continue;

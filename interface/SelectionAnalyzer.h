@@ -22,7 +22,7 @@ class SelectionAnalyzer : public FFCalculator{
   void WSelections(float var, float weight, TString cat, TString strVar, TString fname, TString extend="");
   void dataSelections(float var, float weight, TString cat, TString strVar, TString fname, TString extend="");
   void signalSelections(float var, float weight, TString cat, TString strVar, TString fname, TString mass);
-
+  TString OwnReplace(TString in, TString oldS, TString newS);
   int LSelection();
   int TSelection();
   int JSelection();

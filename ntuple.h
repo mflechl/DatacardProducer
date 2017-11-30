@@ -42,6 +42,7 @@ public :
    Float_t         topWeight;
    Float_t         topWeight_run1;
    Float_t         ZWeight;
+   Float_t         Higgs_genPt;
    Float_t         zpt_weight_nom;
    Float_t         zpt_weight_esup;
    Float_t         zpt_weight_esdown;
@@ -346,6 +347,7 @@ public :
    TBranch        *b_topWeight;   //!
    TBranch        *b_topWeight_run1;   //!
    TBranch        *b_ZWeight;   //!
+   TBranch        *b_Higgs_genPt;   //!
    TBranch        *b_zpt_weight_nom;   //!
    TBranch        *b_zpt_weight_esup;   //!
    TBranch        *b_zpt_weight_esdown;   //!
@@ -752,6 +754,7 @@ void ntuple::Init(TTree *tree)
    fChain->SetBranchAddress("topWeight", &topWeight, &b_topWeight);
    fChain->SetBranchAddress("topWeight_run1", &topWeight_run1, &b_topWeight_run1);
    fChain->SetBranchAddress("ZWeight", &ZWeight, &b_ZWeight);
+   fChain->SetBranchAddress("Higgs_genPt", &Higgs_genPt, &b_Higgs_genPt);
    fChain->SetBranchAddress("zpt_weight_nom", &zpt_weight_nom, &b_zpt_weight_nom);
    fChain->SetBranchAddress("zpt_weight_esup", &zpt_weight_esup, &b_zpt_weight_esup);
    fChain->SetBranchAddress("zpt_weight_esdown", &zpt_weight_esdown, &b_zpt_weight_esdown);
