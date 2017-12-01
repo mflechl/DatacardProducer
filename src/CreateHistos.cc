@@ -49,14 +49,16 @@ CreateHistos::CreateHistos(TString runOption_, TString ch){
   }
 
   // Set of background samples to process
-  vector<TString> bkg_samples = { s_Z,
+  vector<TString> bkg_samples = { 
+                                  s_Z,
                                   s_TT,
                                   s_VV,
                                   s_SMggH,
                                   s_SMvbf,
                                   s_SMWminus,
                                   s_SMWplus,
-                                  s_SMZH };
+                                  s_SMZH 
+                                };
   if (runOption == "quicktest") bkg_samples = { };
 
   // Create filepaths mapped to unique identifier for data an MC samples
@@ -100,6 +102,8 @@ CreateHistos::CreateHistos(TString runOption_, TString ch){
   for(auto var : variables)      vars.push_back(var);
   for(auto cat : categories){
     cats.push_back(cat);
+    cats.push_back( cat + "_wcr_os" );
+    cats.push_back( cat + "_wcr_ss" );
   }
 }
 
@@ -181,15 +185,15 @@ void CreateHistos::run(){
     for(auto cat : cats){
       for(auto strVar : vars){
 
-	m_var=this->getVarName(strVar,cat);
-	if (DEBUG && !cat.EndsWith("_cr") && !cat.EndsWith("loose_btag") )
-	  std::cout << "CreateHistos::run \t " << cat << " " << strVar << " " << m_var << std::endl;
+  m_var=this->getVarName(strVar,cat);
+  if (DEBUG && !cat.EndsWith("_cr") && !cat.EndsWith("loose_btag") )
+    std::cout << "CreateHistos::run \t " << cat << " " << strVar << " " << m_var << std::endl;
 
-	initDYSelections(cat,m_var);
-	initTSelections(cat,m_var);
-	initVVSelections(cat,m_var);
-	initEWKZSelections(cat,m_var);
-	//initSignalSelections(cat,m_var);
+  initDYSelections(cat,m_var);
+  initTSelections(cat,m_var);
+  initVVSelections(cat,m_var);
+  initEWKZSelections(cat,m_var);
+  //initSignalSelections(cat,m_var);
 
       }
     }
@@ -270,39 +274,42 @@ void CreateHistos::run(){
       if ( vars.at(ind) == "default" ) break_cat_loop=false;
 
       for(auto cat : categories){
-	TString m_var=this->getVarName(vars.at(ind),cat);
-	TString m_type=this->getVarType(vartypes.at(ind),cat);
+        TString m_var=this->getVarName(vars.at(ind),cat);
+        TString m_type=this->getVarType(vartypes.at(ind),cat);
 
-	this->splitString(m_type,s_join2d,p_types.at(ind));
-	this->splitString(m_var,s_join2d,p_names.at(ind));
+        this->splitString(m_type,s_join2d,p_types.at(ind));
+        this->splitString(m_var,s_join2d,p_names.at(ind));
 
-	for( auto vname : p_names.at(ind) ){
-	  if (DEBUG==2) std::cout << "CreateHistos::run \t vname= " << vname << "\t" << cat << std::endl;
+        for( auto vname : p_names.at(ind) ){
+          if (DEBUG==2) std::cout << "CreateHistos::run \t vname= " << vname << "\t" << cat << std::endl;
 
-	  u tmp; tmp.i=-1;
-	  if ( p_vars.count(vname) == 0 ){
-	    p_vars.insert(make_pair(vname,tmp));
-	    NtupleView->fChain->SetBranchAddress(vname, &p_vars[vname]);
-	  }
+          u tmp; tmp.i=-1;
+          if ( p_vars.count(vname) == 0 ){
+            p_vars.insert(make_pair(vname,tmp));
+            NtupleView->fChain->SetBranchAddress(vname, &p_vars[vname]);
+          }
 
-	  if (DEBUG==2){
-	    for (int i=0; i<p_names.at(ind).size(); i++){
-	      std::cout << "CreateHistos::run \t i= " << i << " " << &p_vars[p_names.at(ind).at(i)] << std::endl;
-	    }
-	  }
-	}
-	if (break_cat_loop) break;
+          if (DEBUG==2){
+            for (int i=0; i<p_names.at(ind).size(); i++){
+              std::cout << "CreateHistos::run \t i= " << i << " " << &p_vars[p_names.at(ind).at(i)] << std::endl;
+            }
+          }
+        }
+        if (break_cat_loop) break;
       }
     }
 
     if (DEBUG)
       for (auto const& p_var : p_vars)
-	cout << "CreateHistos::run \t Reading variable " << p_var.first << " \t " << &(p_var.second) << endl;
+  cout << "CreateHistos::run \t Reading variable " << p_var.first << " \t " << &(p_var.second) << endl;
 
-    if (DEBUG==2)
-      for (int i=0; i<p_types.size(); i++)
-	for (int j=0; j<p_types.at(i).size(); j++)
-	  cout << i << "," << j << ": " << p_types.at(i).at(j) << endl;
+    if (DEBUG==2){
+      for (int i=0; i<p_types.size(); i++){
+        for (int j=0; j<p_types.at(i).size(); j++){
+          cout << i << "," << j << ": " << p_types.at(i).at(j) << endl;
+        }
+      }
+    }
 
     for (Int_t jentry=0; jentry<nentries;jentry++){       
 
@@ -313,8 +320,9 @@ void CreateHistos::run(){
         cout<< "                                                             \r"<< flush;
         cout<< jentry << "/" << nentries <<"\t\t" << perc << "%\r"<< flush;
       }
+      try{
+        NtupleView->GetEntry(jentry);
 
-      NtupleView->GetEntry(jentry);
 
       if( !this->SpecialCuts() ) continue;
 
@@ -340,36 +348,36 @@ void CreateHistos::run(){
 
       for(auto cat : cats){
 
-	//        for(auto strVar : vars){
+  //        for(auto strVar : vars){
         for(int ind=0; ind<vars.size(); ind++){
 
-	  TString m_var=this->getVarName(vars.at(ind),cat);
-	  TString m_type=this->getVarType(vartypes.at(ind),cat);
+    TString m_var=this->getVarName(vars.at(ind),cat);
+    TString m_type=this->getVarType(vartypes.at(ind),cat);
 
-	  std::vector<TString> vnames=this->splitString(m_var,s_join2d);
-	  std::vector<TString> vtypes=this->splitString(m_type,s_join2d);
+    std::vector<TString> vnames=this->splitString(m_var,s_join2d);
+    std::vector<TString> vtypes=this->splitString(m_type,s_join2d);
 
           var = -999;
 
-	  if (vnames.size()>1){ //2D histos
-	    var=(float)this->get2DBin(m_var,p_vars,vnames,vtypes);
-	  } else{
-	    if (vtypes.at(0)=="float") var=p_vars[vnames.at(0)].f;
-	    if (vtypes.at(0)=="int")   var=p_vars[vnames.at(0)].i;
-	  }
+    if (vnames.size()>1){ //2D histos
+      var=(float)this->get2DBin(m_var,p_vars,vnames,vtypes);
+    } else{
+      if (vtypes.at(0)=="float") var=p_vars[vnames.at(0)].f;
+      if (vtypes.at(0)=="int")   var=p_vars[vnames.at(0)].i;
+    }
 
-	  if ( DEBUG && jentry<4 && cat==cats.at(0) ){  
-	    for (int i=0; i<vnames.size(); i++){ 
-	      std::cout << "CreateHistos::run \t vnames_" << i << ": " << flush;
-	      std::cout << ((TObjString*) (m_var.Tokenize("|")->At(i)))->String() << " = " << flush;
-	      if (vtypes.at(i)=="int")   std::cout << p_vars[vnames.at(i)].i;
-	      if (vtypes.at(i)=="float") std::cout << p_vars[vnames.at(i)].f;
-	      std::cout << " \t" << flush;
-	    }
-	    cout << std::endl;
-	  }
+    if ( DEBUG && jentry<4 && cat==cats.at(0) ){  
+      for (int i=0; i<vnames.size(); i++){ 
+        std::cout << "CreateHistos::run \t vnames_" << i << ": " << flush;
+        std::cout << ((TObjString*) (m_var.Tokenize("|")->At(i)))->String() << " = " << flush;
+        if (vtypes.at(i)=="int")   std::cout << p_vars[vnames.at(i)].i;
+        if (vtypes.at(i)=="float") std::cout << p_vars[vnames.at(i)].f;
+        std::cout << " \t" << flush;
+      }
+      cout << std::endl;
+    }
 
-	  //TODO: if you want to impose cuts, do it here - not when selecting variables (e.g. jeta_1)
+    //TODO: if you want to impose cuts, do it here - not when selecting variables (e.g. jeta_1)
 
           if( fileindex == 1 )                this->DYSelections(var, weight, cat, m_var, filetype);
           else if( fileindex == 2 )           this->signalSelections(var, weight, cat, m_var, filetype, mass);
@@ -381,6 +389,9 @@ void CreateHistos::run(){
 
         }//end loop over vars
       }//end loop over cats
+    } catch (const std::bad_alloc& e) {
+        std::cout << "Allocation failed: " << e.what() << '\n';
+    }
     }//end loop over entries
   }//end loop over files
   cout.precision(10);
@@ -416,19 +427,6 @@ TString CreateHistos::getVarName(TString str, TString cat, int returnType){ //re
 }
 TString CreateHistos::getVarType(TString str, TString cat){
   return getVarName(str,cat,1);
-}
-
-void CreateHistos::splitString(TString str,TString sep,vector<TString>& vec){
-  TObjArray *toa = str.Tokenize(sep);
-  for (Int_t i = 0; i < toa->GetEntries(); i++){
-    vec.push_back(((TObjString *)(toa->At(i)))->String());
-  }
-}
-
-std::vector<TString> CreateHistos::splitString(TString str,TString sep){
-  std::vector<TString> vec;
-  this->splitString(str,sep,vec);
-  return vec;
 }
 
 
@@ -512,7 +510,7 @@ float CreateHistos::getAntiLep_tauscaling(){
   if(channel == "mt"){
     if(NtupleView->againstMuonTight3_2 > 0.5
        && ( NtupleView->gen_match_2 == 2 
-	    || NtupleView->gen_match_2 == 4)
+      || NtupleView->gen_match_2 == 4)
        ){
 
       if(fabs(NtupleView->eta_2) < 1.2) return 1.28;       // +-0.06
@@ -523,7 +521,7 @@ float CreateHistos::getAntiLep_tauscaling(){
   if(channel == "et"){
     if(NtupleView->againstElectronTightMVA6_2 > 0.5
        && ( NtupleView->gen_match_2 == 1 
-	    || NtupleView->gen_match_2 == 3)
+      || NtupleView->gen_match_2 == 3)
        ){
 
       if(fabs(NtupleView->eta_2) < 1.46) return 1.42;       // +-0.06
@@ -534,14 +532,14 @@ float CreateHistos::getAntiLep_tauscaling(){
     //run2 SF for VLoose for tau2
     float scaleFactor_tautau = 1;
     if( NtupleView->gen_match_2 == 1                                                                                                                                                        
-	|| NtupleView->gen_match_2 == 3 ){
+  || NtupleView->gen_match_2 == 3 ){
 
       if( fabs(NtupleView->eta_2 ) < 1.46) scaleFactor_tautau = 1.21;
       else if( fabs(NtupleView->eta_2 ) > 1.558) scaleFactor_tautau =  1.38;
     }  
     //run2 SF with bad muon filter for cut-based Loose for tau2
     if( NtupleView->gen_match_2 == 2                                                                                                                                                          
-	|| NtupleView->gen_match_2 == 4 ){
+  || NtupleView->gen_match_2 == 4 ){
 
       if( fabs(NtupleView->eta_2) < 0.4 ) scaleFactor_tautau =  1.22;
       else if( fabs(NtupleView->eta_2) < 0.8 ) scaleFactor_tautau =  1.12;
@@ -551,14 +549,14 @@ float CreateHistos::getAntiLep_tauscaling(){
     }
 
     if( NtupleView->gen_match_1 == 1                                                                                                                                                        
-	|| NtupleView->gen_match_1 == 3 ){
+  || NtupleView->gen_match_1 == 3 ){
 
       if( fabs(NtupleView->eta_1 ) < 1.46) scaleFactor_tautau *= 1.21;
       else if( fabs(NtupleView->eta_1 ) > 1.558) scaleFactor_tautau *=  1.38;
     }  
     //run2 SF with bad muon filter for cut-based Loose for tau2
     if( NtupleView->gen_match_1 == 2                                                                                                                                                          
-	|| NtupleView->gen_match_1 == 4 ){
+  || NtupleView->gen_match_1 == 4 ){
 
       if( fabs(NtupleView->eta_1) < 0.4 ) scaleFactor_tautau *=  1.22;
       else if( fabs(NtupleView->eta_1) < 0.8 ) scaleFactor_tautau *=  1.12;
@@ -1106,13 +1104,13 @@ void CreateHistos::writeHistos( TString channel, vector<TString> cats, vector<TS
           tmp.ReplaceAll(s_jecUp,s_CMSjecScale+s_13TeVUp);
           tmp.ReplaceAll(s_jecDown,s_CMSjecScale+s_13TeVDown);
           tmp.ReplaceAll(s_jetToTauFakeUp,s_CMSjetToTauFake+s_13TeVUp);
-	  if (DEBUG==2) cout << "  -- " << var_string << "  \t" << cat << endl;
+    if (DEBUG==2) cout << "  -- " << var_string << "  \t" << cat << endl;
           tmp.ReplaceAll(s_jetToTauFakeDown,s_CMSjetToTauFake+s_13TeVDown);
           histograms.at( name.first )->SetName(tmp);
           this->resetZeroBins(histograms.at( name.first ));
           //if(histograms.at( name.first )->GetEntries() == 0 ) cout << "Warning: " << name.first << " not filled" << endl;
           histograms.at( name.first )->Write(tmp, TObject::kWriteDelete);
-	  if (DEBUG==2) cout << " mm " << name.first << "  " << histograms.at( name.first ) << endl;
+    if (DEBUG==2) cout << " mm " << name.first << "  " << histograms.at( name.first ) << endl;
         }
       }
     }

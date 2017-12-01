@@ -51,50 +51,33 @@ float GlobalClass::getMT2(){
   return NtupleView->pfmt_2;
 }
 
-float GlobalClass::getHPt(){
-
-  TLorentzVector tau;
-  TLorentzVector mu;
-  TLorentzVector met;
-
-  mu.SetPtEtaPhiM(NtupleView->pt_1, NtupleView->eta_1, NtupleView->phi_1, NtupleView->m_1);
-  tau.SetPtEtaPhiM(NtupleView->pt_2, NtupleView->eta_2, NtupleView->phi_2, NtupleView->m_2);
-  if(useMVAMET)met.SetPtEtaPhiM(NtupleView->mvamet,0.,NtupleView->mvametphi,0.);
-  else met.SetPtEtaPhiM(NtupleView->met,0.,NtupleView->metphi,0.);
-
-  return (tau + mu + met).Pt();
-}
-
 int GlobalClass::Baseline(TString sign, TString cat){
-
-  if(applyMTCut && this->getMT() < Analysis["MTCut"]["low"][channel] ) return 0;
 
   if( this->passIso("base") 
       && this->Vetos()
       && this->CategorySelection(cat,sign)
       ){
 
-      if( ( sign == "OS" || sign == "SS") 
+      if( ( sign == "os" || sign == "ss") 
           && NtupleView->byTightIsolationMVArun2v1DBoldDMwLT_2 )  return 1;
 
-      if( sign == "FF" && NtupleView->byVLooseIsolationMVArun2v1DBoldDMwLT_2){
-          if(!NtupleView->byTightIsolationMVArun2v1DBoldDMwLT_2) return 1;
-      }
-
+      if( sign == "FF" && NtupleView->byVLooseIsolationMVArun2v1DBoldDMwLT_2
+                       && !NtupleView->byTightIsolationMVArun2v1DBoldDMwLT_2
+        )return 1;
+    
       if( sign == "FF1"
           && NtupleView->byMediumIsolationMVArun2v1DBoldDMwLT_2
           && !NtupleView->byMediumIsolationMVArun2v1DBoldDMwLT_1
           && NtupleView->byVLooseIsolationMVArun2v1DBoldDMwLT_1
-          ) return 1;
+        ) return 1;
       if( sign == "FF2"
           && NtupleView->byMediumIsolationMVArun2v1DBoldDMwLT_1
           && !NtupleView->byMediumIsolationMVArun2v1DBoldDMwLT_2
           && NtupleView->byVLooseIsolationMVArun2v1DBoldDMwLT_2
-          ) return 1;
+        ) return 1;
 
   }
   
-   
   return 0;
 }
 
@@ -122,14 +105,26 @@ int GlobalClass::Vetos(){
 
 int GlobalClass::CategorySelection(TString cat, TString sign){
 
-  if( (sign == "OS" || sign.Contains("FF") ) && NtupleView->q_1 * NtupleView->q_2 > 0 ) return 0;
-  if(sign == "SS" && NtupleView->q_1 * NtupleView->q_2 < 0 ) return 0;
+  vector<TString> splCat = this->splitString(cat, "_" );
+  TString subcat = "";
+  if( splCat.size() > 1 ) subcat = splCat.at(1);
 
+  ////// Sign
+  if( (sign == "os" || sign.Contains("FF") ) && NtupleView->q_1 * NtupleView->q_2 > 0 ) return 0;
+  if(  sign == "ss" && NtupleView->q_1 * NtupleView->q_2 < 0 ) return 0;
 
-  if(cat == s_inclusive     )    return 1;    
-  if(cat == s_0jet          )    return this->zeroJetCat();
-  if(cat == s_boosted       )    return this->boostedCat();
-  if(cat == s_vbf           )    return this->vbfCat();
+  ////// mT region
+  float mT    = this->getMT();
+  if( applyMTCut && channel != "tt" ){
+    if( subcat != "wcr" &&  mT > Analysis["MTCut"]["low"][channel] ) return 0;
+    if( subcat == "wcr" &&  mT < Analysis["MTCut"]["high"][channel] ) return 0;
+  }
+
+  ////// Cat selection
+  if(splCat.at(0) == s_inclusive     )    return 1;    
+  if(splCat.at(0) == s_0jet          )    return this->zeroJetCat();
+  if(splCat.at(0) == s_boosted       )    return this->boostedCat();
+  if(splCat.at(0) == s_vbf           )    return this->vbfCat();
   
   return 0;
 }
@@ -137,13 +132,73 @@ int GlobalClass::CategorySelection(TString cat, TString sign){
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 bool GlobalClass::zeroJetCat(){
+  if( this->getNjets() > 0 ) return 0;
+  if( channel != "tt" && NtupleView->pt_2 < 30 ) return 0;
+  if( channel == "tt" && NtupleView->pt_1 < 50 ) return 0;
+
   return 1;
 }
 bool GlobalClass::boostedCat(){
-  return 1;
+  int   njet  = this->getNjets();
+
+  ////////////////////////////
+  if(channel == "et"){
+    if(NtupleView->pt_2 < 30 ) return 0;
+    if( njet == 1 
+        || ( njet >= 2
+             && ( this->getMjj() <= 300
+                  || NtupleView->pt_tt < 50 
+                )
+            )  
+      ) return 1;
+  }
+  ////////////////////////////
+  else if(channel == "mt"){
+    if(NtupleView->pt_2 < 30 ) return 0;
+    if( njet == 1 
+        || ( njet >= 2
+             && ( this->getMjj() <= 300
+                  || NtupleView->pt_tt < 50
+                  || NtupleView->pt_2 < 40
+                )
+            )  
+      ) return 1;    
+  }
+  ////////////////////////////
+  else if(channel == "tt"){
+    if( njet == 1
+        || !(njet >= 2
+             && NtupleView->pt_tt > 100
+             && this->getJdeta() > 2.5
+            )
+      ) return 1;
+  }
+
+  return 0;
 }
 bool GlobalClass::vbfCat(){
-  return 1;
+  if( this->getNjets() < 2 ) return 0;
+
+
+  if(channel == "et"){
+    if( NtupleView->pt_2 < 30 ) return 0;
+    if( NtupleView->pt_tt > 50
+        && this->getMjj() > 300
+      ) return 1;
+  }
+  else if(channel == "mt"){
+    if( NtupleView->pt_2 < 40 ) return 0;
+    if( NtupleView->pt_tt > 50
+        && this->getMjj() >  300
+      ) return 1;   
+  }
+  else if(channel == "tt"){
+    if( NtupleView->pt_tt > 100 
+        && this->getJdeta() > 2.5
+      ) return 1;
+  }
+
+  return 0;
 }
 
 
@@ -242,7 +297,18 @@ TH1D* GlobalClass::JITHistoCreator(TString name, TString strVar){
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+void GlobalClass::splitString(TString str,TString sep,vector<TString>& vec){
+  TObjArray *toa = str.Tokenize(sep);
+  for (Int_t i = 0; i < toa->GetEntries(); i++){
+    vec.push_back(((TObjString *)(toa->At(i)))->String());
+  }
+}
 
+std::vector<TString> GlobalClass::splitString(TString str,TString sep){
+  std::vector<TString> vec;
+  this->splitString(str,sep,vec);
+  return vec;
+}
 
 int GlobalClass::returnBin(vector<double> bins, double value){
 

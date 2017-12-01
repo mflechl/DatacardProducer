@@ -44,8 +44,7 @@ class CreateHistos : public SelectionAnalyzer{
   int getBin(float var, std::vector<double> bins);
   TString getVarName(TString strVar, TString cat, int returnType=0);
   TString getVarType(TString strVar, TString cat);
-  void splitString(TString str,TString sep,vector<TString>& vec);
-  std::vector<TString> splitString(TString str,TString sep);
+
 
   TFile *outfile;
 

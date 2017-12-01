@@ -104,8 +104,10 @@ void SelectionAnalyzer::DYSelections(float var, float weight, TString cat, TStri
 
     TString sub = extend + "+" + strVar +"_" + cat + "+";
     float usedVar=var;
-    TString sign = "OS";
-    if( cat.Contains("qcd_cr") ) sign = "SS";
+
+    vector<TString> splCat = this->splitString(cat, "_" );
+    TString sign = "os";
+    if( splCat.size() > 1 ) sign = splCat.at(2);
 
     if(fname == s_Z){
 
@@ -337,8 +339,9 @@ void SelectionAnalyzer::EWKZSelections(float var, float weight, TString cat, TSt
 
     TString sub = extend + "+" + strVar +"_" + cat + "+";
     float usedVar=var;
-    TString sign = "OS";
-    if( cat.Contains("qcd_cr") ) sign = "SS";
+    vector<TString> splCat = this->splitString(cat, "_" );
+    TString sign = "os";
+    if( splCat.size() > 1 ) sign = splCat.at(2);
 
     if(fname == s_EWKZ){
       if( this->Baseline(sign,cat) ){
@@ -394,8 +397,10 @@ void SelectionAnalyzer::EWKZSelections(float var, float weight, TString cat, TSt
 void SelectionAnalyzer::TSelections(float var, float weight, TString cat, TString strVar, TString fname, TString extend){
     TString sub = extend+ "+" + strVar +"_" + cat + "+";
     float usedVar=var;
-    TString sign = "OS";
-    if( cat.Contains("qcd_cr") ) sign = "SS";
+
+    vector<TString> splCat = this->splitString(cat, "_" );
+    TString sign = "os";
+    if( splCat.size() > 1 ) sign = splCat.at(2);
 
     if(fname == s_TT){
       if( this->Baseline(sign,cat) ){
@@ -579,8 +584,10 @@ void SelectionAnalyzer::WSelections(float var, float weight, TString cat, TStrin
 
     TString sub = extend + "+" + strVar +"_" + cat + "+";
     float usedVar=var;
-    TString sign = "OS";
-    if( cat.Contains("qcd_cr") ) sign = "SS";
+
+    vector<TString> splCat = this->splitString(cat, "_" );
+    TString sign = "os";
+    if( splCat.size() > 1 ) sign = splCat.at(2);
     
     if(fname == s_W){
       if( this->Baseline(sign,cat) ){
@@ -637,8 +644,10 @@ void SelectionAnalyzer::VVSelections(float var, float weight, TString cat, TStri
 
     TString sub = extend + "+" + strVar +"_" + cat + "+";
     float usedVar=var;
-    TString sign = "OS";
-    if( cat.Contains("qcd_cr") ) sign = "SS";
+
+    vector<TString> splCat = this->splitString(cat, "_" );
+    TString sign = "os";
+    if( splCat.size() > 1 ) sign = splCat.at(2);
     
     if(fname == s_VV){
       if( this->Baseline(sign,cat) ){
@@ -803,8 +812,9 @@ void SelectionAnalyzer::signalSelections(float var, float weight, TString cat, T
   TString sub = "+" + strVar +"_" + cat + "+";
   float usedVar=var;
 
-  TString sign = "OS";
-  if( cat.Contains("qcd_cr") ) sign = "SS";
+  vector<TString> splCat = this->splitString(cat, "_" );
+  TString sign = "os";
+  if( splCat.size() > 1 ) sign = splCat.at(2);
   
 
   if(fname == s_ggH
@@ -933,8 +943,10 @@ void SelectionAnalyzer::dataSelections(float var, float weight, TString cat, TSt
  
     TString sub = extend + "+" + strVar +"_" + cat + "+";
     float usedVar=var;
-    TString sign = "OS";
-    if( cat.Contains("qcd_cr") ) sign = "SS";
+    
+    vector<TString> splCat = this->splitString(cat, "_" );
+    TString sign = "os";
+    if( splCat.size() > 1 ) sign = splCat.at(2);
 
     if( this->Baseline(sign,cat) ){
       //      cout << "########### " << sub << " : " << usedVar << "   \t" << this->GetHistbyName("data_obs"+sub,strVar) << endl;

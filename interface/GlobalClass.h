@@ -25,7 +25,6 @@ class GlobalClass{
   float getJdeta();
   float getMT();
   float getMT2();
-  float getHPt();
 
   int Baseline(TString sign, TString cat);
   int passMTCut();
@@ -42,6 +41,8 @@ class GlobalClass{
   void returnBinning(double*, vector<double> input1d,vector<double> input2d={});
   int returnBins(vector<double> input1d,vector<double> input2d={});
   //  TH1D* getBinnedHisto(TString name,vector<double> input);
+  void splitString(TString str,TString sep,vector<TString>& vec);
+  std::vector<TString> splitString(TString str,TString sep);
   TH1D* getBinnedHisto(TString name,vector<double> input1d,vector<double> input2d={}, TString strVar="");
   void resetZeroBins(TString hist, TString var);
   void resetZeroBins(TH1D* hist);
