@@ -13,8 +13,8 @@
     mkdir histos/tt
     git init  
     git remote add origin git@github.com:mflechl/DatacardProducer.git  
-    git checkout -b master/SM/MSSM  
-    git pull origin master/SM/MSSM  
+    git checkout -b MSSM  
+    git pull origin MSSM  
 
 ## Usage
 
