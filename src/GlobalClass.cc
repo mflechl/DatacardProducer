@@ -29,7 +29,7 @@ GlobalClass::GlobalClass()
   B >> Binning;
   D >> Datasets;
 
-  TFile* rootFile = new TFile("higgs_pt_v2_mssm_mode.root", "READ");
+  TFile* rootFile = new TFile("config/higgs_pt_v2_mssm_mode.root", "READ");
   w = (RooWorkspace*)rootFile->Get("w");
 
 }

@@ -16,4 +16,4 @@ makeHTTDatacards: runFile.cc
 
 
 clean:
-	rm *.o makeHTTDatacards
+	rm -rf *.o makeHTTDatacards .wscode*
