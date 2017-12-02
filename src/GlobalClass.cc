@@ -52,6 +52,7 @@ float GlobalClass::getMT2(){
 }
 
 int GlobalClass::Baseline(TString sign, TString cat){
+
   if( this->passIso("base") 
       && this->Vetos()
       && this->CategorySelection(cat,sign)
@@ -118,7 +119,6 @@ int GlobalClass::CategorySelection(TString cat, TString sign){
     if( subcat != "wcr" &&  mT > Analysis["MTCut"]["low"][channel] ) return 0;
     else if( subcat == "wcr" &&  mT < Analysis["MTCut"]["high"][channel] ) return 0;
   }
-
   ////// Cat selection
   
   if(splCat.at(0) == s_inclusive     )    return 1;    
@@ -140,7 +140,6 @@ bool GlobalClass::zeroJetCat(){
 }
 bool GlobalClass::boostedCat(){
   int   njet  = this->getNjets();
-
   ////////////////////////////
   if(channel == "et"){
     if(NtupleView->pt_2 < 30 ) return 0;
@@ -178,7 +177,6 @@ bool GlobalClass::boostedCat(){
 }
 bool GlobalClass::vbfCat(){
   if( this->getNjets() < 2 ) return 0;
-
 
   if(channel == "et"){
     if( NtupleView->pt_2 < 30 ) return 0;

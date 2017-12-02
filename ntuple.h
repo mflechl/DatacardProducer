@@ -41,7 +41,7 @@ public :
    Float_t         stitchedWeight;
    Float_t         topWeight;
    Float_t         topWeight_run1;
-   Float_t         ZWeight;
+   Float_t         zPtReweightWeight;
    Float_t         zpt_weight_nom;
    Float_t         zpt_weight_esup;
    Float_t         zpt_weight_esdown;
@@ -345,7 +345,7 @@ public :
    TBranch        *b_stitchedWeight;   //!
    TBranch        *b_topWeight;   //!
    TBranch        *b_topWeight_run1;   //!
-   TBranch        *b_ZWeight;   //!
+   TBranch        *b_zPtReweightWeight;   //!
    TBranch        *b_zpt_weight_nom;   //!
    TBranch        *b_zpt_weight_esup;   //!
    TBranch        *b_zpt_weight_esdown;   //!
@@ -751,8 +751,8 @@ void ntuple::Init(TTree *tree,int isData_)
    fChain->SetBranchAddress("stitchedWeight", &stitchedWeight, &b_stitchedWeight);
    fChain->SetBranchAddress("topWeight", &topWeight, &b_topWeight);
    fChain->SetBranchAddress("topWeight_run1", &topWeight_run1, &b_topWeight_run1);
-   fChain->SetBranchAddress("ZWeight", &ZWeight, &b_ZWeight);
    if (!isData_){
+     fChain->SetBranchAddress("zPtReweightWeight", &zPtReweightWeight, &b_zPtReweightWeight);
      fChain->SetBranchAddress("zpt_weight_nom", &zpt_weight_nom, &b_zpt_weight_nom);
      fChain->SetBranchAddress("zpt_weight_esup", &zpt_weight_esup, &b_zpt_weight_esup);
      fChain->SetBranchAddress("zpt_weight_esdown", &zpt_weight_esdown, &b_zpt_weight_esdown);
@@ -951,8 +951,6 @@ void ntuple::Init(TTree *tree,int isData_)
    fChain->SetBranchAddress("passesThirdLepVeto", &passesThirdLepVeto, &b_passesThirdLepVeto);
    fChain->SetBranchAddress("passesDiMuonVeto", &passesDiMuonVeto, &b_passesDiMuonVeto);
    fChain->SetBranchAddress("passesDiElectronVeto", &passesDiElectronVeto, &b_passesDiElectronVeto);
-   fChain->SetBranchAddress("XTrig_match", &XTrig_match, &b_XTrig_match);
-   fChain->SetBranchAddress("STrig_match", &STrig_match, &b_STrig_match);
    fChain->SetBranchAddress("dilepton_veto", &dilepton_veto, &b_dilepton_veto);
    fChain->SetBranchAddress("extraelec_veto", &extraelec_veto, &b_extraelec_veto);
    fChain->SetBranchAddress("extramuon_veto", &extramuon_veto, &b_extramuon_veto);

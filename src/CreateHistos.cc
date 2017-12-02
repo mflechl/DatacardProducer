@@ -236,9 +236,6 @@ void CreateHistos::run(){
     fileindex = this->getFiletype(filetype);
     if ( DEBUG==2 ) std::cout << "CreateHistos::run \t fileindex= " << fileindex << std::endl;
 
-    if(jecShift){
-
-    }
     if(filetype.Contains(s_jecUp)) this->isJEC=1;
     else if(filetype.Contains(s_jecDown)) this->isJEC=-1;
     else this->isJEC=0;
@@ -344,7 +341,7 @@ void CreateHistos::run(){
       else weight *= this->getAntiLep_tauscaling();
 
 
-      if( fileindex == 1 || fileindex == 6 ) weight *= NtupleView->ZWeight;
+      if( fileindex == 1 || fileindex == 6 ) weight *=  NtupleView->zPtReweightWeight;
       if( fileindex == 3 ) weight *= NtupleView->topWeight_run1;
 
 
@@ -380,7 +377,6 @@ void CreateHistos::run(){
           }
 
     //TODO: if you want to impose cuts, do it here - not when selecting variables (e.g. jeta_1)
-
           if( fileindex == 1 )                this->DYSelections(var, weight, cat, m_var, filetype);
           else if( fileindex == 2 )           this->signalSelections(var, weight, cat, m_var, filetype, mass);
           else if( fileindex == 3 )           this->TSelections(var, weight, cat, m_var, filetype);
