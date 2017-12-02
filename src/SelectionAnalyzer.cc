@@ -401,7 +401,6 @@ void SelectionAnalyzer::TSelections(float var, float weight, TString cat, TStrin
     vector<TString> splCat = this->splitString(cat, "_" );
     TString sign = "os";
     if( splCat.size() > 1 ) sign = splCat.at(2);
-
     if(fname == s_TT){
       if( this->Baseline(sign,cat) ){
 
@@ -648,7 +647,6 @@ void SelectionAnalyzer::VVSelections(float var, float weight, TString cat, TStri
     vector<TString> splCat = this->splitString(cat, "_" );
     TString sign = "os";
     if( splCat.size() > 1 ) sign = splCat.at(2);
-    
     if(fname == s_VV){
       if( this->Baseline(sign,cat) ){
 
@@ -943,7 +941,7 @@ void SelectionAnalyzer::dataSelections(float var, float weight, TString cat, TSt
  
     TString sub = extend + "+" + strVar +"_" + cat + "+";
     float usedVar=var;
-    
+
     vector<TString> splCat = this->splitString(cat, "_" );
     TString sign = "os";
     if( splCat.size() > 1 ) sign = splCat.at(2);

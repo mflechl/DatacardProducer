@@ -52,14 +52,14 @@ float GlobalClass::getMT2(){
 }
 
 int GlobalClass::Baseline(TString sign, TString cat){
-
   if( this->passIso("base") 
       && this->Vetos()
       && this->CategorySelection(cat,sign)
       ){
-
-      if( ( sign == "os" || sign == "ss") 
-          && NtupleView->byTightIsolationMVArun2v1DBoldDMwLT_2 )  return 1;
+      if( sign == "os" || sign == "ss"){
+        if(channel != "tt" && NtupleView->byTightIsolationMVArun2v1DBoldDMwLT_2 ) return 1;  
+        else return 1;
+      }
 
       if( sign == "FF" && NtupleView->byVLooseIsolationMVArun2v1DBoldDMwLT_2
                        && !NtupleView->byTightIsolationMVArun2v1DBoldDMwLT_2
@@ -93,7 +93,6 @@ int GlobalClass::passIso(TString type){
   return 0;
 }
 
-//FIXME: temporary fix, has to be undone as soon as tauLepVeto is correct for etau channel
 int GlobalClass::Vetos(){
   if(NtupleView->passesThirdLepVeto){
     if(channel == "et" && NtupleView->passesTauLepVetos && NtupleView->passesDiElectronVeto) return 1;
@@ -110,17 +109,18 @@ int GlobalClass::CategorySelection(TString cat, TString sign){
   if( splCat.size() > 1 ) subcat = splCat.at(1);
 
   ////// Sign
+
   if( (sign == "os" || sign.Contains("FF") ) && NtupleView->q_1 * NtupleView->q_2 > 0 ) return 0;
   if(  sign == "ss" && NtupleView->q_1 * NtupleView->q_2 < 0 ) return 0;
-
   ////// mT region
   float mT    = this->getMT();
   if( applyMTCut && channel != "tt" ){
     if( subcat != "wcr" &&  mT > Analysis["MTCut"]["low"][channel] ) return 0;
-    if( subcat == "wcr" &&  mT < Analysis["MTCut"]["high"][channel] ) return 0;
+    else if( subcat == "wcr" &&  mT < Analysis["MTCut"]["high"][channel] ) return 0;
   }
 
   ////// Cat selection
+  
   if(splCat.at(0) == s_inclusive     )    return 1;    
   if(splCat.at(0) == s_0jet          )    return this->zeroJetCat();
   if(splCat.at(0) == s_boosted       )    return this->boostedCat();
@@ -132,10 +132,10 @@ int GlobalClass::CategorySelection(TString cat, TString sign){
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 bool GlobalClass::zeroJetCat(){
+
   if( this->getNjets() > 0 ) return 0;
   if( channel != "tt" && NtupleView->pt_2 < 30 ) return 0;
-  if( channel == "tt" && NtupleView->pt_1 < 50 ) return 0;
-
+  else if( channel == "tt" && NtupleView->pt_1 < 50 ) return 0;
   return 1;
 }
 bool GlobalClass::boostedCat(){
@@ -245,7 +245,6 @@ TH1D* GlobalClass::getBinnedHisto(TString name,vector<double> input1d,vector<dou
     binning1d.insert(make_pair(strVar,input1d));
     binning2d.insert(make_pair(strVar,input2d));
   }
-
   return tmp;
 }
 
@@ -253,31 +252,30 @@ TH1D* GlobalClass::JITHistoCreator(TString name, TString strVar){
 
   TString binning = "default";
 
-  if ( DEBUG==2) std::cout << "Trying to create histogram for variable " << strVar << endl;
+  if ( DEBUG==3) std::cout << "Trying to create histogram for variable " << strVar << endl;
 
   if(Binning[strVar.Data()]["doVarBins"]["check"]){
 
-    if(Binning[strVar.Data()]["doVarBins"]["type"] == (string)"cat"){
-      if( name.Contains("btag") && !name.Contains("nobtag") )        binning = "btag";
-      else binning = "nobtag";
-    }
+    // if(Binning[strVar.Data()]["doVarBins"]["type"] == (string)"cat"){
+    //   if( name.Contains("btag") && !name.Contains("nobtag") )        binning = "btag";
+    //   else binning = "nobtag";
+    // }
     if(Binning[strVar.Data()]["doVarBins"]["type"] == (string)"channel"){
       binning = channel;
     }  
-
     if ( strVar.Contains(s_join2d) ){
       try{
-	histograms[name] = this->getBinnedHisto(name,Binning[strVar.Data()]["varBins_1D"].at(binning.Data() ), Binning[strVar.Data()]["varBins_2D"].at(binning.Data() ), strVar ) ;
+        histograms[name] = this->getBinnedHisto(name,Binning[strVar.Data()]["varBins_1D"].at(binning.Data() ), Binning[strVar.Data()]["varBins_2D"].at(binning.Data() ), strVar ) ;
       }
       catch(const out_of_range& err){
-	histograms[name] = this->getBinnedHisto(name,Binning[strVar.Data()]["varBins_1D"].at("default"),Binning[strVar.Data()]["varBins_2D"].at("default"), strVar ) ;
+        histograms[name] = this->getBinnedHisto(name,Binning[strVar.Data()]["varBins_1D"].at("default"),Binning[strVar.Data()]["varBins_2D"].at("default"), strVar ) ;
       }
     } else{
       try{
-	histograms[name] = this->getBinnedHisto(name,Binning[strVar.Data()]["varBins"].at(binning.Data() ) ) ;
+        histograms[name] = this->getBinnedHisto(name,Binning[strVar.Data()]["varBins"].at(binning.Data() ) ) ;
       }
       catch(const out_of_range& err){
-	histograms[name] = this->getBinnedHisto(name,Binning[strVar.Data()]["varBins"].at("default") ) ;
+        histograms[name] = this->getBinnedHisto(name,Binning[strVar.Data()]["varBins"].at("default") ) ;
       }
     }
    
@@ -289,7 +287,7 @@ TH1D* GlobalClass::JITHistoCreator(TString name, TString strVar){
       histograms[name] = new TH1D(name,"", Binning[strVar.Data()]["nbins"], Binning[strVar.Data()]["nmin"], Binning[strVar.Data()]["nmax"]  ) ;
     }
   }
-
+  if ( DEBUG==3) std::cout << "GlobalClass::JITHistoCreator: Histoname " << name << endl;
   return histograms.at(name);
 
 }
@@ -298,7 +296,7 @@ TH1D* GlobalClass::JITHistoCreator(TString name, TString strVar){
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 void GlobalClass::splitString(TString str,TString sep,vector<TString>& vec){
-  TObjArray *toa = str.Tokenize(sep);
+  std::unique_ptr<TObjArray> toa( str.Tokenize(sep) );
   for (Int_t i = 0; i < toa->GetEntries(); i++){
     vec.push_back(((TObjString *)(toa->At(i)))->String());
   }

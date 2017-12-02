@@ -21,11 +21,11 @@ const vector<TString> vartypes={
 //"default" is substitutes according to config/Analysis.json
 const vector<TString> variables={
   "default",
-  s_mvis
+  //s_mvis
 };
 const vector<TString> vartypes={
   "default",
-  "float"
+  //"float"
 };
 
 
@@ -34,7 +34,7 @@ const int resetZero=0;
 //create the templates specified in SelectionAnalyzer::init*Selections() before running
 const int doInitialize=1;
 // calculate Fake Factor templates 
-const int calcFF=1;
+const int calcFF=0;
 
 // Used for Debugging. Keep histograms in final root file
 const int keepDebugHistos=0;

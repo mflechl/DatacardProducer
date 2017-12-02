@@ -180,20 +180,20 @@ void CreateHistos::run(){
 
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-  if(doInitialize){
+  if(doInitialize){ // FIXME!! Needed when using 2D categories since binning1d and binning2d are used before filling histogram.
     TString m_var;
     for(auto cat : cats){
       for(auto strVar : vars){
 
-  m_var=this->getVarName(strVar,cat);
-  if (DEBUG && !cat.EndsWith("_cr") && !cat.EndsWith("loose_btag") )
-    std::cout << "CreateHistos::run \t " << cat << " " << strVar << " " << m_var << std::endl;
+        m_var=this->getVarName(strVar,cat);
+        if (DEBUG && !cat.EndsWith("_cr") && !cat.EndsWith("loose_btag") )
+          std::cout << "CreateHistos::run \t " << cat << " " << strVar << " " << m_var << std::endl;
 
-  initDYSelections(cat,m_var);
-  initTSelections(cat,m_var);
-  initVVSelections(cat,m_var);
-  initEWKZSelections(cat,m_var);
-  //initSignalSelections(cat,m_var);
+        initDYSelections(cat,m_var);
+        initTSelections(cat,m_var);
+        initVVSelections(cat,m_var);
+        initEWKZSelections(cat,m_var);
+        //initSignalSelections(cat,m_var);
 
       }
     }
@@ -299,9 +299,11 @@ void CreateHistos::run(){
       }
     }
 
-    if (DEBUG)
-      for (auto const& p_var : p_vars)
-  cout << "CreateHistos::run \t Reading variable " << p_var.first << " \t " << &(p_var.second) << endl;
+    if (DEBUG){
+      for (auto const& p_var : p_vars){
+        cout << "CreateHistos::run \t Reading variable " << p_var.first << " \t " << &(p_var.second) << endl;
+      }
+    }
 
     if (DEBUG==2){
       for (int i=0; i<p_types.size(); i++){
@@ -320,7 +322,7 @@ void CreateHistos::run(){
         cout<< "                                                             \r"<< flush;
         cout<< jentry << "/" << nentries <<"\t\t" << perc << "%\r"<< flush;
       }
-      try{
+
         NtupleView->GetEntry(jentry);
 
 
@@ -351,31 +353,31 @@ void CreateHistos::run(){
   //        for(auto strVar : vars){
         for(int ind=0; ind<vars.size(); ind++){
 
-    TString m_var=this->getVarName(vars.at(ind),cat);
-    TString m_type=this->getVarType(vartypes.at(ind),cat);
+          TString m_var=this->getVarName(vars.at(ind),cat);
+          TString m_type=this->getVarType(vartypes.at(ind),cat);
 
-    std::vector<TString> vnames=this->splitString(m_var,s_join2d);
-    std::vector<TString> vtypes=this->splitString(m_type,s_join2d);
+          std::vector<TString> vnames=this->splitString(m_var,s_join2d);
+          std::vector<TString> vtypes=this->splitString(m_type,s_join2d);
 
-          var = -999;
+                var = -999;
 
-    if (vnames.size()>1){ //2D histos
-      var=(float)this->get2DBin(m_var,p_vars,vnames,vtypes);
-    } else{
-      if (vtypes.at(0)=="float") var=p_vars[vnames.at(0)].f;
-      if (vtypes.at(0)=="int")   var=p_vars[vnames.at(0)].i;
-    }
+          if (vnames.size()>1){ //2D histos
+            var=(float)this->get2DBin(m_var,p_vars,vnames,vtypes);
+          } else{
+            if (vtypes.at(0)=="float") var=p_vars[vnames.at(0)].f;
+            if (vtypes.at(0)=="int")   var=p_vars[vnames.at(0)].i;
+          }
 
-    if ( DEBUG && jentry<4 && cat==cats.at(0) ){  
-      for (int i=0; i<vnames.size(); i++){ 
-        std::cout << "CreateHistos::run \t vnames_" << i << ": " << flush;
-        std::cout << ((TObjString*) (m_var.Tokenize("|")->At(i)))->String() << " = " << flush;
-        if (vtypes.at(i)=="int")   std::cout << p_vars[vnames.at(i)].i;
-        if (vtypes.at(i)=="float") std::cout << p_vars[vnames.at(i)].f;
-        std::cout << " \t" << flush;
-      }
-      cout << std::endl;
-    }
+          if ( DEBUG && jentry<4 && cat==cats.at(0) ){  
+            for (int i=0; i<vnames.size(); i++){ 
+              std::cout << "CreateHistos::run \t vnames_" << i << ": " << flush;
+              std::cout << ((TObjString*) (m_var.Tokenize("|")->At(i)))->String() << " = " << flush;
+              if (vtypes.at(i)=="int")   std::cout << p_vars[vnames.at(i)].i;
+              if (vtypes.at(i)=="float") std::cout << p_vars[vnames.at(i)].f;
+              std::cout << " \t" << flush;
+            }
+            cout << std::endl;
+          }
 
     //TODO: if you want to impose cuts, do it here - not when selecting variables (e.g. jeta_1)
 
@@ -389,9 +391,6 @@ void CreateHistos::run(){
 
         }//end loop over vars
       }//end loop over cats
-    } catch (const std::bad_alloc& e) {
-        std::cout << "Allocation failed: " << e.what() << '\n';
-    }
     }//end loop over entries
   }//end loop over files
   cout.precision(10);
@@ -451,6 +450,7 @@ int CreateHistos::get2DBin(const TString var,std::map<TString, u> p_vars,std::ve
   bin[1]=this->getBin(val[1],binning2d[var]);
 
   int ret_bin=bin[0]*(binning2d[var].size()-1)+bin[1];
+
   if (DEBUG==2) std::cout << "CreateHistos::get2DBin: var= " << var << " " << binning1d[var].size()-1 << " val 0,1= " << val[0] << " " << val[1] << " BINS 0,1,ret= " << bin[0] << " " << bin[1] << " " << ret_bin << std::endl;
 
   return ret_bin;
