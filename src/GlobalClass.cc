@@ -5,6 +5,7 @@
 #include <sstream>
 #include <TObject.h>
 #include <algorithm>
+#include <bitset>
 
 using namespace std;
 
@@ -57,7 +58,7 @@ int GlobalClass::Baseline(TString sign, TString cat){
       && this->Vetos()
       && this->CategorySelection(cat,sign)
       ){
-      if( sign == "os" || sign == "ss"){
+      if( sign == "os" || sign == "ss"){;
         if(channel != "tt" && NtupleView->byTightIsolationMVArun2v1DBoldDMwLT_2 ) return 1;  
         else return 1;
       }
@@ -84,7 +85,8 @@ int GlobalClass::Baseline(TString sign, TString cat){
 
 int GlobalClass::passMTCut(){
   if( !applyMTCut ) return 1;
-  if( this->getMT() < Analysis["MTCut"]["low"][channel] ) return 1;
+  if( this->getMT() < Analysis["MTCut"]["low"][channel] ) return  -1;
+  if( this->getMT() < Analysis["MTCut"]["high"][channel] ) return 1;
   return 0;
 }
 
@@ -140,6 +142,7 @@ bool GlobalClass::zeroJetCat(){
 }
 bool GlobalClass::boostedCat(){
   int   njet  = this->getNjets();
+
   ////////////////////////////
   if(channel == "et"){
     if(NtupleView->pt_2 < 30 ) return 0;
@@ -340,4 +343,46 @@ void GlobalClass::resetZeroBins(TH1D* hist){
     }
   }
   
+}
+
+map<string, int> GlobalClass::ExperimentalCategorizer(){
+  
+  map<string, int> flags;
+  flags["vetos"] = this->Vetos();
+  if( !flags["vetos"] ) return flags;
+
+  flags["0jet"]    = this->zeroJetCat()  ;
+  flags["vbf"]     = this->vbfCat();
+  flags["boosted"] = this->boostedCat();
+  flags["mtCut"]   = this->passMTCut();
+  flags["sign"]    = NtupleView->q_1 * NtupleView->q_2;
+  flags["iso"]     = this->passIso("base") ;
+
+  return flags;
+
+}
+
+TString GlobalClass::Unmask(map<string, int> flags){
+
+  TString strCat = "";
+  if( !flags["vetos"] ) return "";
+
+  if(flags["0jet"] == 1) strCat = "0jet";
+  else if(flags["vbf"] == 1) strCat = "vbf";
+  else if(flags["boosted"] == 1) strCat = "boosted";
+  else return "";
+
+  if(flags["mtCut"] == 1){
+    strCat += "_wcr";
+    if(flags["sign"] > 0) strCat += "_ss";
+    else if(flags["sign"] < 0) strCat += "_os";
+  }
+  else if(flags["mtCut"] == -1){
+    if(flags["sign"] > 0) strCat += "_qcd_ss";
+  }
+  else return "";
+
+  if(flags["iso"] == 1 ) return strCat;
+  return "";
+
 }

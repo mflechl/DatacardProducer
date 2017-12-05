@@ -34,12 +34,12 @@ class CreateHistos : public SelectionAnalyzer{
   void EstimateFF(TString strVar, TString cat, TString extend="");
   void createInclusive(TString strVar, TString cat);
   float recalcEffweight();
-
+  float getVal(TString m_var);
   void loadFile(TString filename, int isData=0);
   void run();
   void clearHistos();
   void writeHistos(TString channel, vector<TString> cats, vector<TString> vars);
-  int get2DBin(const TString var,std::map<TString, u> p_vars,std::vector<TString> p_names,std::vector<TString> p_types);
+  float get2DBin(const TString var, std::vector<float> val);
   float getUnionVal(u var, TString vartype);
   int getBin(float var, std::vector<double> bins);
   TString getVarName(TString strVar, TString cat, int returnType=0);

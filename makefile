@@ -1,7 +1,7 @@
 CXX=g++  -std=c++11
 INCDIR=.
 ROOTINC=$(shell root-config --incdir)
-ROOTLIB=$(shell root-config --libs)
+ROOTLIB=$(shell root-config --libs ) -lTreePlayer
 
 OBJ=GlobalClass.o FFCalculator.o SelectionAnalyzer.o CreateHistos.o ntuple.o
 FF=../tmp/slc6_amd64_gcc530/src/HTTutilities/Jet2TauFakes/src/HTTutilitiesJet2TauFakes/libHTTutilitiesJet2TauFakes.so

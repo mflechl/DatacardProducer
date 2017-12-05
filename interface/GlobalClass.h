@@ -46,6 +46,8 @@ class GlobalClass{
   TH1D* getBinnedHisto(TString name,vector<double> input1d,vector<double> input2d={}, TString strVar="");
   void resetZeroBins(TString hist, TString var);
   void resetZeroBins(TH1D* hist);
+  map<string, int> ExperimentalCategorizer();
+  TString Unmask(map<string, int> Catkey);
 
   
   map<TString, TH1D*> histograms;

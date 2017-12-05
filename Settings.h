@@ -20,11 +20,11 @@ const vector<TString> vartypes={
 
 //"default" is substitutes according to config/Analysis.json
 const vector<TString> variables={
-  //"default",
+  "default",
   s_mvis
 };
 const vector<TString> vartypes={
-  //"default",
+  "default",
   "float"
 };
 
