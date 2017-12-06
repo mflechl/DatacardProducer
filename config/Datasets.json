@@ -17,6 +17,7 @@
         "TT"            :"BASIS_ntuple_TT_merged_MCSummer16_",
         "W"             :"BASIS_ntuple_WXJets_merged_MCSummer16_",
         "VV"            :"BASIS_ntuple_VV_MCSummer16_",
+        "EWKZ"          :"BASIS_ntuple_EWK_merged_MCSummer16_",
         "WminusH_SM125" :"BASIS_ntuple_WminusHToTauTau_M125_powheg_MCSummer16_",
         "WplusH_SM125"  :"BASIS_ntuple_WplusHToTauTau_M125_powheg_MCSummer16_",
         "ZH_SM125"      :"BASIS_ntuple_ZHToTauTau_M125_powheg_MCSummer16_",

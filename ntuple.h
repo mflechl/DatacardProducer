@@ -193,6 +193,7 @@ public :
    Float_t         sphericity;
    Int_t           nadditionalMu;
    Int_t           trg_singlemuon;
+   Int_t           trg_mutaucross;
    Int_t           trg_singletau;
    Int_t           trg_singleelectron;
    Int_t           trg_doubletau;
@@ -322,6 +323,7 @@ public :
 
    // List of branches
    TBranch        *b_trg_singlemuon;
+   TBranch        *b_trg_mutaucross;
    TBranch        *b_trg_singletau;
    TBranch        *b_trg_singleelectron;
    TBranch        *b_trg_doubletau;
@@ -728,6 +730,7 @@ void ntuple::Init(TTree *tree,int isData_)
    fCurrent = -1;
    fChain->SetMakeClass(1);
    fChain->SetBranchAddress("trg_singlemuon", &trg_singlemuon, &b_trg_singlemuon);
+   fChain->SetBranchAddress("trg_mutaucross", &trg_mutaucross, &b_trg_mutaucross);
    fChain->SetBranchAddress("trg_singletau", &trg_singletau, &b_trg_singletau);
    fChain->SetBranchAddress("trg_singleelectron", &trg_singleelectron, &b_trg_singleelectron);
    fChain->SetBranchAddress("trg_doubletau", &trg_doubletau, &b_trg_doubletau);

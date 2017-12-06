@@ -24,10 +24,8 @@ class CreateHistos : public SelectionAnalyzer{
   int isVVFile(TString fileName); 
   int getFiletype(TString fileName);
 
-  double getQCD_osss(TString cat);
-  double getW_osss(TString strVar, TString cat);
-  double getW_mtHL(TString strVar, TString cat, TString sign);
-  double getW_BtagConv(TString strVar, TString cat, TString cr = "");
+  float getQCD_osss(TString cat);
+  float getW_mtHL(TString strVar, TString cat);
   void Estimate_W_QCD(TString strVar, TString cat, TString extend="");
   void EstimateW(TString strVar, TString cat);
   void EstimateQCD(TString strVar, TString cat);

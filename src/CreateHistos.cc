@@ -54,6 +54,7 @@ CreateHistos::CreateHistos(TString runOption_, TString ch){
                                   s_Z,
                                   s_TT,
                                   s_VV,
+                                  s_EWKZ,
                                   s_SMggH,
                                   s_SMvbf,
                                   s_SMWminus,
@@ -103,8 +104,12 @@ CreateHistos::CreateHistos(TString runOption_, TString ch){
   for(auto var : variables)      vars.push_back(var);
   for(auto cat : categories){
     cats.push_back(cat);
+    cats.push_back( cat + "_qcd_ss" );
+    cats.push_back( cat + "_qcdrel_ss" );
     cats.push_back( cat + "_wcr_os" );
     cats.push_back( cat + "_wcr_ss" );
+    cats.push_back( cat + "_wcrrel_os" );
+    cats.push_back( cat + "_rel_os" );
   }
 }
 
@@ -249,7 +254,7 @@ void CreateHistos::run(){
     this->loadFile(filename,fileindex==0);
     Int_t nentries=0;
     if(runOption == "test" || runOption == "quicktest"){
-      nentries = min( Int_t(NtupleView->fChain->GetEntries()), Int_t( 10000 ) );
+      nentries = min( Int_t(NtupleView->fChain->GetEntries()), Int_t( 100000 ) );
     }else{
       nentries = Int_t(NtupleView->fChain->GetEntries());
     }
@@ -320,7 +325,7 @@ void CreateHistos::run(){
     //     }
     //   }
     // }
-    TString cat = "";
+    std::vector<TString> vcat;
     for (Int_t jentry=0; jentry<nentries;jentry++){
       
 
@@ -336,7 +341,7 @@ void CreateHistos::run(){
 
       //if( !this->SpecialCuts() ) continue;
 
-      if( channel== "mt" && (NtupleView->Flag_badMuons || NtupleView->Flag_duplicateMuons || !(NtupleView->trg_singlemuon) ) ) continue;
+      if( channel== "mt" && (NtupleView->Flag_badMuons || NtupleView->Flag_duplicateMuons || !(NtupleView->trg_singlemuon || NtupleView->trg_mutaucross) ) ) continue;
       if( channel== "et" && ( !NtupleView->trg_singleelectron ) )continue;
       if( channel== "tt" && !NtupleView->trg_doubletau )continue;
 
@@ -355,11 +360,13 @@ void CreateHistos::run(){
       if( fileindex == 1 || fileindex == 6 ) weight *=  NtupleView->zPtReweightWeight;
       if( fileindex == 3 ) weight *= NtupleView->topWeight_run1;
 
+      // Experimental!!!! Categorization is still done in XXSelections a second time.
+      vcat = this->Unmask( this->ExperimentalCategorizer() );
+      for(auto cat : vcat){
 
-      for(auto cat : cats){
+        if(cat == "") continue;
   //        for(auto strVar : vars){
-        // cat = this->Unmask( this->ExperimentalCategorizer() );
-        // if(cat == "") continue;
+
         for(int ind=0; ind<vars.size(); ind++){
 
           TString m_var=this->getVarName(vars.at(ind),cat);
@@ -389,6 +396,7 @@ void CreateHistos::run(){
           //   cout << std::endl;
           // }
     //TODO: if you want to impose cuts, do it here - not when selecting variables (e.g. jeta_1)
+
           if( fileindex == 1 )                this->DYSelections(var, weight, cat, m_var, filetype);
           else if( fileindex == 2 )           this->signalSelections(var, weight, cat, m_var, filetype, mass);
           else if( fileindex == 3 )           this->TSelections(var, weight, cat, m_var, filetype);
@@ -455,12 +463,17 @@ float CreateHistos::getVal(TString m_var){
     if(m_var == "m_vis|decayMode_2") values = { NtupleView->m_vis, (float)NtupleView->decayMode_2 };
     if(m_var == "m_vis|pt_tt")       values = { NtupleView->m_vis, NtupleView->pt_tt };
     if(m_var == "m_vis|mjj")         values = { NtupleView->m_vis, NtupleView->mjj };
+    if(m_var == "m_sv|decayMode_2")  values = { NtupleView->m_sv,  (float)NtupleView->decayMode_2 };
+    if(m_var == "m_sv|pt_tt")        values = { NtupleView->m_sv,  NtupleView->pt_tt };
+    if(m_var == "m_sv|mjj")          values = { NtupleView->m_sv,  NtupleView->mjj };
+
 
     return this->get2DBin(m_var,values);
 
   }
   else{
     if(m_var == "m_vis") return NtupleView->m_vis;
+    if(m_var == "m_sv")  return NtupleView->m_sv;
   }
 
 } 
@@ -860,190 +873,126 @@ void CreateHistos::EstimateFF(TString strVar, TString cat, TString extend){
   //cout << "//////////////////////////////////////" << endl;
 
 }
-double CreateHistos::getQCD_osss(TString cat){
+float CreateHistos::getQCD_osss(TString cat){
   if(channel == "mt"){
-    if(cat.Contains("looseiso")){
-      if(cat.Contains("btag") && !cat.Contains("nobtag") ) return 0.95;
-      if(cat.Contains("nobtag") ) return 1.20;
-      if(cat.Contains("inclusive") ) return 1.19;
-    }
-    else{
-      if(cat.Contains("btag") && !cat.Contains("nobtag") ) return 1.01;
-      if(cat.Contains("nobtag") ) return 1.14;
-      if(cat.Contains("inclusive") ) return 1.10;      
-    }
+    if( cat == "0jet" ) return 1.07;
+    if( cat == "boosted" ) return 1.06;
+    if( cat == "vbf" ) return 1.;
   }
-  if(channel == "et"){
-    if(cat.Contains("looseiso")){
-      if(cat.Contains("btag") && !cat.Contains("nobtag") ) return 0.84;
-      if(cat.Contains("nobtag") ) return 0.97;
-      if(cat.Contains("inclusive") ) return 0.99;
-    }
-    else{
-      if(cat.Contains("btag") && !cat.Contains("nobtag") ) return 1.16;
-      if(cat.Contains("nobtag") ) return 1.11;
-      if(cat.Contains("inclusive") ) return 1.04;      
-    }
+  if(channel == "mt"){
+    if( cat == "0jet" ) return 1.0;
+    if( cat == "boosted" ) return 1.28;
+    if( cat == "vbf" ) return 1.0;
   }
+
 
   return 1.0;
 }
-double CreateHistos::getW_osss(TString strVar, TString cat){
 
-  TString sub = "+" + strVar +"_" + cat+"_wjets_cr+";
-  if(cat.Contains("btag") && !cat.Contains("nobtag") ) sub = "+" + strVar +"_" + cat+"_loosebtag_wjets_cr+";
-  
-  return this->GetHistbyName("OS_incl_"+s_W+sub,strVar)->Integral() / this->GetHistbyName("SS_incl_"+s_W+sub,strVar)->Integral();
-}
-double CreateHistos::getW_mtHL(TString strVar, TString cat, TString sign){
+float CreateHistos::getW_mtHL(TString strVar, TString cat){
   TString sub = "+" + strVar +"_" + cat;
-  if(cat.Contains("btag") && !cat.Contains("nobtag") ) sub = "+" + strVar +"_" + cat+"_loosebtag";
-  if(sign == "OS")  return this->GetHistbyName(s_W+ "_MC"+ sub + "+",strVar)->Integral() / this->GetHistbyName(s_W+ "_MC"+ sub+"_wjets_cr+",strVar)->Integral();
-  if(sign == "SS")  return this->GetHistbyName(s_W+ "_MC"+ sub + "_qcd_cr+",strVar)->Integral() / this->GetHistbyName(s_W+ "_MC"+ sub+"_wjets_ss_cr+",strVar)->Integral();
-}
-double CreateHistos::getW_BtagConv(TString strVar, TString cat, TString cr){
-  TString sub = "+" + strVar +"_" + cat ;
-  return this->GetHistbyName(s_W+ "_MC" + sub + cr + "+",strVar)->Integral() / this->GetHistbyName(s_W+"_MC"+sub + "_loosebtag" + cr + "+",strVar)->Integral();
+  return this->GetHistbyName(s_W+ "_MC"+ sub + "_rel_os+",strVar)->Integral() / this->GetHistbyName(s_W+ "_MC"+ sub+"_wcrrel_os+",strVar)->Integral();
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CreateHistos::EstimateW(TString strVar, TString cat){
-  if(cat.Contains("wjets_cr") || cat.Contains("loosebtag") || cat.Contains("wjets_ss_cr") || cat.Contains("qcd_cr") ) return;
-
-  double R_W = this->getW_osss(strVar, cat);
-  double R_QCD = this->getQCD_osss(cat);
-  double HLExt_OS = this->getW_mtHL(strVar, cat,"OS");
-  double HLExt_SS = this->getW_mtHL(strVar, cat,"SS");
-  double BConv_SR = 1.;
-  double BConv_CR = 1.;
-
-
-
-  TString bt = "";
-  if(cat.Contains("btag") && !cat.Contains("nobtag")){
-    BConv_SR = this->getW_BtagConv(strVar, cat);
-    BConv_CR = this->getW_BtagConv(strVar, cat, "_wjets_cr");
-    bt = "_loosebtag";
-  }
-  TString sub = "+" + strVar +"_" + cat;
-
-  this->GetHistbyName("data_os_obs"+sub+"_wjets_cr+",strVar)->Add( this->GetHistbyName(s_data + sub + bt +"_wjets_cr+",strVar)   );
-  this->GetHistbyName("backgrounds_os"+sub+"_wjets_cr+",strVar)->Add( this->GetHistbyName(s_Z + sub + bt +"_wjets_cr+",strVar) );
-  this->GetHistbyName("backgrounds_os"+sub+"_wjets_cr+",strVar)->Add( this->GetHistbyName(s_EWKZ + sub + bt +"_wjets_cr+",strVar));
-  this->GetHistbyName("backgrounds_os"+sub+"_wjets_cr+",strVar)->Add( this->GetHistbyName(s_VV + sub + bt +"_wjets_cr+",strVar) );
-  this->GetHistbyName("backgrounds_os"+sub+"_wjets_cr+",strVar)->Add( this->GetHistbyName(s_TT + sub + bt +"_wjets_cr+",strVar) );
-
-  this->GetHistbyName("data_ss_obs"+sub+"_wjets_ss_cr+",strVar)->Add( this->GetHistbyName(s_data + sub + bt +"_wjets_ss_cr+",strVar)   );
-  this->GetHistbyName("backgrounds_ss"+sub+"_wjets_ss_cr+",strVar)->Add( this->GetHistbyName(s_Z + sub + bt +"_wjets_ss_cr+",strVar) );
-  this->GetHistbyName("backgrounds_ss"+sub+"_wjets_ss_cr+",strVar)->Add( this->GetHistbyName(s_EWKZ + sub + bt +"_wjets_ss_cr+",strVar));
-  this->GetHistbyName("backgrounds_ss"+sub+"_wjets_ss_cr+",strVar)->Add( this->GetHistbyName(s_VV + sub + bt +"_wjets_ss_cr+",strVar) );
-  this->GetHistbyName("backgrounds_ss"+sub+"_wjets_ss_cr+",strVar)->Add( this->GetHistbyName(s_TT + sub + bt +"_wjets_ss_cr+",strVar) );
-
-  double wjets_ss_cr_norm  = this->GetHistbyName("data_os_obs"+sub+"_wjets_cr+",strVar)->Integral() - this->GetHistbyName("backgrounds_os"+sub+"_wjets_cr+",strVar)->Integral();
-  wjets_ss_cr_norm -= (this->GetHistbyName("data_ss_obs"+sub+"_wjets_ss_cr+",strVar)->Integral() - this->GetHistbyName("backgrounds_ss"+sub+"_wjets_ss_cr+",strVar)->Integral() ) * R_QCD;
-  wjets_ss_cr_norm *= ( 1 /  ( R_W - R_QCD ) );
-
-
-  this->GetHistbyName(s_W+sub+"_wjets_ss_cr+",strVar)->Add( this->GetHistbyName(s_W+"_MC"+sub+"_wjets_ss_cr+",strVar) );
-  this->GetHistbyName(s_W+sub+"_wjets_cr+",strVar)->Add( this->GetHistbyName(s_W +"_MC"+sub+"_wjets_cr+",strVar) );
-  this->GetHistbyName(s_W +sub +"_qcd_cr+",strVar)->Add( this->GetHistbyName(s_W+ "_MC" +sub +"_qcd_cr+",strVar) );
-  this->GetHistbyName(s_W +sub +"+",strVar)->Add( this->GetHistbyName(s_W+ "_MC" +sub +"+",strVar) ); 
-  if(DEBUG && channel != "tt"){
-    cout << "W numbers " << cat << endl;
-    cout << "R_W           "   << R_W << endl;
-    cout << "R_QCD         " << R_QCD << endl;
-    cout << "HLExt_OS      " << HLExt_OS << endl;
-    cout << "HLExt_SS      " << HLExt_SS << endl;
-    cout << "BConv_SR      "<< BConv_SR << endl;
-    cout << "BConv_CR      "<< BConv_CR << endl;
-    cout << "W_SS_CR_norm  "<< wjets_ss_cr_norm << endl;
-    cout << "WSS/W         "<< wjets_ss_cr_norm / this->GetHistbyName(s_W +sub +"+",strVar)->Integral() << endl;
-    cout << "WSS/W_QCD     "<< wjets_ss_cr_norm / this->GetHistbyName(s_W +sub +"_qcd_cr+",strVar)->Integral() << endl;
-    cout << "WSS/WCR       "<< wjets_ss_cr_norm / this->GetHistbyName(s_W+sub+"_wjets_cr+",strVar)->Integral() << endl;
-    cout << "WSS/WSS       "<< wjets_ss_cr_norm / this->GetHistbyName(s_W+sub+"_wjets_ss_cr+",strVar)->Integral() << endl;
-    cout << "data OS       "<< this->GetHistbyName("data_os_obs"+sub+"_wjets_cr+",strVar)->Integral()  << endl;
-    cout << "BG OS         "<< this->GetHistbyName("backgrounds_os"+sub+"_wjets_cr+",strVar)->Integral() << endl;
-    cout << "data SS       "<< this->GetHistbyName("data_ss_obs"+sub+"_wjets_ss_cr+",strVar)->Integral() << endl;
-    cout << "BG SS         "<< this->GetHistbyName("backgrounds_ss"+sub+"_wjets_ss_cr+",strVar)->Integral() << endl;
-    cout << "------" << endl;
-  }
-
-  TString w_FakeShape_up="W_CMS_htt_wFakeShape_13TeVUp";
-  TString w_FakeShape_down="W_CMS_htt_wFakeShape_13TeVDown";
-
-  this->GetHistbyName(w_FakeShape_up +sub+"+",strVar)->Add( this->GetHistbyName(s_W+ "_MC_fakeShapeUp_" +sub +"+",strVar) );
-  this->GetHistbyName(w_FakeShape_down +sub+"+",strVar)->Add( this->GetHistbyName(s_W+ "_MC_fakeShapeDown_" +sub +"+",strVar) );
-
-  if(channel != "tt"){
-    this->GetHistbyName(s_W +sub +"+",strVar)->Scale( (wjets_ss_cr_norm * HLExt_OS * R_W* BConv_SR ) / this->GetHistbyName(s_W +sub +"+",strVar)->Integral() );
-    this->GetHistbyName(s_W +sub +"_qcd_cr+",strVar)->Scale( (wjets_ss_cr_norm * HLExt_SS* BConv_SR) / this->GetHistbyName(s_W +sub +"_qcd_cr+",strVar)->Integral() );
-    this->GetHistbyName(s_W+sub+"_wjets_cr+",strVar)->Scale( (wjets_ss_cr_norm *R_W * BConv_CR) / this->GetHistbyName(s_W+sub+"_wjets_cr+",strVar)->Integral() );
-    this->GetHistbyName(s_W+sub+"_wjets_ss_cr+",strVar)->Scale( (wjets_ss_cr_norm * BConv_CR) / this->GetHistbyName(s_W+sub+"_wjets_ss_cr+",strVar)->Integral() );
-
-    this->GetHistbyName(w_FakeShape_up +sub +"+",strVar)->Scale( (wjets_ss_cr_norm * HLExt_OS * R_W* BConv_SR ) / this->GetHistbyName(w_FakeShape_up +sub +"+",strVar)->Integral() );
-    this->GetHistbyName(w_FakeShape_down +sub +"+",strVar)->Scale( (wjets_ss_cr_norm * HLExt_OS * R_W* BConv_SR ) / this->GetHistbyName(w_FakeShape_down +sub +"+",strVar)->Integral() );
-  }
-}
-
-void CreateHistos::EstimateQCD(TString strVar, TString cat){
-  if(cat.Contains("wjets_cr") || cat.Contains("loosebtag") || cat.Contains("wjets_ss_cr") || cat.Contains("qcd_cr") ) return;
+  if( cat.Contains("wcr") || cat.Contains("rel_") || cat.Contains("qcd") ) return;
   TString sub = "+" + strVar +"_" + cat ;
 
   if(channel != "tt"){
-    TString bt = "";
-    if(cat.Contains("btag") && !cat.Contains("nobtag")) bt = "_loosebtag";
+    float QCD_OSSS_ratio = this->getQCD_osss(cat);
+    float W_HL_ratio = this->getW_mtHL( strVar, cat );
 
-    double CR_QCD_norm = 1.;
+    float QCD_OS_W_norm = this->GetHistbyName(s_data+sub  + "_wcr_ss+",strVar)->Integral();
+    QCD_OS_W_norm -= this->GetHistbyName(s_Z+sub  + "_wcr_ss+",strVar)->Integral();
+    QCD_OS_W_norm -= this->GetHistbyName(s_VV+sub + "_wcr_ss+",strVar)->Integral();
+    QCD_OS_W_norm -= this->GetHistbyName(s_TT+sub + "_wcr_ss+",strVar)->Integral();
 
-    this->GetHistbyName("QCD" + sub +"_qcd_cr+" ,strVar)->Add( this->GetHistbyName(s_data+sub  + "_qcd_cr+",strVar));
-    this->GetHistbyName("QCD" + sub +"_qcd_cr+" ,strVar)->Add( this->GetHistbyName(s_Z+sub  + "_qcd_cr+",strVar), -1);
-    this->GetHistbyName("QCD" + sub +"_qcd_cr+" ,strVar)->Add( this->GetHistbyName(s_VV+sub  + "_qcd_cr+",strVar), -1);
-    this->GetHistbyName("QCD" + sub +"_qcd_cr+" ,strVar)->Add( this->GetHistbyName(s_TT+sub  + "_qcd_cr+",strVar), -1);
-    CR_QCD_norm   = this->GetHistbyName("QCD" + sub +"_qcd_cr+" ,strVar)->Integral();
-    CR_QCD_norm  -= this->GetHistbyName(s_W+sub + "_qcd_cr+",strVar)->Integral();
+    float W_OS_norm = this->GetHistbyName(s_data+sub  + "_wcr_os+",strVar)->Integral();
+    W_OS_norm -= this->GetHistbyName(s_Z+sub  + "_wcr_os+",strVar)->Integral();
+    W_OS_norm -= this->GetHistbyName(s_VV+sub + "_wcr_os+",strVar)->Integral();
+    W_OS_norm -= this->GetHistbyName(s_TT+sub + "_wcr_os+",strVar)->Integral();
 
-    this->GetHistbyName("QCD" + sub +"_qcd_cr+" ,strVar)->Add( this->GetHistbyName(s_W+ "_MC" +sub   + "_qcd_cr+",strVar), -1);
-    this->GetHistbyName("QCD" + sub +"_qcd_cr+" ,strVar)->Scale( CR_QCD_norm / this->GetHistbyName("QCD" + sub +"_qcd_cr+" ,strVar)->Integral() );
+    W_OS_norm -= QCD_OS_W_norm * QCD_OSSS_ratio;
 
-    this->GetHistbyName("QCD"+ sub + "+" ,strVar)->Add( this->GetHistbyName("QCD" + sub +"_qcd_cr+" ,strVar) );
-    this->GetHistbyName("QCD"+ sub + "+" ,strVar)->Scale( this->getQCD_osss(cat) );
+    W_OS_norm *= W_HL_ratio;
 
-    this->GetHistbyName("QCD" + sub +"_wjets_ss_cr+",strVar)->Add( this->GetHistbyName(s_data + sub +"_wjets_ss_cr+",strVar)   );
-    this->GetHistbyName("QCD" + sub +"_wjets_ss_cr+",strVar)->Add( this->GetHistbyName(s_Z + sub +"_wjets_ss_cr+",strVar), -1 );
-    this->GetHistbyName("QCD" + sub +"_wjets_ss_cr+",strVar)->Add( this->GetHistbyName(s_VV + sub +"_wjets_ss_cr+",strVar), -1 );
-    this->GetHistbyName("QCD" + sub +"_wjets_ss_cr+",strVar)->Add( this->GetHistbyName(s_TT + sub +"_wjets_ss_cr+",strVar), -1 );
-    CR_QCD_norm   = this->GetHistbyName("QCD" + sub +"_wjets_ss_cr+" ,strVar)->Integral();
-    CR_QCD_norm  -= this->GetHistbyName(s_W+sub + "_wjets_ss_cr+",strVar)->Integral();
+    this->GetHistbyName("W" + sub +"+" ,strVar)->Add( this->GetHistbyName(s_W+"_MC"+sub  + "_rel_os+",strVar));
+    this->GetHistbyName("W" + sub +"+" ,strVar)->Scale( W_OS_norm / this->GetHistbyName("W" + sub +"+" ,strVar)->Integral() );
 
-    this->GetHistbyName("QCD" + sub +"_wjets_ss_cr+",strVar)->Add( this->GetHistbyName(s_W + "_MC" + sub +"_wjets_ss_cr+",strVar), -1 );
-    this->GetHistbyName("QCD" + sub +"_wjets_ss_cr+" ,strVar)->Scale( CR_QCD_norm / this->GetHistbyName("QCD" + sub +"_wjets_ss_cr+" ,strVar)->Integral() );
-
-    this->GetHistbyName("QCD" + sub +"_wjets_cr+",strVar)->Add( this->GetHistbyName("QCD" + sub +"_wjets_ss_cr+",strVar) );
-    this->GetHistbyName("QCD" + sub +"_wjets_cr+",strVar)->Scale( this->getQCD_osss(cat) );
+    cout <<"QCD OSSS  for: "<< cat<< "  " << QCD_OSSS_ratio << endl;
+    cout <<"W OS norm for: "<< cat<< "  " << W_OS_norm << endl;
+    cout <<"W HL fact for: "<< cat<< "  " <<W_HL_ratio << endl;
   }
-  else {
-    this->GetHistbyName("QCD" + sub +"+" ,strVar)->Add( this->GetHistbyName(s_data+sub  + "_looseTiso+",strVar));
-    this->GetHistbyName("QCD" + sub +"+" ,strVar)->Add( this->GetHistbyName(s_Z+sub  + "_looseTiso+",strVar), -1);
-    //this->GetHistbyName("QCD" + sub +"+" ,strVar)->Add( this->GetHistbyName(s_EWKZ+sub  + "_looseTiso+",strVar), -1);
-    this->GetHistbyName("QCD" + sub +"+" ,strVar)->Add( this->GetHistbyName(s_VV+sub  + "_looseTiso+",strVar), -1);
-    this->GetHistbyName("QCD" + sub +"+" ,strVar)->Add( this->GetHistbyName(s_TT+sub  + "_looseTiso+",strVar), -1);
-    this->GetHistbyName("QCD" + sub +"+" ,strVar)->Add( this->GetHistbyName(s_W+ "_MC" +sub   + "_looseTiso+",strVar), -1);
+  else{
+    this->GetHistbyName("W" + sub +"+" ,strVar)->Add( this->GetHistbyName(s_W+"_MC"+sub  + "+",strVar));
+  }
 
-    double SS_loose = this->GetHistbyName(s_data+sub  + "_looseTiso_qcd_cr+",strVar)->Integral();
-    SS_loose -= this->GetHistbyName(s_Z+sub  + "_looseTiso_qcd_cr+",strVar)->Integral();
-    //SS_loose -= this->GetHistbyName(s_EWKZ+sub  + "_looseTiso_qcd_cr+",strVar)->Integral();
-    SS_loose -= this->GetHistbyName(s_VV+sub  + "_looseTiso_qcd_cr+",strVar)->Integral();
-    SS_loose -= this->GetHistbyName(s_TT+sub  + "_looseTiso_qcd_cr+",strVar)->Integral();
-    SS_loose -= this->GetHistbyName(s_W+ "_MC" +sub   + "_looseTiso_qcd_cr+",strVar)->Integral();
 
-    double SS = this->GetHistbyName(s_data+sub  + "_qcd_cr+",strVar)->Integral();
-    SS -= this->GetHistbyName(s_Z+sub  + "_qcd_cr+",strVar)->Integral();
-    //SS -= this->GetHistbyName(s_EWKZ+sub  + "_qcd_cr+",strVar)->Integral();
-    SS -= this->GetHistbyName(s_VV+sub  + "_qcd_cr+",strVar)->Integral();
-    SS -= this->GetHistbyName(s_TT+sub  + "_qcd_cr+",strVar)->Integral();
-    SS -= this->GetHistbyName(s_W+ "_MC" +sub   + "_qcd_cr+",strVar)->Integral();
 
-    this->GetHistbyName("QCD" + sub +"+" ,strVar)->Scale( SS / SS_loose );    
+}
+
+void CreateHistos::EstimateQCD(TString strVar, TString cat){
+  if( cat.Contains("wcr") || cat.Contains("rel_") || cat.Contains("qcd") ) return;
+  TString sub = "+" + strVar +"_" + cat ;
+
+  if(channel != "tt"){
+    float QCD_OSSS_ratio = this->getQCD_osss(cat);
+    float W_SF = this->GetHistbyName("W" + sub +"+" ,strVar)->Integral() / this->GetHistbyName(s_W+ "_MC"+ sub+"+",strVar)->Integral();
+
+    float QCD_OS_low_norm = this->GetHistbyName(s_data+sub  + "_qcd_ss+",strVar)->Integral();
+    QCD_OS_low_norm -= this->GetHistbyName(s_Z+sub  + "_qcd_ss+",strVar)->Integral();
+    QCD_OS_low_norm -= this->GetHistbyName(s_VV+sub + "_qcd_ss+",strVar)->Integral();
+    QCD_OS_low_norm -= this->GetHistbyName(s_TT+sub + "_qcd_ss+",strVar)->Integral();
+    QCD_OS_low_norm -= this->GetHistbyName(s_W+ "_MC"+sub + "_qcd_ss+",strVar)->Integral() * W_SF;
+
+    QCD_OS_low_norm *= QCD_OSSS_ratio;
+
+    this->GetHistbyName("QCD"+sub  + "+",strVar)->Add( this->GetHistbyName(s_data+sub  + "_qcdrel_ss+",strVar) );
+    this->GetHistbyName("QCD"+sub  + "+",strVar)->Add( this->GetHistbyName(s_Z+sub  + "_qcdrel_ss+",strVar), -1 );
+    this->GetHistbyName("QCD"+sub  + "+",strVar)->Add( this->GetHistbyName(s_VV+sub + "_qcdrel_ss+",strVar), -1 );
+    this->GetHistbyName("QCD"+sub  + "+",strVar)->Add( this->GetHistbyName(s_TT+sub + "_qcdrel_ss+",strVar), -1 );
+
+    this->GetHistbyName(s_W+ "_MC"+sub + "_qcdrel_ss+",strVar)->Scale( W_SF );
+    this->GetHistbyName("QCD"+sub  + "+",strVar)->Add( this->GetHistbyName(s_W+ "_MC"+sub + "_qcdrel_ss+",strVar), -1 );
+
+    this->GetHistbyName("QCD"+sub  + "+",strVar)->Scale( QCD_OS_low_norm / this->GetHistbyName("QCD"+sub  + "+",strVar)->Integral() );
+  }
+  else{
+
+    float QCD_OS_loose = this->GetHistbyName(s_data+sub  + "_rel_os+",strVar)->Integral();
+    QCD_OS_loose -= this->GetHistbyName(s_Z+sub  + "_rel_os+",strVar)->Integral();
+    QCD_OS_loose -= this->GetHistbyName(s_VV+sub + "_rel_os+",strVar)->Integral();
+    QCD_OS_loose -= this->GetHistbyName(s_TT+sub + "_rel_os+",strVar)->Integral();
+    QCD_OS_loose -= this->GetHistbyName(s_W+ "_MC"+sub + "_rel_os+",strVar)->Integral();
+
+    float QCD_SS_loose = this->GetHistbyName(s_data+sub  + "_qcdrel_ss+",strVar)->Integral();
+    QCD_SS_loose -= this->GetHistbyName(s_Z+sub  + "_qcdrel_ss+",strVar)->Integral();
+    QCD_SS_loose -= this->GetHistbyName(s_VV+sub + "_qcdrel_ss+",strVar)->Integral();
+    QCD_SS_loose -= this->GetHistbyName(s_TT+sub + "_qcdrel_ss+",strVar)->Integral();
+    QCD_SS_loose -= this->GetHistbyName(s_W+ "_MC"+sub + "_qcdrel_ss+",strVar)->Integral();
+
+    float QCD_SS = this->GetHistbyName(s_data+sub  + "_qcd_ss+",strVar)->Integral();
+    QCD_SS -= this->GetHistbyName(s_Z+sub  + "_qcd_ss+",strVar)->Integral();
+    QCD_SS -= this->GetHistbyName(s_VV+sub + "_qcd_ss+",strVar)->Integral();
+    QCD_SS -= this->GetHistbyName(s_TT+sub + "_qcd_ss+",strVar)->Integral();
+    QCD_SS -= this->GetHistbyName(s_W+ "_MC"+sub + "_qcd_ss+",strVar)->Integral();
+
+    float QCD_norm = QCD_OS_loose * ( QCD_SS / QCD_SS_loose );
+
+    cout << "QCD_OS_loose: " << QCD_OS_loose << endl;
+    cout << "QCD_SS_loose: " << QCD_SS_loose << endl;
+    cout << "QCD_SS:       " << QCD_SS << endl;
+    cout << "QCD_norm:     " << QCD_norm << endl;
+
+    this->GetHistbyName("QCD"+sub  + "+",strVar)->Add( this->GetHistbyName(s_data+sub  + "_rel_os+",strVar) );
+    this->GetHistbyName("QCD"+sub  + "+",strVar)->Add( this->GetHistbyName(s_Z+sub  + "_rel_os+",strVar), -1 );
+    this->GetHistbyName("QCD"+sub  + "+",strVar)->Add( this->GetHistbyName(s_VV+sub + "_rel_os+",strVar), -1 );
+    this->GetHistbyName("QCD"+sub  + "+",strVar)->Add( this->GetHistbyName(s_TT+sub + "_rel_os+",strVar), -1 );
+    this->GetHistbyName("QCD"+sub  + "+",strVar)->Add( this->GetHistbyName(s_W+ "_MC"+sub + "_rel_os+",strVar), -1 );
+
+    this->GetHistbyName("QCD"+sub  + "+",strVar)->Scale( QCD_norm / this->GetHistbyName("QCD"+sub  + "+",strVar)->Integral() );
+
   }
 
 
@@ -1073,7 +1022,7 @@ void CreateHistos::writeHistos( TString channel, vector<TString> cats, vector<TS
 
   cout << endl;
   for(auto var : vars){
-    cout << "#### " << var << endl;
+    if(DEBUG) cout << "#### " << var << endl;
     TString var_str=var;
     outfile_name << "histos/"<<folder << "/htt_" << channel << ".inputs-mssm-13TeV-"<<var_str.ReplaceAll("|","_vs_")<<subDC<<".root";
     //outfile_name << "histos/htt_" << channel+"_"+UseIso << ".inputs-mssm-13TeV-"<<var<<subDC<<".root";
@@ -1099,7 +1048,7 @@ void CreateHistos::writeHistos( TString channel, vector<TString> cats, vector<TS
       sub = "+" + var_string +"_" + cat + "+";
 
 
-      if (!cat.EndsWith("_cr") ) cout << "  -- " << var_string << "  \t" << cat << endl;
+      //if (!cat.EndsWith("_cr") ) cout << "  -- " << var_string << "  \t" << cat << endl;
 
       for (auto const& name : histograms){
 

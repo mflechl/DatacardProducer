@@ -54,47 +54,71 @@ float GlobalClass::getMT2(){
 
 int GlobalClass::Baseline(TString sign, TString cat){
 
-  if( this->passIso("base") 
+  TString isoType = "base";
+  if( cat.Contains("rel_") ) isoType = "relaxed";
+
+  if( this->passIso( sign,isoType ) 
       && this->Vetos()
       && this->CategorySelection(cat,sign)
-      ){
-      if( sign == "os" || sign == "ss"){;
-        if(channel != "tt" && NtupleView->byTightIsolationMVArun2v1DBoldDMwLT_2 ) return 1;  
-        else return 1;
-      }
-
-      if( sign == "FF" && NtupleView->byVLooseIsolationMVArun2v1DBoldDMwLT_2
-                       && !NtupleView->byTightIsolationMVArun2v1DBoldDMwLT_2
-        )return 1;
-    
-      if( sign == "FF1"
-          && NtupleView->byMediumIsolationMVArun2v1DBoldDMwLT_2
-          && !NtupleView->byMediumIsolationMVArun2v1DBoldDMwLT_1
-          && NtupleView->byVLooseIsolationMVArun2v1DBoldDMwLT_1
-        ) return 1;
-      if( sign == "FF2"
-          && NtupleView->byMediumIsolationMVArun2v1DBoldDMwLT_1
-          && !NtupleView->byMediumIsolationMVArun2v1DBoldDMwLT_2
-          && NtupleView->byVLooseIsolationMVArun2v1DBoldDMwLT_2
-        ) return 1;
-
-  }
-  
+      ){return 1; }
   return 0;
 }
 
 int GlobalClass::passMTCut(){
-  if( !applyMTCut ) return 1;
+
+    // Careful!!! Good return values are -1 and 1. Both are evaluated as true in if-statement
+  if( !applyMTCut ) return -1;
   if( this->getMT() < Analysis["MTCut"]["low"][channel] ) return  -1;
-  if( this->getMT() < Analysis["MTCut"]["high"][channel] ) return 1;
+  if( this->getMT() > Analysis["MTCut"]["high"][channel] ) return 1;
   return 0;
 }
 
-int GlobalClass::passIso(TString type){
-  if(channel == "tt") return 1;
-  if(NtupleView->iso_1 < Analysis["iso"][type.Data()][channel] ) return 1;
+int GlobalClass::passIso(TString sign, TString type){
+
+  if(channel != "tt" && NtupleView->iso_1 > Analysis["iso"][type.Data()][channel] ) return 0;
+
+  if(sign == "os" || sign == "ss"){
+    if(type == "base"){
+      if(channel != "tt" && NtupleView->byTightIsolationMVArun2v1DBoldDMwLT_2 ) return 1;
+      if(channel == "tt" && NtupleView->byTightIsolationMVArun2v1DBoldDMwLT_1
+                         && NtupleView->byTightIsolationMVArun2v1DBoldDMwLT_2 ) return 1; 
+    }
+    if(type == "relaxed"){
+      if(channel != "tt" && NtupleView->byMediumIsolationMVArun2v1DBoldDMwLT_2 ) return 1;
+
+      if(channel == "tt" && ( (NtupleView->byMediumIsolationMVArun2v1DBoldDMwLT_1
+                               && NtupleView->byLooseIsolationMVArun2v1DBoldDMwLT_2
+                               && !NtupleView->byTightIsolationMVArun2v1DBoldDMwLT_2
+                              )
+                              ||(NtupleView->byMediumIsolationMVArun2v1DBoldDMwLT_2 
+                                 && NtupleView->byLooseIsolationMVArun2v1DBoldDMwLT_1 
+                                 && !NtupleView->byTightIsolationMVArun2v1DBoldDMwLT_1
+                                )
+                            ) 
+         ) return 1;
+    }
+  }
+  else if( sign.Contains("FF") ){
+    if( sign == "FF" && NtupleView->byVLooseIsolationMVArun2v1DBoldDMwLT_2
+                     && !NtupleView->byTightIsolationMVArun2v1DBoldDMwLT_2
+      )return 1;
+  
+    if( sign == "FF1"
+        && NtupleView->byMediumIsolationMVArun2v1DBoldDMwLT_2
+        && !NtupleView->byMediumIsolationMVArun2v1DBoldDMwLT_1
+        && NtupleView->byVLooseIsolationMVArun2v1DBoldDMwLT_1
+      ) return 1;
+    if( sign == "FF2"
+        && NtupleView->byMediumIsolationMVArun2v1DBoldDMwLT_1
+        && !NtupleView->byMediumIsolationMVArun2v1DBoldDMwLT_2
+        && NtupleView->byVLooseIsolationMVArun2v1DBoldDMwLT_2
+      ) return 1;
+  }
+
   return 0;
 }
+
+
 
 int GlobalClass::Vetos(){
   if(NtupleView->passesThirdLepVeto){
@@ -118,8 +142,8 @@ int GlobalClass::CategorySelection(TString cat, TString sign){
   ////// mT region
   float mT    = this->getMT();
   if( applyMTCut && channel != "tt" ){
-    if( subcat != "wcr" &&  mT > Analysis["MTCut"]["low"][channel] ) return 0;
-    else if( subcat == "wcr" &&  mT < Analysis["MTCut"]["high"][channel] ) return 0;
+    if( !subcat.Contains("wcr") &&  mT > Analysis["MTCut"]["low"][channel] ) return 0;
+    else if( subcat.Contains("wcr") &&  mT < Analysis["MTCut"]["high"][channel] ) return 0;
   }
   ////// Cat selection
   
@@ -356,33 +380,60 @@ map<string, int> GlobalClass::ExperimentalCategorizer(){
   flags["boosted"] = this->boostedCat();
   flags["mtCut"]   = this->passMTCut();
   flags["sign"]    = NtupleView->q_1 * NtupleView->q_2;
-  flags["iso"]     = this->passIso("base") ;
+  flags["iso"]     = this->passIso("os","base");
+  flags["reliso"]  = this->passIso("os","relaxed");
+  flags["FFiso"]  = this->passIso("FF","relaxed");
+  flags["FF1iso"]  = this->passIso("FF1","relaxed");
+  flags["FF2iso"]  = this->passIso("FF2","relaxed");
+
+  if(DEBUG){
+    for(auto a : flags) cout << a.first << ": " << a.second << " | " ; cout << endl;
+    cout <<"mt: " << this->getMT() <<" |";
+    cout <<"mjj:"<< this->getMjj() <<" |";
+    cout <<"nj: "<< this->getNjets() <<" |";
+    cout <<"ptt:"<< NtupleView->pt_tt <<" |";
+    cout <<"pt1:"<< NtupleView->pt_1 <<" |";
+    cout <<"pt2:"<< NtupleView->pt_2 <<endl;
+  }
 
   return flags;
 
 }
 
-TString GlobalClass::Unmask(map<string, int> flags){
+vector<TString> GlobalClass::Unmask(map<string, int> flags){
 
   TString strCat = "";
-  if( !flags["vetos"] ) return "";
+  vector<TString> vecCat = {};
+
+  if( !flags["vetos"] ) return {""};
 
   if(flags["0jet"] == 1) strCat = "0jet";
   else if(flags["vbf"] == 1) strCat = "vbf";
   else if(flags["boosted"] == 1) strCat = "boosted";
-  else return "";
+  else return {""};
 
-  if(flags["mtCut"] == 1){
-    strCat += "_wcr";
-    if(flags["sign"] > 0) strCat += "_ss";
-    else if(flags["sign"] < 0) strCat += "_os";
+  if( flags["reliso"] ){
+    if( flags["mtCut"] == -1 ){
+      if( flags["sign"] < 0 ) vecCat.push_back( strCat + "_rel_os" );
+      if( flags["sign"] > 0 ) vecCat.push_back( strCat + "_qcdrel_ss" );
+    }
+    if( flags["mtCut"] == 1 ){
+      if( flags["sign"] < 0 ) vecCat.push_back( strCat + "_wcrrel_os" );
+      if( flags["sign"] > 0 ) vecCat.push_back( strCat + "_wcrrel_ss" );
+    } 
   }
-  else if(flags["mtCut"] == -1){
-    if(flags["sign"] > 0) strCat += "_qcd_ss";
+  if( flags["iso"] ){
+    if( flags["mtCut"] == -1 ){
+      if( flags["sign"] < 0 ) vecCat.push_back( strCat );
+      if( flags["sign"] > 0 ) vecCat.push_back( strCat + "_qcd_ss" );
+    }
+    if( flags["mtCut"] == 1 ){
+      if( flags["sign"] < 0 ) vecCat.push_back( strCat + "_wcr_os" );
+      if( flags["sign"] > 0 ) vecCat.push_back( strCat + "_wcr_ss" );
+    } 
   }
-  else return "";
 
-  if(flags["iso"] == 1 ) return strCat;
-  return "";
+  if(vecCat.size() == 0)  return {""};
+  return vecCat;
 
 }

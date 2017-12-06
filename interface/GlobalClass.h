@@ -28,7 +28,7 @@ class GlobalClass{
 
   int Baseline(TString sign, TString cat);
   int passMTCut();
-  int passIso(TString type);
+  int passIso(TString sign,TString type);
   int Vetos();
   int CategorySelection(TString cat, TString sign);
   bool zeroJetCat();
@@ -47,7 +47,7 @@ class GlobalClass{
   void resetZeroBins(TString hist, TString var);
   void resetZeroBins(TH1D* hist);
   map<string, int> ExperimentalCategorizer();
-  TString Unmask(map<string, int> Catkey);
+  vector<TString> Unmask(map<string, int> Catkey);
 
   
   map<TString, TH1D*> histograms;
