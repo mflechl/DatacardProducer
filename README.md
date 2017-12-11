@@ -1,7 +1,7 @@
 ## Setup
 
-    cmsrel CMSSW_9_2_7  
-    cd CMSSW_9_2_7/src/  
+    cmsrel CMSSW_8_0_25  
+    cd CMSSW_8_0_25/src/  
     cmsenv  
     git clone https://github.com/CMS-HTT/Jet2TauFakes.git HTTutilities/Jet2TauFakes  
     mkdir HTTutilities/Jet2TauFakes/data/  
