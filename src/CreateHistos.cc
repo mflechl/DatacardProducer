@@ -52,7 +52,7 @@ CreateHistos::CreateHistos(TString runOption_, TString ch){
                                   s_SMZH };
 
   // Create filepaths mapped to unique identifier for data an MC samples
-  files[s_data].first = this->getFilestring( Datasets["id"][s_data.Data()][channel] );
+  if(!MCC) files[s_data].first = this->getFilestring( Datasets["id"][s_data.Data()][channel] );
   files[s_W].first = this->getFilestring( Datasets["id"][s_W.Data()] );
   for(auto shift : shifts ){
     for( auto sample : bkg_samples ){
@@ -240,13 +240,10 @@ void CreateHistos::run(){
     }else{
       nentries = Int_t(NtupleView->fChain->GetEntries());
     }
-
     if(nentries > 0) cout<< "Contains "+green;
     else cout<< "Contains " + red;
     cout<< left << setw(8) << setfill(' ')  << nentries;
     cout<<endc+" events. File:  "<<bold + filename.ReplaceAll(remFolder,"") + endc<<endl;
-
-    
     // nentries = 1;
     for (Int_t jentry=0; jentry<nentries;jentry++){       
 
@@ -325,13 +322,15 @@ void CreateHistos::run(){
 
           else continue;
 
-          if( fileindex == 1 )                this->DYSelections(var, weight, cat, strVar, filetype);
-          else if( fileindex == 2 )           this->signalSelections(var, weight, cat, strVar, filetype, mass);
-          else if( fileindex == 3 )           this->TSelections(var, weight, cat, strVar, filetype);
-          else if( fileindex == 4 )           this->WSelections(var, weight, cat, strVar, filetype);             
-          else if( fileindex == 5 )           this->VVSelections(var, weight, cat, strVar, filetype);                 
-          else if( fileindex == 6 )           this->EWKZSelections(var, weight, cat, strVar, filetype);       
-          else if( filetype == s_data )       this->dataSelections(var, weight_data, cat, strVar, filetype);
+          if( fileindex == 1 )                       this->DYSelections(var, weight, cat, strVar, filetype);
+          else if( fileindex == 2 )                  this->signalSelections(var, weight, cat, strVar, filetype, mass);
+          else if( fileindex == 3 )                  this->TSelections(var, weight, cat, strVar, filetype);
+          else if( fileindex == 4 )                  this->WSelections(var, weight, cat, strVar, filetype);             
+          else if( fileindex == 5 )                  this->VVSelections(var, weight, cat, strVar, filetype);                 
+          else if( fileindex == 6 )                  this->EWKZSelections(var, weight, cat, strVar, filetype);       
+          else if( filetype == s_data && !MCC)       this->dataSelections(var, weight_data, cat, strVar, filetype);
+          if(MCC && fileindex != 2) this->dataSelections(var, weight, cat, strVar, s_data);
+          
 
         }
       }

@@ -18,7 +18,8 @@ void FFCalculator::initFakeFactors(){
     FFfile[cat] = TFile::Open("HTTutilities/Jet2TauFakes/data/"+channel+"/"+catSuffix+"/"+FFversion);
     FFObj[cat] = (FakeFactor*)FFfile[cat]->Get("ff_comb");
   }
-  FFsyst["mt"] = Parameter.FFsystematics.mt.syst;
+  if(!MCC) FFsyst["mt"] = Parameter.FFsystematics.mt.syst;
+  else FFsyst["mt"] = Parameter.FFsystematics.mt.systMCC;
   FFsyst["et"] = Parameter.FFsystematics.et.syst;
   FFsyst["tt"] = Parameter.FFsystematics.tt.syst;
 }

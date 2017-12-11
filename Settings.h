@@ -12,6 +12,7 @@ const int resetZero=0;
 const int doInitialize=1;
 // calculate Fake Factor templates 
 const int calcFF=1;
+const int MCC = 1;
 
 // Used for Debugging. Keep histograms in final root file
 const int keepDebugHistos=0;
